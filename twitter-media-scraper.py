@@ -5,6 +5,8 @@ headers = {}
 host_url = 'https://api.twitter.com/1.1/guest/activate.json'
 api_url = 'https://api.twitter.com/2/timeline/conversation/{}.json?include_entities=false&include_user_entities=false&tweet_mode=extended'
 authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+dl_path = 'twitter_download'
+log_path = 'twitter_log'
 p_tw_link = re.compile(r'status/(\d+)')
 p_media_link = re.compile(r"(https://pbs.twimg.com/media/.+?)'")
 s = requests.Session()
@@ -48,13 +50,22 @@ def get_media_link(page_id):
 
 
 def download_media(links):
+    if not os.path.exists(dl_path):
+        os.mkdir(dl_path)
     for link in links:
         filename = link.replace('https://pbs.twimg.com/media/', '')
-        print('正在下载: '+filename)
+        prog_text = '\r正在下载: {}'.format(filename) + ' ...{}'
+        print(prog_text.format('0%'), end="")
         r = s.get(link+'?name=orig', proxies=proxy, stream=True)
-        with open('./download/'+filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
+        dl_size = 0
+        content_size = int(r.headers['content-length'])
+        with open('./{}/{}'.format(dl_path, filename), 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024*2):
                 f.write(chunk)
+                dl_size += len(chunk)
+                prog = '{}%'.format(int(round(dl_size/content_size, 2)*100))
+                print(prog_text.format(prog), end="")
+        print(prog_text.format('下载完成'))
         time.sleep(1)
 
 
@@ -95,15 +106,13 @@ def start_crawl():
 
 
 def write_log(page_id, page_content):
-    if not os.path.exists('log'):
-        os.mkdir("log")
-    with open('./log/{}.txt'.format(page_id), 'w', encoding='utf-8') as f:
+    if not os.path.exists(log_path):
+        os.mkdir(log_path)
+    with open('./{}/{}.txt'.format(log_path, page_id), 'w', encoding='utf-8') as f:
         f.write(page_content)
 
 
 def main():
-    if not os.path.exists('download'):
-        os.mkdir("download")
     get_proxy()
     set_header()
     start_crawl()
@@ -115,7 +124,7 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         if 'WinError 10060' in str(e):
-            print('连接twitter.com超时，请检查系统代理')
+            print('连接twitter.com超时，请检查代理设置')
         else:
             traceback.print_exc()
             print(e)
