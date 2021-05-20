@@ -16,6 +16,7 @@
 
 1. 支持cmd传参调用
 2. 支持爬取视频/动图文件
-3. 支持linux平台
+3. 支持遍历爬取推主所有媒体
+4. 支持linux平台
 
 <a href="https://sm.ms/image/wvPBc4mgVy9aCxo" target="_blank"><img src="https://i.loli.net/2020/08/13/wvPBc4mgVy9aCxo.png" ></a>
