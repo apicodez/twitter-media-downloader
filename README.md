@@ -19,5 +19,6 @@
 3. 支持遍历爬取推主所有媒体
 4. 下载进度显示
 5. 支持linux平台
+6. 支持手动设置UA和代理
 
 <a href="https://sm.ms/image/wvPBc4mgVy9aCxo" target="_blank"><img src="https://i.loli.net/2020/08/13/wvPBc4mgVy9aCxo.png" ></a>
