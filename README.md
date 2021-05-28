@@ -17,8 +17,9 @@ PS:
 1. 支持cmd传参调用
 2. 支持爬取视频/动图文件
 3. 支持遍历爬取推主所有媒体
-4. 下载进度显示
+4. ~~下载进度显示~~ (完成)
 5. 支持linux平台
 6. 支持手动设置UA和代理
+7. 支持设置cookie用于爬取锁推
 
 <a href="https://sm.ms/image/wvPBc4mgVy9aCxo" target="_blank"><img src="https://i.loli.net/2020/08/13/wvPBc4mgVy9aCxo.png" ></a>
