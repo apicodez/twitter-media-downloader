@@ -22,8 +22,9 @@ dl_path = 'twitter_scraper_download'
 log_path = 'twitter_scraper_log'
 p_proxy = re.compile(r'.+?:(\d+)$')
 p_user_id = re.compile(r'"rest_id":"(\d+)"')
+p_tw_id = re.compile(r'conversation_id_str":"(\d+)')
 p_user_media_count = re.compile(r'"media_count":(\d+),')
-p_user_link = re.compile(r'https://twitter.com/([^/]+)$')
+p_user_link = re.compile(r'https://twitter.com/([^/]+?)(?:/media)?$')
 p_tw_link = re.compile(r'https://twitter.com/.+?/status/(\d+)')
 p_pic_link = re.compile(r'''(https://pbs.twimg.com/media/(.+?))['"]''')
 p_gif_link = re.compile(r'(https://video.twimg.com/tweet_video/(.+?\.mp4))')
@@ -31,6 +32,7 @@ p_vid_link = re.compile(r'(https://video.twimg.com/ext_tw_video/(\d+)/pu/vid/(\d
 issue_page = 'https://github.com/mengzonefire/twitter-media-scraper/issues'
 api_warning = '提取失败: 接口访问错误, 请检查log文件, 并前往issue页反馈:\n{}'
 nothing_warning = '提取失败: 该推文不含媒体内容, 若包含, 请到issue页反馈:\n{}'
+user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{}'
 s = requests.Session()
 
 description = \
@@ -38,7 +40,7 @@ description = \
     1. https://twitter.com/***/status/***
     2. https://t.co/*** (tweets short url)
     3. https://twitter.com/*** 
-    (user page url, *** is userid, will gather all media of user's tweets)
+    # 3. is user page, *** is user_id, will gather all media of user's tweets)
     '''
 # usage info
 parser = argparse.ArgumentParser(description=description)
@@ -74,7 +76,7 @@ def set_header():
         exit()
 
 
-def match_media_link(tw_content):
+def match_media_link(tw_content, page_id):
     link_dict = {}
 
     # get pic links
@@ -82,34 +84,34 @@ def match_media_link(tw_content):
     # get [(media_url, file_name)], add query '?name=orig' can get original pic file
     if pic_links:
         for pic_link in pic_links:
-            link_dict[pic_link[1]] = pic_link[0] + '?name=orig'
+            file_name = '{}_{}'.format(page_id, pic_link[1])
+            link_dict[file_name] = pic_link[0] + '?name=orig'
+        return link_dict
 
     # get gif links(.mp4)
     gif_links = p_gif_link.findall(tw_content)
     # get [(media_url, file_name)]
     if gif_links:
         for gif_link in gif_links:
-            link_dict[gif_link[1]] = gif_link[0]
+            file_name = '{}_{}'.format(page_id, gif_link[1])
+            link_dict[file_name] = gif_link[0]
+        return link_dict
 
     # get video links(.mp4)
     vid_links = p_vid_link.findall(tw_content)
     # [(media_url, resolution, file_name)]
     if vid_links:
-        best_choices = {}
+        best_choice = {'resolution': 0, 'file_name': None, 'url': None}
         # choose largest resolution
         for vid_link in vid_links:
             resolution = eval(vid_link[2].replace('x', '*'))
-            if vid_link[1] not in best_choices:
-                best_choices[vid_link[1]] = {'resolution': 0, 'file_name': None, 'url': None}
-            if resolution > best_choices[vid_link[1]]['resolution']:
-                best_choices[vid_link[1]]['resolution'] = resolution
-                best_choices[vid_link[1]]['file_name'] = vid_link[3]
-                best_choices[vid_link[1]]['url'] = vid_link[0]
-        for vid_id in best_choices:
-            link_dict[best_choices[vid_id]['file_name']] = best_choices[vid_id]['url']
+            if resolution > best_choice['resolution']:
+                best_choice['resolution'] = resolution
+                best_choice['file_name'] = vid_link[3]
+                best_choice['url'] = vid_link[0]
+        file_name = '{}_{}'.format(page_id, best_choice['file_name'])
+        link_dict[file_name] = best_choice['url']
 
-    if not link_dict:
-        print(nothing_warning.format(issue_page))
     # get [file_name: media_url] as link_dict
     return link_dict
 
@@ -120,7 +122,10 @@ def get_page_media_link(page_id):
         tw_content = str(json.loads(page_content)['globalObjects']['tweets'][page_id])
         # debug
         # print(tw_content)
-        return match_media_link(tw_content)
+        media_links = match_media_link(tw_content, page_id)
+        if not media_links:
+            print(nothing_warning.format(issue_page))
+        return media_links
     else:
         if 'Sorry, that page does not exist' in page_content:
             print('提取失败: 该推文已删除/不存在')
@@ -130,7 +135,9 @@ def get_page_media_link(page_id):
         return None
 
 
-def download_media(link, file_name):
+def download_media(link, file_name, save_path=''):
+    if not save_path:
+        save_path = dl_path
     prog_text = '\r正在下载: {}'.format(file_name) + ' ...{}'
     print(prog_text.format('0%'), end="")
     r = s.get(link, proxies=proxy, stream=True)
@@ -140,7 +147,7 @@ def download_media(link, file_name):
         content_size = int(r.headers['content-length'])
     elif 'Content-Length' in r.headers:
         content_size = int(r.headers['Content-Length'])
-    with open('./{}/{}'.format(dl_path, file_name), 'wb') as f:
+    with open('./{}/{}'.format(save_path, file_name), 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024 * 2):
             f.write(chunk)
             if content_size:
@@ -178,8 +185,13 @@ def start_crawl(page_urls):
                 continue
             user_media_links = get_user_media_link(user_id, media_count)
             if user_media_links:
+                save_path = dl_path + '/{}'.format(user_name)
+                if not os.path.exists(save_path):
+                    os.mkdir(save_path)
                 for file_name in user_media_links:
-                    download_media(user_media_links[file_name], file_name)
+                    download_media(user_media_links[file_name], file_name, save_path)
+            else:
+                print(nothing_warning.format(issue_page))
             continue
 
         # convert short url to normal
@@ -202,9 +214,14 @@ def start_crawl(page_urls):
 
 
 def get_user_media_link(user_id, media_count):
+    link_dict = {}
     page_content = s.get(media_api_url.format(
         quote(media_api_par.format(user_id, media_count))), proxies=proxy, headers=headers).text
-    link_dict = match_media_link(page_content)
+    page_id_list = p_tw_id.findall(page_content)
+    content_split = page_content.split('conversation_id_str')
+    page_id_dict = dict(zip(page_id_list, content_split[1:]))
+    for page_id in page_id_dict:
+        link_dict = dict(link_dict, **match_media_link(page_id_dict[page_id], page_id))
     return link_dict
 
 
@@ -216,7 +233,7 @@ def get_user_info(user_name):
     if user_id:
         user_id = user_id[0]
     else:
-        print(api_warning.format(issue_page))
+        print(user_warning.format(issue_page))
         write_log(user_name, page_content)
         return None, None
     if media_count:
@@ -274,12 +291,12 @@ def main():
     args_handler()
 
 
-def except_handler(e):
-    if 'Connection' in str(e):
+def except_handler(err):
+    if 'Connection' in str(err):
         print('网络连接超时, 请检查代理设置')
     else:
         traceback.print_exc()
-        write_log('crash', str(e))
+        write_log('crash', str(err))
     if input('回车键退出, 输入任意内容重置脚本\n'):
         main()
 
