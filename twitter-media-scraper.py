@@ -23,7 +23,7 @@ log_path = 'twitter_scraper_log'
 p_proxy = re.compile(r'.+?:(\d+)$')
 p_user_id = re.compile(r'"rest_id":"(\d+)"')
 p_user_media_count = re.compile(r'"media_count":(\d+),')
-p_user_link = re.compile(r'https://twitter.com/([^/]+)')
+p_user_link = re.compile(r'https://twitter.com/([^/]+)$')
 p_tw_link = re.compile(r'https://twitter.com/.+?/status/(\d+)')
 p_pic_link = re.compile(r'''(https://pbs.twimg.com/media/(.+?))['"]''')
 p_gif_link = re.compile(r'(https://video.twimg.com/tweet_video/(.+?\.mp4))')
@@ -190,7 +190,7 @@ def start_crawl(page_urls):
         if page_id:
             page_id = page_id[0]
         else:
-            print('提取失败: 错误的推文链接')
+            print('提取失败: 错误的推文/推主主页链接')
             continue
         media_links = get_page_media_link(page_id)
         if media_links:
