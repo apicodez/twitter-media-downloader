@@ -1,4 +1,5 @@
 import winreg, traceback, requests, re, os, time, json, argparse
+from argparse import RawTextHelpFormatter
 from urllib.parse import quote
 
 version = '1.1'
@@ -36,19 +37,18 @@ user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页�
 s = requests.Session()
 
 description = \
-    '''[urls] argument must be like:
+    '''[url] argument must be like:
     1. https://twitter.com/***/status/***
     2. https://t.co/*** (tweets short url)
-    3. https://twitter.com/*** 
-    # 3. is user page, *** is user_id, will gather all media of user's tweets)
-    '''
+    3. https://twitter.com/*** (user page, *** is user_id)
+    # 3. will gather all media files of user's tweets'''
 # usage info
-parser = argparse.ArgumentParser(description=description)
+parser = argparse.ArgumentParser(description=description, formatter_class=RawTextHelpFormatter)
 parser.add_argument('-c', '--cookie', dest='cookie', type=str,  help='set cookie to access locked tweets')
 parser.add_argument('-p', '--proxy', dest='proxy', type=str, help='set network proxy, must be http proxy')
 parser.add_argument('-u', '--user_agent', dest='user_agent', type=str, help='set user-agent')
-parser.add_argument('--version', '-v', action='store_true', help='show version')
-parser.add_argument('urls', type=str, nargs='*', help='twitter url to gather media')
+parser.add_argument('-v', '--version', action='store_true', help='show version')
+parser.add_argument('url', type=str, nargs='*', help='twitter url to gather media')
 args = parser.parse_args()
 
 
@@ -257,7 +257,8 @@ def write_log(log_name, log_content):
 def args_handler():
     global UA, cookie
     if args.version:
-        print('version {}'.format(version))
+        print('version: {}\nissue page: {}'.format(version, issue_page))
+        return
     if args.proxy:
         set_proxy(args.proxy)
     else:
@@ -268,7 +269,7 @@ def args_handler():
         UA = args.user_agent
     set_header()
     save_env()
-    start_crawl(args.urls)
+    start_crawl(args.url)
 
 
 def save_env():
@@ -286,8 +287,6 @@ def set_proxy(proxy_str):
 
 
 def main():
-    # debug
-    # print(args.urls)
     args_handler()
 
 
