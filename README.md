@@ -1,5 +1,5 @@
 # twitter-media-downloader
-用于提取推特页面中包含的媒体数据（支持图片, 视频, 动图）的脚本  
+用于下载推特页面中包含的媒体文件（支持图片, 视频, 动图）的脚本  
 <br/>
 
 支持输入如下三种格式的链接:
@@ -14,6 +14,33 @@ PS:
 3. 默认使用系统代理，无需配置 (仅win平台, 其余平台请手动设置)
 4. 爬取视频文件时, 会自动选择最高分辨率下载
 5. 若提取出现任何问题，请反馈log文件  
+
+# 使用方法
+usage: python3 twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
+                                   [-t TWEET_ID] [-d DIR] [-v]
+                                   [url [url ...]]
+
+[url] argument must be like:
+    1. https://twitter.com/***/status/***
+    2. https://t.co/*** (tweets short url)
+    3. https://twitter.com/*** (user page, *** is user_id)
+    # 3. will gather all media files of user's tweets
+
+positional arguments:
+  url                   twitter url to gather media
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c COOKIE, --cookie COOKIE
+                        set cookie to access locked tweets
+  -p PROXY, --proxy PROXY
+                        set network proxy, must be http proxy
+  -u USER_AGENT, --user_agent USER_AGENT
+                        set user-agent
+  -t TWEET_ID, --tweet_id TWEET_ID
+                        convert tweet_id to tweet_url
+  -d DIR, --dir DIR     set download path
+  -v, --version         show version
 
 # TODO (待实现需求)  
 1. ~~支持cmd传参调用~~ (完成)
