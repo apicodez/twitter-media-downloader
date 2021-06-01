@@ -19,8 +19,8 @@ user_api_url = 'https://twitter.com/i/api/graphql/Vf8si2dfZ1zmah8ePYPjDQ/UserByS
 user_api_par = '{{"screen_name":"{}","withHighlightedLabel":false}}'
 authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs" \
                 "%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA "
-dl_path = 'twitter_media_download'
-log_path = 'media_downloader_log'
+dl_path = './twitter_media_download'
+log_path = './media_downloader_log'
 p_proxy = re.compile(r'.+?:(\d+)$')
 p_user_id = re.compile(r'"rest_id":"(\d+)"')
 p_tw_id = re.compile(r'conversation_id_str":"(\d+)')
@@ -118,12 +118,22 @@ def match_media_link(tw_content, page_id):
     return link_dict
 
 
-def get_page_media_link(page_id):
+def get_page_media_link(page_id, get_url=False):
     page_content = s.get(api_url.format(page_id), proxies=proxy, headers=headers).text
     if '"{}":'.format(page_id) in page_content:
         tw_content = str(json.loads(page_content)['globalObjects']['tweets'][page_id])
         # debug
         # print(tw_content)
+
+        # convert tweet_id to tweet_url
+        if get_url:
+            tw_link = p_tw_link.search(tw_content)
+            if tw_link:
+                return tw_link.group()
+            else:
+                print(api_warning.format(issue_page))
+                return None
+
         media_links = match_media_link(tw_content, page_id)
         if not media_links:
             print(nothing_warning.format(issue_page))
@@ -149,7 +159,7 @@ def download_media(link, file_name, save_path=''):
         content_size = int(r.headers['content-length'])
     elif 'Content-Length' in r.headers:
         content_size = int(r.headers['Content-Length'])
-    with open('./{}/{}'.format(save_path, file_name), 'wb') as f:
+    with open('{}/{}'.format(save_path, file_name), 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024 * 2):
             f.write(chunk)
             if content_size:
@@ -250,14 +260,14 @@ def get_user_info(user_name):
 def write_log(log_name, log_content):
     if not os.path.exists(log_path):
         os.mkdir(log_path)
-    file_path = './{}/{}.txt'.format(log_path, log_name)
+    file_path = '{}/{}.txt'.format(log_path, log_name)
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(log_content)
         print('log文件已保存到{}'.format(file_path))
 
 
 def args_handler():
-    global UA, cookie
+    global UA, cookie, dl_path
     if args.version:
         print('version: {}\nissue page: {}'.format(version, issue_page))
         return
@@ -269,8 +279,15 @@ def args_handler():
         cookie = args.cookie
     if args.user_agent:
         UA = args.user_agent
+    if args.dir:
+        dl_path = args.dir
     set_header()
     save_env()
+    if args.tweet_id:
+        tw_link = get_page_media_link(args.tweet_id, True)
+        if tw_link:
+            print(tw_link)
+        return
     start_crawl(args.url)
 
 
