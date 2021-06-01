@@ -16,31 +16,33 @@ PS:
 5. 若提取出现任何问题，请反馈log文件  
 
 # 使用方法
-usage: python3 twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
-                                   [-t TWEET_ID] [-d DIR] [-v]
-                                   [url [url ...]]
 
-[url] argument must be like:
-    1. https://twitter.com/***/status/***
-    2. https://t.co/*** (tweets short url)
-    3. https://twitter.com/*** (user page, *** is user_id)
-    # 3. will gather all media files of user's tweets
+    usage: python3 twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
+                                       [-t TWEET_ID] [-d DIR] [-v]
+                                       [url [url ...]]
 
-positional arguments:
-  url                   twitter url to gather media
+    [url] argument must be like:
+        1. https://twitter.com/***/status/***
+        2. https://t.co/*** (tweets short url)
+        3. https://twitter.com/*** (user page, *** is user_id)
+        # 3. will gather all media files of user's tweets
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -c COOKIE, --cookie COOKIE
-                        set cookie to access locked tweets
-  -p PROXY, --proxy PROXY
-                        set network proxy, must be http proxy
-  -u USER_AGENT, --user_agent USER_AGENT
-                        set user-agent
-  -t TWEET_ID, --tweet_id TWEET_ID
-                        convert tweet_id to tweet_url
-  -d DIR, --dir DIR     set download path
-  -v, --version         show version
+    positional arguments:
+      url                   twitter url to gather media
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -c COOKIE, --cookie COOKIE
+                            set cookie to access locked tweets
+      -p PROXY, --proxy PROXY
+                            set network proxy, must be http proxy
+      -u USER_AGENT, --user_agent USER_AGENT
+                            set user-agent
+      -t TWEET_ID, --tweet_id TWEET_ID
+                            convert tweet_id to tweet_url
+      -d DIR, --dir DIR     set download path
+      -v, --version         show version
+
 
 # TODO (待实现需求)  
 1. ~~支持cmd传参调用~~ (完成)
