@@ -2,7 +2,7 @@ import winreg, traceback, requests, re, os, time, json, argparse
 from argparse import RawTextHelpFormatter
 from urllib.parse import quote
 
-version = '1.1'
+version = '1.1.0'
 UA = None
 cookie = None
 proxy = {}
