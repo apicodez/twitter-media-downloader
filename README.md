@@ -1,4 +1,4 @@
-# twitter-media-scraper
+# twitter-media-downloader
 用于提取推特页面中包含的媒体数据（支持图片, 视频, 动图）的脚本  
 <br/>
 
@@ -9,7 +9,7 @@
 <br/>
 
 PS:    
-1. 获取到的媒体文件自动下载到路径下的twitter_scraper_download文件夹  
+1. 获取到的媒体文件自动下载到路径下的twitter_media_download文件夹  
 2. 已知单条推文仅可能出现4张以内的图片或1个动图/视频
 3. 默认使用系统代理，无需配置 (仅win平台, 其余平台请手动设置)
 4. 爬取视频文件时, 会自动选择最高分辨率下载
