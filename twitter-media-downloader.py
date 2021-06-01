@@ -47,6 +47,8 @@ parser = argparse.ArgumentParser(description=description, formatter_class=RawTex
 parser.add_argument('-c', '--cookie', dest='cookie', type=str,  help='set cookie to access locked tweets')
 parser.add_argument('-p', '--proxy', dest='proxy', type=str, help='set network proxy, must be http proxy')
 parser.add_argument('-u', '--user_agent', dest='user_agent', type=str, help='set user-agent')
+parser.add_argument('-t', '--tweet_id', dest='tweet_id', type=str, help='convert tweet_id to tweet_url')
+parser.add_argument('-d', '--dir', dest='dir', type=str, help='set download path')
 parser.add_argument('-v', '--version', action='store_true', help='show version')
 parser.add_argument('url', type=str, nargs='*', help='twitter url to gather media')
 args = parser.parse_args()
