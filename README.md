@@ -35,7 +35,7 @@ PS:
     optional arguments:
       -h, --help            show this help message and exit
       -c COOKIE, --cookie COOKIE
-                            set cookie to access locked tweets
+                            set cookie to access locked users or tweets
       -p PROXY, --proxy PROXY
                             set network proxy, must be http proxy
       -u USER_AGENT, --user_agent USER_AGENT
