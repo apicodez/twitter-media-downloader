@@ -1,9 +1,10 @@
-import winreg, traceback, requests, os, time, json, argparse
+import traceback, requests, os, time, json, argparse, sys
 from argparse import RawTextHelpFormatter
 from urllib.parse import quote
 from const import *
 from warning import *
-
+if sys.platform in ['win32', 'win64']:
+    import winreg
 proxy = {}
 headers = {'Cookie': ''}
 dl_path = './twitter_media_download'
@@ -268,12 +269,15 @@ def args_handler():
         return
     if args.proxy:
         set_proxy(args.proxy)
-    else:
+    elif sys.platform in ['win32', 'win64']:
         get_proxy()
     if args.cookie:
+        if args.cookie[-1] == ';':
+            print(cookie_para_warning)
+            return
         headers['Cookie'] = args.cookie
         csrf_token = p_csrf_token.findall(args.cookie)
-        if csrf_token or 'auth_token' not in args.cookie:
+        if csrf_token and 'auth_token' in args.cookie:
             headers['x-csrf-token'] = csrf_token[0]
         else:
             print(cookie_warning)

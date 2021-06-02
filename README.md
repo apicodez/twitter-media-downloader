@@ -19,6 +19,15 @@ PS:
 
 # 使用方法
 
+直接运行程序:  
+运行后根据提示输入推文/推主链接即可.
+
+    python3 twitter-media-downloader.py
+
+<img src="https://i.loli.net/2020/08/13/wvPBc4mgVy9aCxo.png" ></a>
+
+命令行调用:
+
     usage: python3 twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
                                        [-t TWEET_ID] [-d DIR] [-v]
                                        [url [url ...]]
