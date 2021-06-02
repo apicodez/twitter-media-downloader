@@ -70,4 +70,5 @@ PS:
 13. 提供语言设置(中/英), 翻译warning文本和readme页面
 14. 设置UA/代理后, 自动保存到配置文件, 下次运行程序自动读取设置
 
+批量下载:  
 <img src="https://pic.rmb.bdstatic.com/bjh/e7bb8983c155712b6175e99f9f66ff35.png">
