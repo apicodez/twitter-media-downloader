@@ -3,7 +3,7 @@ issue_page = 'https://github.com/mengzonefire/twitter-media-downloader/issues'
 cookie_tips_page = 'https://git.io/how_to_get_cookies_cn'
 
 # warning str
-api_warning = '提取失败: 接口访问错误, 请检查log文件, 并前往issue页反馈:\n{}'.format(issue_page)
+api_warning = '提取失败: 解析失败, 请检查log, 并前往issue页反馈:\n{}'.format(issue_page)
 nothing_warning = '提取失败: 该推文不含媒体内容, 若包含, 请到issue页反馈:\n{}'.format(issue_page)
 user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{}'.format(issue_page)
 token_warning = '运行失败: guest_token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
@@ -16,10 +16,17 @@ tweet_unavailable_warning = '提取失败: 该推文的用户已锁定/冻结, �
 network_error_warning = '网络连接失败, 请检查代理设置'
 wrong_url_warning = '提取失败: 错误的推文/推主主页链接'
 not_exist_warning = '提取失败: 该推文已删除/不存在'
+tw_id_waring = '格式错误: 推文id必须为纯数字串'
+input_warning = '解析失败: 错误的链接或命令'
 
 # normal str
+input_cookie_ask = '请复制cookie并粘贴到此处, 再单击回车确认\n'
+input_tw_id_ask = '请输入推文id(支持批量, 空格分隔), 再单击回车确认\n'
 rest_ask = '单击回车键->退出程序, 输入任意内容+回车->重置脚本\n'
 continue_ask = '单击回车键->退出程序, 输入任意内容+回车->继续提取\n'
-input_ask = '请输入链接(支持批量, 一行一条, 双击回车确认):'
+input_ask = '请输入1.或2.\n' \
+            '1. 命令: "set cookie" 或 "convert id" (不输入双引号, 单击回车确认)\n' \
+            '# "set cookie"用于设置cookie, "convert id"用于转换推文id为推文链接\n' \
+            '2. 推文/推主链接 (支持批量, 一行一条, 双击回车确认):'
 exit_ask = '\n单击回车键退出程序\n'
 

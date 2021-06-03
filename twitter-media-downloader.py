@@ -5,27 +5,28 @@ from const import *
 from warning import *
 if sys.platform in ['win32', 'win64']:
     import winreg
+
 proxy = {}
 headers = {'Cookie': ''}
 dl_path = './twitter_media_download'
 log_path = './media_downloader_log'
 s = requests.Session()
 
-description = \
-    '''[url] argument must be like:
+# usage info
+url_args_help = \
+    '''tw url to gather media, must be like:
     1. https://twitter.com/***/status/***
     2. https://t.co/*** (tweets short url)
     3. https://twitter.com/*** (user page, *** is user_id)
     # 3. will gather all media files of user's tweets'''
-# usage info
-parser = argparse.ArgumentParser(description=description, formatter_class=RawTextHelpFormatter)
+parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument('-c', '--cookie', dest='cookie', type=str,  help='set cookie to access locked users or tweets')
 parser.add_argument('-p', '--proxy', dest='proxy', type=str, help='set network proxy, must be http proxy')
 parser.add_argument('-u', '--user_agent', dest='user_agent', type=str, help='set user-agent')
-parser.add_argument('-t', '--tweet_id', dest='tweet_id', type=str, help='convert tweet_id to tweet_url')
+parser.add_argument('-t', '--tweet_id', dest='tweet_id', type=str, nargs='*', help='convert tweet_id to tweet_url')
 parser.add_argument('-d', '--dir', dest='dir', type=str, help='set download path')
 parser.add_argument('-v', '--version', action='store_true', help='show version')
-parser.add_argument('url', type=str, nargs='*', help='twitter url to gather media')
+parser.add_argument('url', type=str, nargs='*', help=url_args_help)
 args = parser.parse_args()
 
 
@@ -111,6 +112,7 @@ def get_page_media_link(page_id, get_url=False):
                 return tw_link.group()
             else:
                 print(api_warning)
+                write_log(page_id, tw_content)
                 return None
 
         media_links = match_media_link(tw_content, page_id)
@@ -158,17 +160,6 @@ def start_crawl(page_urls):
     if not os.path.exists(dl_path):
         os.mkdir(dl_path)
 
-    input_flag = False
-    if not page_urls:
-        input_flag = True
-        print(input_ask)
-        while True:
-            temp = input()
-            if not temp:
-                break
-            if '//t.co/' in temp or '//twitter.com/' in temp:
-                page_urls.append(temp)
-
     for page_url in page_urls:
         print('\n正在提取: {}'.format(page_url))
 
@@ -205,9 +196,6 @@ def start_crawl(page_urls):
         if media_links:
             for file_name in media_links:
                 download_media(media_links[file_name], file_name)
-
-    if input_flag and input(continue_ask):
-        start_crawl([])
 
 
 def get_user_media_link(user_id, media_count):
@@ -267,37 +255,87 @@ def args_handler():
     if args.version:
         print('version: {}\nissue page: {}'.format(version, issue_page))
         return
+
+    # env args
     if args.proxy:
         set_proxy(args.proxy)
     elif sys.platform in ['win32', 'win64']:
         get_proxy()
     if args.cookie:
-        if args.cookie[-1] == ';':
-            print(cookie_para_warning)
-            return
-        headers['Cookie'] = args.cookie
-        csrf_token = p_csrf_token.findall(args.cookie)
-        if csrf_token and 'auth_token' in args.cookie:
-            headers['x-csrf-token'] = csrf_token[0]
-        else:
-            print(cookie_warning)
+        if not check_cookie(args.cookie):
             return
     if args.user_agent:
         headers['User-Agent'] = args.user_agent
     if args.dir:
         dl_path = args.dir
+
+    # api operate part
     set_header()
     save_env()
     if args.tweet_id:
-        tw_link = get_page_media_link(args.tweet_id, True)
-        if tw_link:
-            print(tw_link)
+        convert_id2url(args.tweet_id)
         return
     start_crawl(args.url)
 
 
+def convert_id2url(tweet_ids):
+    pattern = re.compile(r'\d+')
+    for tweet_id in tweet_ids:
+        if not pattern.match(tweet_id):
+            print(tw_id_waring)
+            continue
+        tw_link = get_page_media_link(tweet_id, True)
+        if tw_link:
+            print(tw_link)
+
+
+def check_cookie(cookie):
+    if cookie[-1] == ';':
+        print(cookie_para_warning)
+        return False
+    headers['Cookie'] = cookie
+    csrf_token = p_csrf_token.findall(cookie)
+    if csrf_token and 'auth_token' in cookie:
+        headers['x-csrf-token'] = csrf_token[0]
+        print()
+        return True
+    else:
+        print(cookie_warning)
+        return False
+
+
 def save_env():
     pass
+
+
+def cmd_mode():
+    page_urls = []
+    while True:
+        temp = input()
+        if not temp:
+            break
+        if '//t.co/' in temp or '//twitter.com/' in temp:
+            page_urls.append(temp)
+        else:
+            cmd_command(temp)
+            return
+    if page_urls:
+        start_crawl(page_urls)
+    else:
+        print()
+
+    if input(continue_ask):
+        cmd_mode()
+
+
+def cmd_command(command):
+    if command == 'set cookie':
+        check_cookie(input(input_cookie_ask))
+    elif command == 'convert id':
+        convert_id2url(input(input_tw_id_ask).split(' '))
+    else:
+        print(input_warning)
+    cmd_mode()
 
 
 def set_proxy(proxy_str):
@@ -312,7 +350,13 @@ def set_proxy(proxy_str):
 
 
 def main():
-    args_handler()
+    if len(sys.argv) == 1:
+        print('version: {}\nissue page: {}'.format(version, issue_page))
+        set_header()
+        print('\n' + input_ask)
+        cmd_mode()
+    else:
+        args_handler()
 
 
 def except_handler(err):
