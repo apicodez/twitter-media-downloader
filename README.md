@@ -24,7 +24,7 @@ PS:
 
     python3 twitter-media-downloader.py
 
-<img src="https://i.loli.net/2020/08/13/wvPBc4mgVy9aCxo.png" ></a>
+<img src="https://i.loli.net/2020/08/13/wvPBc4mgVy9aCxo.png">
 
 命令行调用:
 
