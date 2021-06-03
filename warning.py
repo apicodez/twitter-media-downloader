@@ -1,6 +1,6 @@
 # external page url
 issue_page = 'https://github.com/mengzonefire/twitter-media-downloader/issues'
-cookie_tips_page = 'https://github.com/mengzonefire/some_tips/blob/master/how_to_get_cookies.cn.md'
+cookie_tips_page = 'https://git.io/how_to_get_cookies_cn'
 
 # warning str
 api_warning = '提取失败: 接口访问错误, 请检查log文件, 并前往issue页反馈:\n{}'.format(issue_page)
