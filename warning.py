@@ -1,13 +1,13 @@
 # external page url
 issue_page = 'https://github.com/mengzonefire/twitter-media-downloader/issues'
-cookie_tips_page = ''
+cookie_tips_page = 'https://github.com/mengzonefire/some_tips/blob/master/how_to_get_cookies.cn.md'
 
 # warning str
 api_warning = '提取失败: 接口访问错误, 请检查log文件, 并前往issue页反馈:\n{}'.format(issue_page)
 nothing_warning = '提取失败: 该推文不含媒体内容, 若包含, 请到issue页反馈:\n{}'.format(issue_page)
 user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{}'.format(issue_page)
 token_warning = '运行失败: guest_token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
-cookie_warning = '参数错误: 输入的cookie格式错误, 请参考教程获取cookie:{}'.format(cookie_tips_page)
+cookie_warning = '参数错误: 输入的cookie格式错误, 请参考教程获取cookie:\n{}'.format(cookie_tips_page)
 cookie_para_warning = '参数错误: 请使用一对双引号" "包含全部cookie'
 http_warning = '提取失败: http访问异常, 状态码: {}, 请前往issue页反馈:\n{}'
 proxy_warning = '参数错误: 代理格式错误, 格式: [ip/域名]:[端口], 示例: 127.0.0.1:7890'
