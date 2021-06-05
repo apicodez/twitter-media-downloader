@@ -1,4 +1,4 @@
-import traceback, requests, os, time, json, argparse, sys
+import traceback, requests, os, time, json, argparse, sys, configparser
 from argparse import RawTextHelpFormatter
 from urllib.parse import quote
 from const import *
@@ -11,6 +11,9 @@ headers = {'Cookie': ''}
 dl_path = './twitter_media_download'
 log_path = './media_downloader_log'
 s = requests.Session()
+
+conf = configparser.RawConfigParser()
+conf_path = os.path.expanduser('~') + '/tw_media_downloader.conf'
 
 # usage info
 url_args_help = \
@@ -271,7 +274,6 @@ def args_handler():
 
     # api operate part
     set_header()
-    save_env()
     if args.tweet_id:
         convert_id2url(args.tweet_id)
         return
@@ -297,7 +299,7 @@ def check_cookie(cookie):
     csrf_token = p_csrf_token.findall(cookie)
     if csrf_token and 'auth_token' in cookie:
         headers['x-csrf-token'] = csrf_token[0]
-        print()
+        print(cookie_success)
         return True
     else:
         print(cookie_warning)
@@ -305,7 +307,36 @@ def check_cookie(cookie):
 
 
 def save_env():
-    pass
+    conf.read(conf_path)
+    if 'global' not in conf.sections():
+        conf.add_section('global')
+    if args.proxy:
+        conf.set("global", "proxy", args.proxy)
+    if args.dir:
+        conf.set("global", "download_path", args.dir)
+    if args.user_agent:
+        conf.set("global", "user-agent", args.user_agent)
+    if headers['Cookie']:
+        conf.set("global", "cookie", headers['Cookie'])
+    conf.write(open(conf_path, 'w'))
+
+
+def set_env():
+    global dl_path
+    if os.path.exists(conf_path):
+        conf.read(conf_path)
+        if 'global' not in conf.sections():
+            return
+        items = conf.items('global')
+        for item in items:
+            if item[0] == 'cookie':
+                check_cookie(item[1])
+            elif item[0] == 'user-agent':
+                headers['User-Agent'] = item[1]
+            elif item[0] == 'proxy':
+                set_proxy(item[1])
+            elif item[0] == 'download_path':
+                dl_path = item[1]
 
 
 def cmd_mode():
@@ -329,7 +360,9 @@ def cmd_mode():
 
 
 def cmd_command(command):
-    if command == 'set cookie':
+    if command == 'exit':
+        return
+    elif command == 'set cookie':
         check_cookie(input(input_cookie_ask))
     elif command == 'convert id':
         convert_id2url(input(input_tw_id_ask).split(' '))
@@ -346,17 +379,20 @@ def set_proxy(proxy_str):
         print('代理设置为: {}'.format(proxy_str))
     else:
         print(proxy_warning)
-        exit()
 
 
 def main():
+    set_env()
     if len(sys.argv) == 1:
         print('version: {}\nissue page: {}'.format(version, issue_page))
+        if sys.platform in ['win32', 'win64']:
+            get_proxy()
         set_header()
         print('\n' + input_ask)
         cmd_mode()
     else:
         args_handler()
+    save_env()
 
 
 def except_handler(err):

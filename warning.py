@@ -20,13 +20,14 @@ tw_id_waring = '格式错误: 推文id必须为纯数字串'
 input_warning = '解析失败: 错误的链接或命令'
 
 # normal str
+cookie_success = '自定义cookie导入成功'
 input_cookie_ask = '请复制cookie并粘贴到此处, 再单击回车确认\n'
 input_tw_id_ask = '请输入推文id(支持批量, 空格分隔), 再单击回车确认\n'
 rest_ask = '单击回车键->退出程序, 输入任意内容+回车->重置脚本\n'
 continue_ask = '单击回车键->退出程序, 输入任意内容+回车->继续提取\n'
 input_ask = '请输入1.或2.\n' \
-            '1. 命令: "set cookie" 或 "convert id" (不输入双引号, 单击回车确认)\n' \
-            '# "set cookie"用于设置cookie, "convert id"用于转换推文id为推文链接\n' \
+            '1. 命令: "exit"、"set cookie" 或 "convert id" (不输入双引号, 单击回车确认)\n' \
+            '# "exit"退出程序, "set cookie"用于设置cookie, "convert id"用于转换推文id为推文链接\n' \
             '2. 推文/推主链接 (支持批量, 一行一条, 双击回车确认):'
 exit_ask = '\n单击回车键退出程序\n'
 
