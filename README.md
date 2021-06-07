@@ -62,7 +62,9 @@
 # dev note 开发记录
 1. 关于TODO#15: 原本想通过程序内subprocess.run再调用的方式传参, 实现交互模式(即无参直接运行脚本)的参数输入,
    但考虑到实际需要的参数并不多, 为不影响脚本的上手门槛, 遂放弃此方案, 现版本交互模式仅支持设置cookie和转换id的命令
-   (个人认为这两个比较常用)
+   (个人认为这两个比较常用)  
+2. ~~发现有个同名的插件, 而且还更好用, 本项目停止开发.~~  
+(插件地址: https://chrome.google.com/webstore/detail/twitter-media-downloader/cblpjenafgeohmnjknfhpdbdljfkndig/related)
 
 <br/>
 
