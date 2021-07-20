@@ -64,6 +64,7 @@
    但考虑到实际需要的参数并不多, 为不影响脚本的上手门槛, 遂放弃此方案, 现版本交互模式仅支持设置cookie和转换id的命令
    (个人认为这两个比较常用)  
 2. ~~发现有个同名的插件, 而且还更好用, 故本项目停止开发.~~ (发现自己的脚本还是有点优势的, 继续开发吧)
+
 (插件地址: https://chrome.google.com/webstore/detail/twitter-media-downloader/cblpjenafgeohmnjknfhpdbdljfkndig)
 
 <br/>
