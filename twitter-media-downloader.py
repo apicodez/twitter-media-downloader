@@ -352,10 +352,9 @@ def cmd_mode():
             return
     if page_urls:
         start_crawl(page_urls)
-    else:
-        print()
 
     if input(continue_ask):
+        print(continue_msg)
         cmd_mode()
 
 
@@ -402,6 +401,10 @@ def except_handler(err):
         traceback.print_exc()
         write_log('crash', str(err))
     if input(rest_ask):
+        if sys.platform in ['win32', 'win64']:
+            os.system('cls')
+        else:
+            os.system('clear')
         main()
 
 

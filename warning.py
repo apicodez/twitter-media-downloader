@@ -25,6 +25,7 @@ input_cookie_ask = '请复制cookie并粘贴到此处, 再单击回车确认\n'
 input_tw_id_ask = '请输入推文id(支持批量, 空格分隔), 再单击回车确认\n'
 rest_ask = '单击回车键->退出程序, 输入任意内容+回车->重置脚本\n'
 continue_ask = '单击回车键->退出程序, 输入任意内容+回车->继续提取\n'
+continue_msg = '请继续输入内容:\n'
 input_ask = '请输入1.或2.\n' \
             '1. 命令: "exit"、"set cookie" 或 "convert id" (不输入双引号, 单击回车确认)\n' \
             '# "exit"退出程序, "set cookie"用于设置cookie, "convert id"用于转换推文id为推文链接\n' \
