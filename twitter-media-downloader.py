@@ -100,7 +100,7 @@ def match_media_link(tw_content, page_id):
 def get_page_media_link(page_id, get_url=False):
     response = s.get(api_url.format(page_id), proxies=proxy, headers=headers)
     if response.status_code != 200:
-        print(http_warning.format(response.status_code, issue_page))
+        print(http_warning.format('get_page_media_link', response.status_code, issue_page))
         return None
     page_content = response.text
     # debug
@@ -140,7 +140,7 @@ def download_media(link, file_name, save_path=''):
     print(prog_text.format('0%'), end="")
     response = s.get(link, proxies=proxy, stream=True)
     if response.status_code != 200:
-        print(http_warning.format(response.status_code, issue_page))
+        print(http_warning.format('download_media', response.status_code, issue_page))
         return
     dl_size = 0
     content_size = 0
@@ -206,7 +206,7 @@ def get_user_media_link(user_id, media_count):
     response = s.get(media_api_url.format(
         quote(media_api_par.format(user_id, media_count))), proxies=proxy, headers=headers)
     if response.status_code != 200:
-        print(http_warning.format(response.status_code, issue_page))
+        print(http_warning.format('get_user_media_link', response.status_code, issue_page))
         return 'error'
     page_content = response.text
     if 'UserUnavailable' in page_content:
@@ -224,7 +224,7 @@ def get_user_info(user_name):
     response = s.get(user_api_url.format(
         quote(user_api_par.format(user_name))), proxies=proxy, headers=headers)
     if response.status_code != 200:
-        print(http_warning.format(response.status_code, issue_page))
+        print(http_warning.format('get_user_info', response.status_code, issue_page))
         return None, None
     page_content = response.text
     user_id = p_user_id.findall(page_content)

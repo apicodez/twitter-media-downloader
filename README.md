@@ -63,7 +63,7 @@
 1. 关于TODO#15: 原本想通过程序内subprocess.run再调用的方式传参, 实现交互模式(即无参直接运行脚本)的参数输入,
    但考虑到实际需要的参数并不多, 为不影响脚本的上手门槛, 遂放弃此方案, 现版本交互模式仅支持设置cookie和转换id的命令
    (个人认为这两个比较常用)  
-2. ~~发现有个同名的插件, 而且还更好用, 故本项目停止开发.~~  
+2. ~~发现有个同名的插件, 而且还更好用, 故本项目停止开发.~~ (发现自己的脚本还是有点优势的, 继续开发吧)
 (插件地址: https://chrome.google.com/webstore/detail/twitter-media-downloader/cblpjenafgeohmnjknfhpdbdljfkndig)
 
 <br/>
@@ -83,6 +83,7 @@
 13. 提供语言设置(中/英), 翻译warning文本和readme页面
 14. ~~退出时保存UA/代理/cookie到配置文件, 下次运行程序自动读取设置~~ (完成)
 15. ~~在直接运行程序的交互模式下加入cookie,下载路径,代理的设置命令~~ (完成)
+16. 添加自动更新功能
 
 批量下载:  
 <img src="https://pic.rmb.bdstatic.com/bjh/e7bb8983c155712b6175e99f9f66ff35.png">

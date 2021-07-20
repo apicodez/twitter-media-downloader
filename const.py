@@ -1,18 +1,19 @@
 import re
 
-version = '1.1.0'
+version = '1.1.1'
 
 # api url
 host_url = 'https://api.twitter.com/1.1/guest/activate.json'
 api_url = 'https://api.twitter.com/2/timeline/conversation/{' \
           '}.json?include_entities=false&include_user_entities=false&tweet_mode=extended'
-media_api_url = 'https://twitter.com/i/api/graphql/ep3EdGK189uKvABB-8uIlQ/UserMedia?variables={}'
+media_api_url = 'https://twitter.com/i/api/graphql/OBcjbNAUqhXAWVk2kCWQ8Q/UserMedia?variables={}'
 
 # api parameter
-media_api_par = '{{"userId":"{}","count":{},"withHighlightedLabel":false,' \
-                '"withTweetQuoteCount":false,"includePromotedContent":false,"withTweetResult":false,' \
-                '"withReactions":false,"withUserResults":false,"withClientEventToken":false,' \
-                '"withBirdwatchNotes":false,"withBirdwatchPivots":false,"withVoice":false,"withNonLegacyCard":false}}'
+media_api_par = '{{"userId":"{}","count":{},"withHighlightedLabel":false,"withTweetQuoteCount":false,' \
+                '"includePromotedContent":false,"withTweetResult":false,"withReactions":false,' \
+                '"withSuperFollowsTweetFields":false,"withSuperFollowsUserFields":false,"withUserResults":false,' \
+                '"withClientEventToken":false,"withBirdwatchNotes":false,"withBirdwatchPivots":false,' \
+                '"withVoice":false}} '
 user_api_url = 'https://twitter.com/i/api/graphql/Vf8si2dfZ1zmah8ePYPjDQ/UserByScreenNameWithoutResults?variables={}'
 user_api_par = '{{"screen_name":"{}","withHighlightedLabel":false}}'
 

@@ -1,8 +1,2 @@
-
-.idea/workspace.xml
-.idea/vcs.xml
-.idea/twitter-media-scraper.iml
-.idea/modules.xml
-.idea/misc.xml
-.idea/inspectionProfiles/Project_Default.xml
-.idea/inspectionProfiles/profiles_settings.xml
+__pycache__
+.idea
