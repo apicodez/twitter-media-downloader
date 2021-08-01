@@ -399,7 +399,7 @@ def except_handler(err):
         print(network_error_warning)
     else:
         traceback.print_exc()
-        write_log('crash', str(err))
+        write_log('crash', traceback.format_exc())
     if input(rest_ask):
         if sys.platform in ['win32', 'win64']:
             os.system('cls')

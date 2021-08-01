@@ -22,7 +22,7 @@ authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4p
                 "%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
 # re pattern
-p_csrf_token = re.compile(r'ct0=(.+?);')
+p_csrf_token = re.compile(r'ct0=(.+?);?$')
 p_proxy = re.compile(r'.+?:(\d+)$')
 p_user_id = re.compile(r'"rest_id":"(\d+)"')
 p_tw_id = re.compile(r'conversation_id_str":"(\d+)')
