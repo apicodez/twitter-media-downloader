@@ -65,7 +65,7 @@
    (个人认为这两个比较常用)  
 2. ~~发现有个同名的插件, 而且还更好用, 故本项目停止开发.~~ (发现自己的脚本还是有点优势的, 继续开发吧)
 
-(插件地址: https://chrome.google.com/webstore/detail/twitter-media-downloader/cblpjenafgeohmnjknfhpdbdljfkndig)
+    (插件地址: https://chrome.google.com/webstore/detail/twitter-media-downloader/cblpjenafgeohmnjknfhpdbdljfkndig)
 
 <br/>
 
