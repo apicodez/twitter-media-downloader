@@ -1,4 +1,11 @@
-import traceback, requests, os, time, json, argparse, sys, configparser
+import traceback
+import requests
+import os
+import time
+import json
+import argparse
+import sys
+import configparser
 from argparse import RawTextHelpFormatter
 from urllib.parse import quote
 from const import *
@@ -23,23 +30,29 @@ url_args_help = \
     3. https://twitter.com/*** (user page, *** is user_id)
     # 3. will gather all media files of user's tweets'''
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
-parser.add_argument('-c', '--cookie', dest='cookie', type=str,  help='set cookie to access locked users or tweets')
-parser.add_argument('-p', '--proxy', dest='proxy', type=str, help='set network proxy, must be http proxy')
-parser.add_argument('-u', '--user_agent', dest='user_agent', type=str, help='set user-agent')
-parser.add_argument('-t', '--tweet_id', dest='tweet_id', type=str, nargs='*', help='convert tweet_id to tweet_url')
-parser.add_argument('-d', '--dir', dest='dir', type=str, help='set download path')
-parser.add_argument('-v', '--version', action='store_true', help='show version')
+parser.add_argument('-c', '--cookie', dest='cookie', type=str,
+                    help='set cookie to access locked users or tweets')
+parser.add_argument('-p', '--proxy', dest='proxy', type=str,
+                    help='set network proxy, must be http proxy')
+parser.add_argument('-u', '--user_agent', dest='user_agent',
+                    type=str, help='set user-agent')
+parser.add_argument('-d', '--dir', dest='dir',
+                    type=str, help='set download path')
+parser.add_argument('-v', '--version', action='store_true',
+                    help='show version')
 parser.add_argument('url', type=str, nargs='*', help=url_args_help)
 args = parser.parse_args()
 
 
 def get_proxy():
     global proxy
-    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
+    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
     proxy_enable, key_type = winreg.QueryValueEx(key, "ProxyEnable")
     if proxy_enable:
         proxy_server, key_type = winreg.QueryValueEx(key, "ProxyServer")
-        proxy = {'http': 'http://'+proxy_server, 'https': 'https://'+proxy_server}
+        proxy = {'http': 'http://'+proxy_server,
+                 'https': 'https://'+proxy_server}
 
 
 def set_header():
@@ -100,13 +113,15 @@ def match_media_link(tw_content, page_id):
 def get_page_media_link(page_id, get_url=False):
     response = s.get(api_url.format(page_id), proxies=proxy, headers=headers)
     if response.status_code != 200:
-        print(http_warning.format('get_page_media_link', response.status_code, issue_page))
+        print(http_warning.format('get_page_media_link',
+              response.status_code, issue_page))
         return None
     page_content = response.text
     # debug
     # print(page_content)
     if '"{}":'.format(page_id) in page_content:
-        tw_content = str(json.loads(page_content)['globalObjects']['tweets'][page_id])
+        tw_content = str(json.loads(page_content)[
+                         'globalObjects']['tweets'][page_id])
 
         # convert tweet_id to tweet_url
         if get_url:
@@ -134,13 +149,18 @@ def get_page_media_link(page_id, get_url=False):
 
 
 def download_media(link, file_name, save_path=''):
+    prog_text = '\r正在下载: {}'.format(file_name) + ' ...{}'
     if not save_path:
         save_path = dl_path
-    prog_text = '\r正在下载: {}'.format(file_name) + ' ...{}'
+    filePath = '{}/{}'.format(save_path, file_name)
+    if os.path.join(filePath):
+        print(prog_text.format('文件已存在'))
+        return
     print(prog_text.format('0%'), end="")
     response = s.get(link, proxies=proxy, stream=True)
     if response.status_code != 200:
-        print(http_warning.format('download_media', response.status_code, issue_page))
+        print(http_warning.format('download_media',
+              response.status_code, issue_page))
         return
     dl_size = 0
     content_size = 0
@@ -148,12 +168,13 @@ def download_media(link, file_name, save_path=''):
         content_size = int(response.headers['content-length'])
     elif 'Content-Length' in response.headers:
         content_size = int(response.headers['Content-Length'])
-    with open('{}/{}'.format(save_path, file_name), 'wb') as f:
+    with open(filePath, 'wb') as f:
         for chunk in response.iter_content(chunk_size=1024 * 2):
             f.write(chunk)
             if content_size:
                 dl_size += len(chunk)
-                prog = '{}%'.format(int(round(dl_size / content_size, 2) * 100))
+                prog = '{}%'.format(
+                    int(round(dl_size / content_size, 2) * 100))
                 print(prog_text.format(prog), end="")
     print(prog_text.format('下载完成'))
     time.sleep(1)
@@ -180,7 +201,8 @@ def start_crawl(page_urls):
                     if not os.path.exists(save_path):
                         os.mkdir(save_path)
                     for file_name in user_media_links:
-                        download_media(user_media_links[file_name], file_name, save_path)
+                        download_media(
+                            user_media_links[file_name], file_name, save_path)
             else:
                 print(nothing_warning)
             continue
@@ -206,7 +228,8 @@ def get_user_media_link(user_id, media_count):
     response = s.get(media_api_url.format(
         quote(media_api_par.format(user_id, media_count))), proxies=proxy, headers=headers)
     if response.status_code != 200:
-        print(http_warning.format('get_user_media_link', response.status_code, issue_page))
+        print(http_warning.format('get_user_media_link',
+              response.status_code, issue_page))
         return 'error'
     page_content = response.text
     if 'UserUnavailable' in page_content:
@@ -216,7 +239,8 @@ def get_user_media_link(user_id, media_count):
     content_split = page_content.split('conversation_id_str')
     page_id_dict = dict(zip(page_id_list, content_split[1:]))
     for page_id in page_id_dict:
-        link_dict = dict(link_dict, **match_media_link(page_id_dict[page_id], page_id))
+        link_dict = dict(
+            link_dict, **match_media_link(page_id_dict[page_id], page_id))
     return link_dict
 
 
@@ -224,7 +248,8 @@ def get_user_info(user_name):
     response = s.get(user_api_url.format(
         quote(user_api_par.format(user_name))), proxies=proxy, headers=headers)
     if response.status_code != 200:
-        print(http_warning.format('get_user_info', response.status_code, issue_page))
+        print(http_warning.format('get_user_info',
+              response.status_code, issue_page))
         return None, None
     page_content = response.text
     user_id = p_user_id.findall(page_content)
@@ -272,23 +297,8 @@ def args_handler():
     if args.dir:
         dl_path = args.dir
 
-    # api operate part
     set_header()
-    if args.tweet_id:
-        convert_id2url(args.tweet_id)
-        return
     start_crawl(args.url)
-
-
-def convert_id2url(tweet_ids):
-    pattern = re.compile(r'\d+')
-    for tweet_id in tweet_ids:
-        if not pattern.match(tweet_id):
-            print(tw_id_waring)
-            continue
-        tw_link = get_page_media_link(tweet_id, True)
-        if tw_link:
-            print(tw_link)
 
 
 def check_cookie(cookie):
@@ -363,8 +373,6 @@ def cmd_command(command):
         return
     elif command == 'set cookie':
         check_cookie(input(input_cookie_ask))
-    elif command == 'convert id':
-        convert_id2url(input(input_tw_id_ask).split(' '))
     else:
         print(input_warning)
     cmd_mode()
@@ -374,7 +382,8 @@ def set_proxy(proxy_str):
     global proxy
     proxy_match = p_proxy.match(proxy_str)
     if proxy_match and 1024 <= int(proxy_match.group(1)) <= 65535:
-        proxy = {'http': 'http://' + proxy_str, 'https': 'https://' + proxy_str}
+        proxy = {'http': 'http://' + proxy_str,
+                 'https': 'https://' + proxy_str}
         print('代理设置为: {}'.format(proxy_str))
     else:
         print(proxy_warning)
