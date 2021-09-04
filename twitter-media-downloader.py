@@ -153,7 +153,7 @@ def download_media(link, file_name, save_path=''):
     if not save_path:
         save_path = dl_path
     filePath = '{}/{}'.format(save_path, file_name)
-    if os.path.join(filePath):
+    if os.path.exists(filePath):
         print(prog_text.format('文件已存在'))
         return
     print(prog_text.format('0%'), end="")
