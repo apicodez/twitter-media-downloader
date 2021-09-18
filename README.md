@@ -10,6 +10,9 @@
 
 <br/>
 
+# donate 赞助
+作者开发维护不易, 若喜欢本项目, 欢迎前往 [爱发电](https://afdian.net/@mengzonefire) 支持作者
+
 # tips 提示  
 1. 获取到的媒体文件自动下载到路径下的twitter_media_download文件夹  
 2. 锁定的推主/推文必须设置cookie才能爬取, 设置完成后, 正常退出程序(exit命令)可自动保存cookie
