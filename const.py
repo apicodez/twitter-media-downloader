@@ -1,6 +1,6 @@
 import re
 
-version = '1.1.1-dev'
+version = '1.1.1'
 
 # api url
 host_url = 'https://api.twitter.com/1.1/guest/activate.json'
