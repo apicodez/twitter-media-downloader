@@ -60,7 +60,8 @@ def set_header():
     headers['authorization'] = authorization
     if headers['Cookie']:
         return
-    response = s.post(host_url, proxies=proxy, headers=headers).json()
+    response = s.post(host_url, proxies=proxy,
+                      headers=headers, timeout=5).json()
     if 'guest_token' in response:
         x_guest_token = response['guest_token']
         headers['x-guest-token'] = x_guest_token
@@ -232,6 +233,8 @@ def get_user_media_link(user_id, media_count):
               response.status_code, issue_page))
         return 'error'
     page_content = response.text
+    # debug
+    # print(page_content)
     if 'UserUnavailable' in page_content:
         print(user_unavailable_warning)
         return 'error'
