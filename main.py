@@ -1,27 +1,26 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2021-09-22 18:34:01
+LastEditTime: 2021-09-22 19:09:40
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
-from const import *
-from text import *
-from common.exceptHandler import except_handler
-from common.tools import initalArgs, getProxy, setHeader, argsHandler
 import sys
 import os
+from const import *
+from text import *
+from common.tools import *
+from common.exceptHandler import except_handler
 
 
 def main():
     initalArgs()
     setEnv()
     if len(sys.argv) == 1:  # 命令行参数为空 -> 双击运行程序
-        print('version: {}\nissue page: {}'.format(version, issue_page))
-        if sys.platform in ['win32', 'win64']:
-            getProxy()
-        setHeader()
-        print('\n' + input_ask)
+        print('version: {}\nissue page: {}\n'.format(version, issue_page))
+        getProxy()
+        getHeader()
+        print(input_ask)
         cmdMode()
     else:
         argsHandler()

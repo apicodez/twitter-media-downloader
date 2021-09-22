@@ -1,4 +1,6 @@
 import re
+import os
+import configparser
 import requests
 
 version = '1.1.1-dev'
@@ -11,7 +13,9 @@ url_args_help = \
     2. https://t.co/*** (tweets short url)
     3. https://twitter.com/*** (user page, *** is user_id)
     # 3. will gather all media files of user's tweets'''
-    
+conf = configparser.RawConfigParser()
+conf_path = os.path.expanduser('~') + '/tw_media_downloader.conf'
+
 # api auth token
 authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
@@ -19,7 +23,7 @@ authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4p
 context = {
     'globalSession': requests.Session(),
     'proxy': {},
-    'headers': {'authorization': authorization, 'Cookie': ''},
+    'headers': {'authorization': authorization, 'Cookie': '', 'User-Agent': ''},
     'dl_path': './twitter_media_download',
     'log_path': './media_downloader_log'
 }

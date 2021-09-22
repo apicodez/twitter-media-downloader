@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-22 18:34:20
+LastEditTime: 2021-09-22 19:09:45
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -33,6 +33,10 @@ def initalArgs():
 
 
 def getProxy():
+    if getContext('proxy'):
+        return
+    if sys.platform not in ['win32', 'win64']:
+        return
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                          r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
     proxy_enable, key_type = winreg.QueryValueEx(key, "ProxyEnable")
@@ -42,12 +46,12 @@ def getProxy():
                    'https': 'https://'+proxy_server})
 
 
-def setHeader():
+def getHeader():  # 获取游客token
     headers = getContext('headers')
+    if headers['Cookie']:  # 已设置cookie, 无需游客token
+        return
     proxy = getContext('proxy')
     s = getContext('globalSession')
-    if headers['Cookie']:
-        return
     response = s.post(host_url, proxies=proxy,
                       headers=headers, timeout=5).json()
     if 'guest_token' in response:
@@ -74,11 +78,10 @@ def get_token(cookie):
 
 
 def set_proxy(proxy_str):
-    global proxy
     proxy_match = p_proxy.match(proxy_str)
     if proxy_match and 1024 <= int(proxy_match.group(1)) <= 65535:
-        proxy = {'http': 'http://' + proxy_str,
-                 'https': 'https://' + proxy_str}
+        setContext('proxy', {'http': 'http://' + proxy_str,
+                   'https': 'https://' + proxy_str})
         print('代理设置为: {}'.format(proxy_str))
     else:
         print(proxy_warning)
@@ -108,34 +111,33 @@ def argsHandler():
     setContext('header', headers)
 
 
-def save_env():
+def saveEnv():
     conf.read(conf_path)
     if 'global' not in conf.sections():
         conf.add_section('global')
-    if args.proxy:
-        conf.set("global", "proxy", args.proxy)
-    if args.dir:
-        conf.set("global", "download_path", args.dir)
-    if args.user_agent:
-        conf.set("global", "user-agent", args.user_agent)
-    if headers['Cookie']:
-        conf.set("global", "cookie", headers['Cookie'])
+    conf.set("global", "proxy", getContext("proxy"))
+    conf.set("global", "download_path", getContext("dl_path"))
+    conf.set("global", "user-agent", getContext("headers")["User-Agent"])
+    conf.set("global", "cookie", getContext("headers")['Cookie'])
     conf.write(open(conf_path, 'w'))
 
 
-def set_env():
-    global dl_path
+def setEnv():
     if os.path.exists(conf_path):
         conf.read(conf_path)
-        if 'global' not in conf.sections():
-            return
-        items = conf.items('global')
-        for item in items:
-            if item[0] == 'cookie':
-                check_cookie(item[1])
-            elif item[0] == 'user-agent':
-                headers['User-Agent'] = item[1]
-            elif item[0] == 'proxy':
-                set_proxy(item[1])
-            elif item[0] == 'download_path':
-                dl_path = item[1]
+        if 'global' in conf.sections():
+            headers = getContext("headers")
+            items = conf.items('global')
+            for item in items:
+                if item[0] == 'cookie':
+                    token = get_token(item[1])
+                    if token:
+                        headers['x-csrf-token'] = token
+                        headers['Cookie'] = item[1]
+                elif item[0] == 'user-agent':
+                    headers['User-Agent'] = item[1]
+                elif item[0] == 'proxy':
+                    set_proxy(item[1])
+                elif item[0] == 'download_path':
+                    setContext('dl_path', item[1])
+            setContext('headers', headers)
