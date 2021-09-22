@@ -11,12 +11,14 @@ url_args_help = \
     2. https://t.co/*** (tweets short url)
     3. https://twitter.com/*** (user page, *** is user_id)
     # 3. will gather all media files of user's tweets'''
+# api auth token
+authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
 # context
 context = {
     'globalSession': requests.Session(),
     'proxy': {},
-    'headers': {'Cookie': ''},
+    'headers': {'authorization': authorization, 'Cookie': ''},
     'dl_path': './twitter_media_download',
     'log_path': './media_downloader_log'
 }
@@ -39,9 +41,6 @@ user_api_url = 'https://twitter.com/i/api/graphql/Vf8si2dfZ1zmah8ePYPjDQ/UserByS
 # api parameter
 media_api_par = '{{"userId":"{}","count":{},"withTweetQuoteCount":false,"includePromotedContent":false,"withSuperFollowsUserFields":false,"withUserResults":false,"withBirdwatchPivots":false,"withReactionsMetadata":false,"withReactionsPerspective":false,"withSuperFollowsTweetFields":false,"withClientEventToken":false,"withBirdwatchNotes":false,"withVoice":false}}'
 user_api_par = '{{"screen_name":"{}","withHighlightedLabel":false}}'
-
-# api auth token
-authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
 # re pattern
 p_csrf_token = re.compile(r'ct0=(.+?);?$')
