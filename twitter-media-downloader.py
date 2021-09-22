@@ -9,7 +9,7 @@ import configparser
 from argparse import RawTextHelpFormatter
 from urllib.parse import quote
 from const import *
-from warning import *
+from text import *
 if sys.platform in ['win32', 'win64']:
     import winreg
 
@@ -412,7 +412,7 @@ def except_handler(err):
     else:
         traceback.print_exc()
         write_log('crash', traceback.format_exc())
-    if input(rest_ask):
+    if input(reset_ask):
         if sys.platform in ['win32', 'win64']:
             os.system('cls')
         else:

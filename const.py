@@ -1,6 +1,28 @@
 import re
+import requests
 
 version = '1.1.1-dev'
+
+# const
+twt_count = 100  # 推主媒体批量爬取时, 每次api抓取的推文计数
+
+# context
+context = {
+    'globalSession': requests.Session(),
+    'proxy': {},
+    'headers': {'Cookie': ''},
+    'dl_path': './twitter_media_download',
+    'log_path': './media_downloader_log'
+}
+
+
+def setContext(key, value):
+    context[key] = value
+
+
+def getContext(key):
+    return context[key]
+
 
 # api url
 host_url = 'https://api.twitter.com/1.1/guest/activate.json'
