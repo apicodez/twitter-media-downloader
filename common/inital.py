@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-22 14:38:16
+LastEditTime: 2021-09-22 14:42:41
 LastEditors: mengzonefire
 Description: 程序初始化
 '''
@@ -32,14 +32,13 @@ def inital():
 
 
 def get_proxy():
-    global proxy
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                          r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
     proxy_enable, key_type = winreg.QueryValueEx(key, "ProxyEnable")
     if proxy_enable:
         proxy_server, key_type = winreg.QueryValueEx(key, "ProxyServer")
-        proxy = {'http': 'http://'+proxy_server,
-                 'https': 'https://'+proxy_server}
+        setContext('proxy', {'http': 'http://'+proxy_server,
+                   'https': 'https://'+proxy_server})
 
 
 def set_header():
