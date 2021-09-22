@@ -1,14 +1,14 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-22 17:33:33
+LastEditTime: 2021-09-22 18:34:20
 LastEditors: mengzonefire
 Description: 工具模块
 '''
 import sys
 import argparse
 from argparse import RawTextHelpFormatter
-from const import url_args_help, host_url, setContext, getContext
+from const import *
 from text import *
 if sys.platform in ['win32', 'win64']:
     import winreg
@@ -32,7 +32,7 @@ def initalArgs():
     setContext('args', args)
 
 
-def get_proxy():
+def getProxy():
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                          r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
     proxy_enable, key_type = winreg.QueryValueEx(key, "ProxyEnable")
@@ -42,7 +42,7 @@ def get_proxy():
                    'https': 'https://'+proxy_server})
 
 
-def set_header():
+def setHeader():
     headers = getContext('headers')
     proxy = getContext('proxy')
     s = getContext('globalSession')
@@ -58,3 +58,84 @@ def set_header():
         print(token_warning)
         input(exit_ask)
         exit()
+
+
+def get_token(cookie):
+    if cookie[-1] == ';':
+        print(cookie_para_warning)
+        return None
+    csrf_token = p_csrf_token.findall(cookie)
+    if csrf_token and 'auth_token' in cookie:
+        print(cookie_success)
+        return csrf_token[0]
+    else:
+        print(cookie_warning)
+        return None
+
+
+def set_proxy(proxy_str):
+    global proxy
+    proxy_match = p_proxy.match(proxy_str)
+    if proxy_match and 1024 <= int(proxy_match.group(1)) <= 65535:
+        proxy = {'http': 'http://' + proxy_str,
+                 'https': 'https://' + proxy_str}
+        print('代理设置为: {}'.format(proxy_str))
+    else:
+        print(proxy_warning)
+
+
+def argsHandler():
+    args = getContext('args')
+    headers = getContext('headers')
+    if args.version:
+        print('version: {}\nissue page: {}'.format(version, issue_page))
+        return
+    if args.proxy:
+        set_proxy(args.proxy)
+    elif sys.platform in ['win32', 'win64']:
+        getProxy()
+    if args.cookie:
+        token = get_token(args.cookie)
+        if token:
+            headers['x-csrf-token'] = token
+            headers['Cookie'] = args.cookie
+        else:
+            return
+    if args.user_agent:
+        headers['User-Agent'] = args.user_agent
+    if args.dir:
+        setContext('dl_path', args.dir)
+    setContext('header', headers)
+
+
+def save_env():
+    conf.read(conf_path)
+    if 'global' not in conf.sections():
+        conf.add_section('global')
+    if args.proxy:
+        conf.set("global", "proxy", args.proxy)
+    if args.dir:
+        conf.set("global", "download_path", args.dir)
+    if args.user_agent:
+        conf.set("global", "user-agent", args.user_agent)
+    if headers['Cookie']:
+        conf.set("global", "cookie", headers['Cookie'])
+    conf.write(open(conf_path, 'w'))
+
+
+def set_env():
+    global dl_path
+    if os.path.exists(conf_path):
+        conf.read(conf_path)
+        if 'global' not in conf.sections():
+            return
+        items = conf.items('global')
+        for item in items:
+            if item[0] == 'cookie':
+                check_cookie(item[1])
+            elif item[0] == 'user-agent':
+                headers['User-Agent'] = item[1]
+            elif item[0] == 'proxy':
+                set_proxy(item[1])
+            elif item[0] == 'download_path':
+                dl_path = item[1]
