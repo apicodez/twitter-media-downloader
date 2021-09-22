@@ -1,9 +1,9 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-22 14:42:41
+LastEditTime: 2021-09-22 17:33:33
 LastEditors: mengzonefire
-Description: 程序初始化
+Description: 工具模块
 '''
 import sys
 import argparse
@@ -14,7 +14,7 @@ if sys.platform in ['win32', 'win64']:
     import winreg
 
 
-def inital():
+def initalArgs():
     # prog argument
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('-c', '--cookie', dest='cookie', type=str,
@@ -29,6 +29,7 @@ def inital():
                         help='show version')
     parser.add_argument('url', type=str, nargs='*', help=url_args_help)
     args = parser.parse_args()
+    setContext('args', args)
 
 
 def get_proxy():
@@ -43,6 +44,7 @@ def get_proxy():
 
 def set_header():
     headers = getContext('headers')
+    proxy = getContext('proxy')
     s = getContext('globalSession')
     if headers['Cookie']:
         return
