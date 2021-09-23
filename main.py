@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2021-09-22 19:09:40
+LastEditTime: 2021-09-23 11:36:33
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
@@ -10,17 +10,17 @@ import os
 from const import *
 from text import *
 from common.tools import *
+from common.console import cmdMode
 from common.exceptHandler import except_handler
 
 
 def main():
     initalArgs()
-    setEnv()
+    getEnv()
     if len(sys.argv) == 1:  # 命令行参数为空 -> 双击运行程序
         print('version: {}\nissue page: {}\n'.format(version, issue_page))
         getProxy()
         getHeader()
-        print(input_ask)
         cmdMode()
     else:
         argsHandler()

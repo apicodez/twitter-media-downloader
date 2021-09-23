@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-22 19:09:45
+LastEditTime: 2021-09-23 11:36:34
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -122,7 +122,7 @@ def saveEnv():
     conf.write(open(conf_path, 'w'))
 
 
-def setEnv():
+def getEnv():
     if os.path.exists(conf_path):
         conf.read(conf_path)
         if 'global' in conf.sections():
