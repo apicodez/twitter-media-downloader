@@ -10,9 +10,8 @@ twt_count = 100  # 推主媒体批量爬取时, 每次api抓取的推文计数
 url_args_help = \
     '''tw url to gather media, must be like:
     1. https://twitter.com/***/status/***
-    2. https://t.co/*** (tweets short url)
-    3. https://twitter.com/*** (user page, *** is user_id)
-    # 3. will gather all media files of user's tweets'''
+    2. https://twitter.com/***(/media) (user page, *** is user_id)
+    # 2. will gather all media files of user's tweets'''
 conf = configparser.RawConfigParser()
 conf_path = os.path.expanduser('~') + '/tw_media_downloader.conf'
 
