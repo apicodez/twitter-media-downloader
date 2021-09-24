@@ -367,7 +367,6 @@ def cmd_mode():
         start_crawl(page_urls)
 
     if input(continue_ask):
-        print(continue_msg)
         cmd_mode()
 
 
