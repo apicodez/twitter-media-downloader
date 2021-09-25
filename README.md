@@ -4,11 +4,10 @@
 
 <br/>
 
-支持输入如下三种格式的链接:
+支持输入如下两种种格式的链接:
 
 1. https://<span></span>twitter.com/\*\*\*/status/\*\*\* (推文)
-2. https://<span></span>t.co/**\*\*** (短链, 部分短链会跳转至非推文页面, 脚本会自动跳过)
-3. https://<span></span>twitter.com/\*\*\* (推主主页, \*\*\*为推主 id, 用于批量爬取)
+2. https://<span></span>twitter.com/\*\*\* (推主主页, \*\*\*为推主 id, 用于批量爬取)
 
 <br/>
 
