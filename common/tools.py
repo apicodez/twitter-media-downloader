@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-26 01:41:09
+LastEditTime: 2021-09-26 01:54:09
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -130,16 +130,16 @@ def getEnv():
             headers = getContext("headers")
             items = conf.items('global')
             for item in items:
-                if item[0] == 'cookie':
+                if item[0] == 'cookie' and item[1]:
                     token = get_token(item[1])
                     if token:
                         headers['x-csrf-token'] = token
                         headers['Cookie'] = item[1]
-                elif item[0] == 'user-agent':
+                elif item[0] == 'user-agent' and item[1]:
                     headers['User-Agent'] = item[1]
-                elif item[0] == 'proxy':
-                    setContext('proxy', item[1])
-                elif item[0] == 'download_path':
+                elif item[0] == 'proxy' and item[1]:
+                    setContext('proxy', eval(item[1]))
+                elif item[0] == 'download_path' and item[1]:
                     setContext('dl_path', item[1])
             setContext('headers', headers)
 

@@ -1,12 +1,10 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2021-09-26 00:03:22
+LastEditTime: 2021-09-26 01:51:12
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
-import json
-from common.logger import write_log
 from task.baseTask import Task
 from common.tools import parseData
 from common.text import *

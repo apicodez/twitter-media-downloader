@@ -3,7 +3,7 @@ import os
 import configparser
 import requests
 
-version = '1.2.1-dev'
+version = '1.2.1'
 
 # const
 twtCount = 100  # 推主媒体批量爬取时, 每次api抓取的推文计数
