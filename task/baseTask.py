@@ -1,14 +1,14 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2021-09-25 17:33:22
+LastEditTime: 2021-09-25 18:04:33
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
 from _typeshed import Self
 from abc import abstractmethod
 from typing import AbstractSet
-from common.tools import downloadFile
+from common.tools import downloadFile, saveText
 
 
 class Task:
@@ -29,9 +29,16 @@ class Task:
 
     def start(self):
         self.getDataList()
+
         for key in ['picList', 'gifList', 'vidList']:
             for serverFileName in self.dataList[key]:
                 url = self.dataList[key][serverFileName]['url']
                 fileName = '{}_{}_{}'.format(
                     self.userName, self.dataList[key][serverFileName]['url'], serverFileName)
                 downloadFile(url, fileName, self.savePath)
+
+        for twtId in self.dataList['textList']:
+            content = self.dataList['textList'][twtId]
+            fileName = '{}_{}.txt'.format(
+                self.userName, twtId)
+            saveText(content, fileName, self.savePath)

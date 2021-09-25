@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-25 17:46:03
+LastEditTime: 2021-09-25 18:00:46
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -193,3 +193,11 @@ def downloadFile(url, fileName, savePath):
                 print(prog_text.format(prog), end="")
     print(prog_text.format('下载完成'))
     time.sleep(1)
+
+
+def saveText(content, fileName, savePath):
+    filePath = '{}/{}'.format(savePath, fileName)
+    if os.path.exists(filePath):
+        return
+    with open(filePath, 'w', encoding='utf-8') as f:
+        f.write(content)
