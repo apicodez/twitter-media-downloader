@@ -1,17 +1,19 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-26 00:28:44
+LastEditTime: 2021-09-26 01:25:27
 LastEditors: mengzonefire
 Description: 工具模块
 '''
-from common.logger import write_log
+
 import sys
 import time
 import argparse
-from argparse import RawTextHelpFormatter
-from common.const import *
 from common.text import *
+from common.const import *
+from console import startCrawl
+from common.logger import write_log
+from argparse import RawTextHelpFormatter
 if sys.platform in ['win32', 'win64']:
     import winreg
 
@@ -109,6 +111,7 @@ def argsHandler():
     if args.dir:
         setContext('dl_path', args.dir)
     setContext('header', headers)
+    startCrawl(args.url)
 
 
 def saveEnv():
