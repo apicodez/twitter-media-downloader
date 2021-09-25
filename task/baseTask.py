@@ -1,13 +1,11 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2021-09-25 18:04:33
+LastEditTime: 2021-09-25 23:27:00
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
-from _typeshed import Self
 from abc import abstractmethod
-from typing import AbstractSet
 from common.tools import downloadFile, saveText
 
 
@@ -34,7 +32,7 @@ class Task:
             for serverFileName in self.dataList[key]:
                 url = self.dataList[key][serverFileName]['url']
                 fileName = '{}_{}_{}'.format(
-                    self.userName, self.dataList[key][serverFileName]['url'], serverFileName)
+                    self.userName, self.dataList[key][serverFileName]['twtId'], serverFileName)
                 downloadFile(url, fileName, self.savePath)
 
         for twtId in self.dataList['textList']:

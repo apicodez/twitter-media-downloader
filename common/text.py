@@ -1,13 +1,14 @@
 # external page url
 issue_page = 'https://github.com/mengzonefire/twitter-media-downloader/issues'
+release_page = 'https://github.com/mengzonefire/twitter-media-downloader/releases'
 cookie_tips_page = 'https://git.io/how_to_get_cookies_cn'
 
 # warning str
 api_warning = '提取失败: 解析失败, 请检查log, 并前往issue页反馈:\n{}'.format(issue_page)
-nothing_warning = '提取失败: 该推文不含媒体内容, 若包含, 请到issue页反馈:\n{}'.format(issue_page)
 user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{}'.format(issue_page)
 token_warning = '运行失败: guest_token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
-cookie_warning = '参数错误: 输入的cookie格式错误, 请参考教程获取cookie:\n{}'.format(cookie_tips_page)
+cookie_warning = '参数错误: 输入的cookie格式错误, 请参考教程获取cookie:\n{}'.format(
+    cookie_tips_page)
 cookie_para_warning = '参数错误: 请使用一对双引号" "包含全部cookie'
 http_warning = '提取失败{}: http访问异常, 状态码: {}, 请前往issue页反馈:\n{}'
 proxy_warning = '参数错误: 代理格式错误, 格式: [ip/域名]:[端口], 示例: 127.0.0.1:7890'
@@ -30,4 +31,3 @@ input_ask = '请输入1.或2.\n' \
             '# "exit"退出程序, "set cookie"用于设置cookie\n' \
             '2. 推文/推主链接 (支持批量, 一行一条, 双击回车确认):'
 exit_ask = '\n单击回车键退出程序\n'
-

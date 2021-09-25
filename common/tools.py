@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-25 18:00:46
+LastEditTime: 2021-09-26 00:28:44
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -9,10 +9,9 @@ from common.logger import write_log
 import sys
 import time
 import argparse
-from urllib.parse import quote
 from argparse import RawTextHelpFormatter
-from const import *
-from text import *
+from common.const import *
+from common.text import *
 if sys.platform in ['win32', 'win64']:
     import winreg
 
@@ -53,10 +52,8 @@ def getHeader():  # 获取游客token
     headers = getContext('headers')
     if headers['Cookie']:  # 已设置cookie, 无需游客token
         return
-    proxy = getContext('proxy')
-    s = getContext('globalSession')
-    response = s.post(host_url, proxies=proxy,
-                      headers=headers, timeout=5).json()
+    response = getContext('globalSession').post(hostUrl, proxies=getContext('proxy'),
+                                                headers=headers, timeout=5).json()
     if 'guest_token' in response:
         x_guest_token = response['guest_token']
         headers['x-guest-token'] = x_guest_token
@@ -147,17 +144,17 @@ def getEnv():
 
 
 def getUserId(userName: str):
-    response = getContext('globalSession').get(user_api_url.format(
-        quote(user_api_par.format(userName))), proxies=getContext('proxy'), headers=getContext('headers'))
+    response = getContext('globalSession').post(userInfoApi, params={'variables': userInfoApiPar.format(
+        userName)}, proxies=getContext('proxy'), headers=getContext('headers'))
     if response.status_code != 200:
         print(http_warning.format('getUserId',
               response.status_code, issue_page))
         return None
     page_content = response.text
-    user_id = p_user_id.findall(page_content)
-    if user_id:
-        user_id = user_id[0]
-        return user_id
+    userId = p_user_id.findall(page_content)
+    if userId:
+        userId = userId[0]
+        return userId
     else:
         print(user_warning)
         write_log(userName, page_content)
@@ -167,6 +164,8 @@ def getUserId(userName: str):
 def downloadFile(url, fileName, savePath):
     prog_text = '\r正在下载: {}'.format(fileName) + ' ...{}'
     filePath = '{}/{}'.format(savePath, fileName)
+    if not os.path.exists(savePath):
+        os.makedirs(savePath)
     if os.path.exists(filePath):
         print(prog_text.format('文件已存在'))
         return
@@ -197,7 +196,63 @@ def downloadFile(url, fileName, savePath):
 
 def saveText(content, fileName, savePath):
     filePath = '{}/{}'.format(savePath, fileName)
+    if not os.path.exists(savePath):
+        os.makedirs(savePath)
     if os.path.exists(filePath):
         return
     with open(filePath, 'w', encoding='utf-8') as f:
         f.write(content)
+
+
+def parseData(strContent, twtId):
+    picDic = {}
+    gifDic = {}
+    vidDic = {}
+    textDic = {}
+
+    # get pic links
+    pic_links = p_pic_link.findall(strContent)
+    # get [(media_url, file_name)], add query '?name=orig' can get original pic file
+    if pic_links:
+        for pic_link in pic_links:
+            picDic[pic_link[1]] = {'url': pic_link[0] +
+                                   '?name=orig', 'twtId': twtId}
+
+    # get gif links(.mp4)
+    gif_links = p_gif_link.findall(strContent)
+    # get [(media_url, file_name)]
+    if gif_links:
+        for gif_link in gif_links:
+            gifDic[gif_link[1]] = {'url': gif_link[0], 'twtId': twtId}
+
+    # get video links(.mp4)
+    vid_links = p_vid_link.findall(strContent)
+    # [(media_url, resolution, file_name)]
+    if vid_links:
+        best_choice = {'resolution': 0, 'file_name': None, 'url': None}
+        # choose largest resolution
+        for vid_link in vid_links:
+            resolution = eval(vid_link[2].replace('x', '*'))
+            if resolution > best_choice['resolution']:
+                best_choice['resolution'] = resolution
+                best_choice['file_name'] = vid_link[3]
+                best_choice['url'] = vid_link[0]
+        vidDic[best_choice['file_name']] = {
+            'url': best_choice['url'], 'twtId': twtId}
+
+    # get twt text content
+    twtText = p_text_content.findall(strContent)
+    if twtText:
+        textDic = {twtId: twtText[0]}
+
+    # return {serverFileName: {url: , twtId: }}
+    return picDic, gifDic, vidDic, textDic
+
+
+def checkUpdate():
+    response = requests.get(checkUpdateApi)
+    jsonData = response.json()
+    tag_name = jsonData["tag_name"]
+    name = jsonData["name"]
+    if version != tag_name:
+        print("发现新版本: {}\n下载地址: {}\n".format(name, release_page))

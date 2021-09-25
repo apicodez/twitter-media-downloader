@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2021-09-25 17:54:41
+LastEditTime: 2021-09-25 23:49:39
 LastEditors: mengzonefire
 Description: 
 '''
@@ -9,8 +9,8 @@ import os
 from task.singlePageTask import SinglePageTask
 from task.userMediaTask import UserMediaTask
 from typing import List
-from text import *
-from const import *
+from common.text import *
+from common.const import *
 from common.tools import get_token, getUserId, saveEnv
 
 
@@ -34,7 +34,7 @@ def cmdMode():
 
 
 def startCrawl(url_list: List):
-    dl_path = getattr('dl_path')
+    dl_path = getContext('dl_path')
     if not os.path.exists(dl_path):
         os.mkdir(dl_path)
 
@@ -50,15 +50,15 @@ def urlHandler(url: str):
         userName = user_link[0]
         userId = getUserId(userName)
         if userId:
-            UserMediaTask(userName, userId).start
+            UserMediaTask(userName, userId).start()
         return
 
     # SinglePage
     twt_link = p_twt_link.findall(url)
     if twt_link:
-        userName = twt_link[0]
-        twtId = twt_link[1]
-        SinglePageTask(twtId, userName).start()
+        userName = twt_link[0][0]
+        twtId = twt_link[0][1]
+        SinglePageTask(userName, twtId).start()
         return
 
 
