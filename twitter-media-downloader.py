@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2021-09-26 01:20:34
+LastEditTime: 2021-09-26 01:30:16
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
@@ -10,7 +10,7 @@ import os
 from common.const import *
 from common.text import *
 from common.tools import *
-from common.console import cmdMode
+from common.console import cmdMode, startCrawl
 from common.exceptHandler import except_handler
 
 
@@ -28,6 +28,7 @@ def main():
         cmdMode()
     else:
         argsHandler()
+        startCrawl(getContext('args').url)
     saveEnv()
 
 

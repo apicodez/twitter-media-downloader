@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-26 01:25:27
+LastEditTime: 2021-09-26 01:29:29
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -11,7 +11,6 @@ import time
 import argparse
 from common.text import *
 from common.const import *
-from console import startCrawl
 from common.logger import write_log
 from argparse import RawTextHelpFormatter
 if sys.platform in ['win32', 'win64']:
@@ -111,7 +110,6 @@ def argsHandler():
     if args.dir:
         setContext('dl_path', args.dir)
     setContext('header', headers)
-    startCrawl(args.url)
 
 
 def saveEnv():
