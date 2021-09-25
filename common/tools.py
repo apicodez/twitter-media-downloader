@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-26 01:29:29
+LastEditTime: 2021-09-26 01:41:09
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -138,7 +138,7 @@ def getEnv():
                 elif item[0] == 'user-agent':
                     headers['User-Agent'] = item[1]
                 elif item[0] == 'proxy':
-                    set_proxy(item[1])
+                    setContext('proxy', item[1])
                 elif item[0] == 'download_path':
                     setContext('dl_path', item[1])
             setContext('headers', headers)
