@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2021-09-23 11:36:33
+LastEditTime: 2021-09-25 16:56:37
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
@@ -15,6 +15,8 @@ from common.exceptHandler import except_handler
 
 
 def main():
+    exe_path, exe_name = os.path.split(sys.argv[0])
+    os.chdir(exe_path)  # 切换工作目录到程序根目录
     initalArgs()
     getEnv()
     if len(sys.argv) == 1:  # 命令行参数为空 -> 双击运行程序

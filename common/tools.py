@@ -1,12 +1,15 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-23 11:36:34
+LastEditTime: 2021-09-25 17:46:03
 LastEditors: mengzonefire
 Description: 工具模块
 '''
+from common.logger import write_log
 import sys
+import time
 import argparse
+from urllib.parse import quote
 from argparse import RawTextHelpFormatter
 from const import *
 from text import *
@@ -141,3 +144,52 @@ def getEnv():
                 elif item[0] == 'download_path':
                     setContext('dl_path', item[1])
             setContext('headers', headers)
+
+
+def getUserId(userName: str):
+    response = getContext('globalSession').get(user_api_url.format(
+        quote(user_api_par.format(userName))), proxies=getContext('proxy'), headers=getContext('headers'))
+    if response.status_code != 200:
+        print(http_warning.format('getUserId',
+              response.status_code, issue_page))
+        return None
+    page_content = response.text
+    user_id = p_user_id.findall(page_content)
+    if user_id:
+        user_id = user_id[0]
+        return user_id
+    else:
+        print(user_warning)
+        write_log(userName, page_content)
+        return None
+
+
+def downloadFile(url, fileName, savePath):
+    prog_text = '\r正在下载: {}'.format(fileName) + ' ...{}'
+    filePath = '{}/{}'.format(savePath, fileName)
+    if os.path.exists(filePath):
+        print(prog_text.format('文件已存在'))
+        return
+    print(prog_text.format('0%'), end="")
+    response = getContext('globalSession').get(
+        url, proxies=getContext('proxy'), headers=getContext('headers'), stream=True)
+    if response.status_code != 200:
+        print(http_warning.format('downloadFile',
+              response.status_code, issue_page))
+        return
+    dl_size = 0
+    content_size = 0
+    if 'content-length' in response.headers:
+        content_size = int(response.headers['content-length'])
+    elif 'Content-Length' in response.headers:
+        content_size = int(response.headers['Content-Length'])
+    with open(filePath, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=1024 * 2):
+            f.write(chunk)
+            if content_size:
+                dl_size += len(chunk)
+                prog = '{}%'.format(
+                    int(round(dl_size / content_size, 2) * 100))
+                print(prog_text.format(prog), end="")
+    print(prog_text.format('下载完成'))
+    time.sleep(1)

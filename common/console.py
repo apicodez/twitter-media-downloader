@@ -1,15 +1,17 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2021-09-23 15:17:46
+LastEditTime: 2021-09-25 17:54:41
 LastEditors: mengzonefire
 Description: 
 '''
 import os
+from task.singlePageTask import SinglePageTask
+from task.userMediaTask import UserMediaTask
 from typing import List
 from text import *
 from const import *
-from common.tools import get_token, saveEnv
+from common.tools import get_token, getUserId, saveEnv
 
 
 def cmdMode():
@@ -40,48 +42,23 @@ def startCrawl(url_list: List):
         print('\n正在提取: {}'.format(page_url))
         urlHandler(page_url)
 
-        # check user page link
-        user_link = p_user_link.findall(page_url)
-        if user_link:
-            user_name = user_link[0]
-            user_id, media_count = get_user_info(user_name)
-            if not user_id:
-                continue
-            user_media_links = get_user_media_link(user_id, media_count)
-            if user_media_links:
-                if user_media_links != 'error':
-                    save_path = dl_path + '/{}'.format(user_name)
-                    if not os.path.exists(save_path):
-                        os.mkdir(save_path)
-                    for file_name in user_media_links:
-                        download_media(
-                            user_media_links[file_name], file_name, save_path)
-            else:
-                print(nothing_warning)
-            continue
-
-        # match url to tweets
-        page_id = p_tw_link.findall(page_url)
-        if page_id:
-            page_id = page_id[0]
-        else:
-            print(wrong_url_warning)
-            continue
-        media_links = get_page_media_link(page_id)
-        if media_links:
-            for file_name in media_links:
-                download_media(media_links[file_name], file_name)
-
 
 def urlHandler(url: str):
+    # userHomePage
     user_link = p_user_link.findall(url)
     if user_link:
-        user_name = user_link[0]
+        userName = user_link[0]
+        userId = getUserId(userName)
+        if userId:
+            UserMediaTask(userName, userId).start
         return
 
-    page_id = p_tw_link.findall(url)
-    if page_id:
-        page_id = page_id[0]
+    # SinglePage
+    twt_link = p_twt_link.findall(url)
+    if twt_link:
+        userName = twt_link[0]
+        twtId = twt_link[1]
+        SinglePageTask(twtId, userName).start()
         return
 
 

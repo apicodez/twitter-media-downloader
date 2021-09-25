@@ -32,8 +32,11 @@ def setContext(key, value):
     context[key] = value
 
 
-def getContext(key):
-    return context[key]
+def getContext(key=None):
+    if key:
+        return context[key]
+    else:
+        return context
 
 
 # api url
@@ -53,7 +56,7 @@ p_user_id = re.compile(r'"rest_id":"(\d+)"')
 p_tw_id = re.compile(r'conversation_id_str":"(\d+)')
 p_user_media_count = re.compile(r'"media_count":(\d+),')
 p_user_link = re.compile(r'https://twitter.com/([^/]+?)(?:/media)?$')
-p_tw_link = re.compile(r'https://twitter.com/.+?/status/(\d+)')
+p_twt_link = re.compile(r'https://twitter.com/(.+?)/status/(\d+)')
 p_pic_link = re.compile(r'''(https://pbs.twimg.com/media/(.+?))['"]''')
 p_gif_link = re.compile(r'(https://video.twimg.com/tweet_video/(.+?\.mp4))')
 p_vid_link = re.compile(
