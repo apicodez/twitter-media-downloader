@@ -26,6 +26,7 @@
 5. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
 6. 支持爬取推文文本, 自动保存为{推主 id}\_{推文 id}.txt
 7. 若出现任何问题/提意见&需求, 请前往 issue 反馈
+8. 程序的默认配置文件路径: linux: ~/tw_media_downloader.conf ; win: %HOMEPATH%/tw_media_downloader.conf
 
 <br/>
 
