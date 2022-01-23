@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2022-01-23 13:04:46
+LastEditTime: 2021-09-26 01:51:12
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
@@ -44,7 +44,7 @@ class UserMediaTask(Task):
         contentDict = dict(zip(twtIdList, contentList[1:]))
         for twtId in contentDict:
             picList, gifList, vidList, textList = parseData(
-                contentDict[twtId].split('extended_entities')[-1], twtId)
+                contentDict[twtId].split('extended_entities')[1], twtId)
             self.dataList['picList'] = dict(
                 self.dataList['picList'], **picList)
             self.dataList['gifList'] = dict(
