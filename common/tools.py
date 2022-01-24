@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2021-09-26 01:54:09
+LastEditTime: 2022-01-24 11:37:23
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -36,7 +36,7 @@ def initalArgs():
 
 
 def getProxy():
-    if getContext('proxy'):
+    if getContext('proxy'): # proxy已配置
         return
     if sys.platform not in ['win32', 'win64']:
         return
@@ -99,12 +99,15 @@ def argsHandler():
     elif sys.platform in ['win32', 'win64']:
         getProxy()
     if args.cookie:
-        token = get_token(args.cookie)
-        if token:
-            headers['x-csrf-token'] = token
-            headers['Cookie'] = args.cookie
+        if args.cookie == ' ':
+            headers['Cookie'] = ''
         else:
-            return
+            token = get_token(args.cookie)
+            if token:
+                headers['x-csrf-token'] = token
+                headers['Cookie'] = args.cookie
+            else:
+                return
     if args.user_agent:
         headers['User-Agent'] = args.user_agent
     if args.dir:

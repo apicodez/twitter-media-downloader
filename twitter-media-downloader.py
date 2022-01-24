@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2021-09-26 01:30:16
+LastEditTime: 2022-01-24 11:37:32
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
@@ -28,6 +28,8 @@ def main():
         cmdMode()
     else:
         argsHandler()
+        getProxy()
+        getHeader()
         startCrawl(getContext('args').url)
     saveEnv()
 
