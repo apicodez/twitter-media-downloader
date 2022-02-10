@@ -15,6 +15,7 @@ proxy_warning = '参数错误: 代理格式错误, 格式: [ip/域名]:[端口],
 user_unavailable_warning = '提取失败: 该用户已锁定/冻结, 访问锁定用户需要设置已关注账号的cookie'
 tweet_unavailable_warning = '提取失败: 该推文的用户已锁定/冻结, 访问锁定推文需要设置已关注账号的cookie'
 network_error_warning = '网络连接失败, 请检查代理设置'
+proxy_error_warning = '代理连接错误, 请检查代理设置是否正确'
 wrong_url_warning = '提取失败: 错误的推文/推主主页链接'
 not_exist_warning = '提取失败: 该推文已删除/不存在'
 tw_id_waring = '格式错误: 推文id必须为纯数字串'
