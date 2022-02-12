@@ -65,3 +65,6 @@ p_vid_link = re.compile(
     r'(https://video.twimg.com/ext_tw_video/(\d+)/pu/vid/(\d+x\d+)/(.+?\.mp4))')
 p_text_content = re.compile(r'''full_text['"]:\s?['"](.+?)['"]''')
 p_cursor = re.compile(r'value":"(.+?)"')
+
+# http code text warning
+{'403': '本机IP已被推特服务器禁止访问, 请尝试更换代理节点'}
