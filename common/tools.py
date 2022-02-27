@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-01-24 11:37:23
+LastEditTime: 2022-02-20 01:10:34
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -66,11 +66,11 @@ def getHeader():  # 获取游客token
 
 
 def get_token(cookie):
+    csrf_token = p_csrf_token.findall(cookie)
     if cookie[-1] == ';':
         print(cookie_para_warning)
         return None
-    csrf_token = p_csrf_token.findall(cookie)
-    if csrf_token and 'auth_token' in cookie:
+    if len(csrf_token)!=0 and 'auth_token' in cookie:
         print(cookie_success)
         return csrf_token[0]
     else:
