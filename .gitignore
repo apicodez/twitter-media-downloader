@@ -1,4 +1,6 @@
 __pycache__
 .idea
+.history
+log
 twitter_media_download
 sample

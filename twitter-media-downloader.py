@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2022-03-02 14:22:09
+LastEditTime: 2022-03-03 02:32:14
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         except_handler(e)
-        if input(reset_ask):
+        if len(sys.argv) == 1 and input(reset_ask):
             if sys.platform in ['win32', 'win64']:  # 判断是否为win平台
                 os.system('cls')
             else:

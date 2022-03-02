@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2022-03-02 14:30:07
+LastEditTime: 2022-03-03 02:18:07
 LastEditors: mengzonefire
 Description: 
 '''
@@ -67,14 +67,17 @@ def cmdCommand(command):
         return
     elif command == 'set cookie':
         headers = getContext("headers")
-        cookie = input(input_cookie_ask)
+        cookie = input(input_cookie_ask).strip()
         if cookie:
             token = get_token(cookie)
             if token:
                 headers['x-csrf-token'] = token
                 headers['Cookie'] = cookie
+                print(cookie_success)
+            else:
+                print(cookie_warning)
         else:
-            headers['Cookie'] = cookie
+            headers['Cookie'] = '' # 清除cookie
             print(cookie_purge_success)
         setContext('headers', headers)
         saveEnv()

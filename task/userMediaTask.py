@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2022-01-23 13:04:46
+LastEditTime: 2022-03-03 02:17:39
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
@@ -12,7 +12,7 @@ from common.const import *
 
 
 class UserMediaTask(Task):
-    userId = None
+    userId = ''
 
     def __init__(self, userName, userId):
         self.userName = userName

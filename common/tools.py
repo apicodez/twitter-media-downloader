@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-02-20 01:10:34
+LastEditTime: 2022-03-03 02:32:52
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -21,11 +21,11 @@ def initalArgs():
     # prog argument
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('-c', '--cookie', dest='cookie', type=str,
-                        help='set cookie to access locked users or tweets')
+                        help='set cookie to access locked users or tweets, input " " to clear')
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
-                        help='set network proxy, must be http proxy')
+                        help='set network proxy, must be http proxy, input " " to clear')
     parser.add_argument('-u', '--user_agent', dest='user_agent',
-                        type=str, help='set user-agent')
+                        type=str, help='set user-agent, input " " to clear')
     parser.add_argument('-d', '--dir', dest='dir',
                         type=str, help='set download path')
     parser.add_argument('-v', '--version', action='store_true',
@@ -36,7 +36,7 @@ def initalArgs():
 
 
 def getProxy():
-    if getContext('proxy'): # proxy已配置
+    if getContext('proxy'):  # proxy已配置
         return
     if sys.platform not in ['win32', 'win64']:
         return
@@ -67,14 +67,9 @@ def getHeader():  # 获取游客token
 
 def get_token(cookie):
     csrf_token = p_csrf_token.findall(cookie)
-    if cookie[-1] == ';':
-        print(cookie_para_warning)
-        return None
-    if len(csrf_token)!=0 and 'auth_token' in cookie:
-        print(cookie_success)
+    if len(csrf_token) != 0:
         return csrf_token[0]
     else:
-        print(cookie_warning)
         return None
 
 
@@ -92,24 +87,33 @@ def argsHandler():
     args = getContext('args')
     headers = getContext('headers')
     if args.version:
-        print('version: {}\nissue page: {}'.format(version, issue_page))
+        print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
+            version, donate_page, issue_page))
         return
     if args.proxy:
-        set_proxy(args.proxy)
+        if args.proxy == ' ':
+            setContext('proxy', {})
+        else:
+            set_proxy(args.proxy)
     elif sys.platform in ['win32', 'win64']:
         getProxy()
     if args.cookie:
         if args.cookie == ' ':
-            headers['Cookie'] = ''
+            headers['Cookie'] = ''  # 清除cookie
         else:
+            args.cookie = args.cookie.strip()
             token = get_token(args.cookie)
             if token:
                 headers['x-csrf-token'] = token
                 headers['Cookie'] = args.cookie
             else:
+                print(cookie_warning)
                 return
     if args.user_agent:
-        headers['User-Agent'] = args.user_agent
+        if args.user_agent == ' ':
+            headers['User-Agent'] = ''
+        else:
+            headers['User-Agent'] = args.user_agent
     if args.dir:
         setContext('dl_path', args.dir)
     setContext('header', headers)
