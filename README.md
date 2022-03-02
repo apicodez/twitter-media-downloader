@@ -42,9 +42,8 @@
 命令行调用:
 
     usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
-                                   [-t [TWEET_ID [TWEET_ID ...]]] [-d DIR]
-                                   [-v]
-                                   [url [url ...]]
+                                      [-d DIR] [-v]
+                                      [url [url ...]]
 
     positional arguments:
       url                   tw url to gather media, must be like:
@@ -53,13 +52,13 @@
                                 # 2. will gather all media files of user's tweets
 
     optional arguments:
-      -h, --help            show help info
+      -h, --help            show this help message and exit
       -c COOKIE, --cookie COOKIE
-                            set cookie to access locked users or tweets
+                            set cookie to access locked users or tweets, input " " to clear
       -p PROXY, --proxy PROXY
-                            set network proxy, must be http proxy
+                            set network proxy, must be http proxy, input " " to clear
       -u USER_AGENT, --user_agent USER_AGENT
-                            set user-agent
+                            set user-agent, input " " to clear
       -d DIR, --dir DIR     set download path
       -v, --version         show version
 
@@ -104,8 +103,8 @@
 23. ~~添加爬取推文文本内容的功能(可选参数)~~ (完成)
 24. 使用多线程并发下载多个文件, 提高下载速度(可选线程并发数)
 25. ~~已知 UserMedia api 会把已删除的推文一起返回, 占用 count, 导致爬取内容不完整, 尝试修复~~ (完成)
-26. 支持输入空配置项(例如cookie设置), 用于重置对应配置
-27. 配置cookie时添加完整的cookie校验, 防止输错cookie导致接口返回403
+26. ~~支持输入空配置项(例如cookie设置), 用于重置对应配置~~ (完成, cookie, proxy, ua均已支持)
+27. ~~配置cookie时添加完整的cookie校验, 防止输错cookie导致接口返回403~~ (已修复, 其实是正则写错导致cookie解析错误)
 
 # preview 预览
 

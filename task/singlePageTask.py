@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2021-09-26 00:34:51
+LastEditTime: 2022-03-03 02:05:24
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -14,7 +14,7 @@ from common.const import *
 
 
 class SinglePageTask(Task):
-    twtId = None
+    twtId = ''
 
     def __init__(self, userName, twtId):
         self.userName = userName

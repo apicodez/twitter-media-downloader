@@ -1,17 +1,18 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2021-09-25 23:27:00
+LastEditTime: 2022-03-03 02:14:55
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
 from abc import abstractmethod
+from common.text import task_finish
 from common.tools import downloadFile, saveText
 
 
 class Task:
-    userName = None
-    savePath = None
+    userName = ''
+    savePath = ''
     config = {}  # 任务配置列表， 即const.context
 
     dataList = {  # 自定义爬取数据结构
@@ -40,3 +41,5 @@ class Task:
             fileName = '{}_{}.txt'.format(
                 self.userName, twtId)
             saveText(content, fileName, self.savePath)
+
+        print(task_finish.format(self.savePath))

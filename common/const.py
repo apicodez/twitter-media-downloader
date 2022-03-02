@@ -3,7 +3,7 @@ import os
 import configparser
 import requests
 
-version = '1.2.1'
+version = '1.2.2-dev'
 
 # const
 twtCount = 100  # 推主媒体批量爬取时, 每次api抓取的推文计数
@@ -24,7 +24,7 @@ context = {
     'proxy': {},
     'headers': {'authorization': authorization, 'Cookie': '', 'User-Agent': ''},
     'dl_path': './twitter_media_download',
-    'log_path': './media_downloader_log'
+    'log_path': './log'
 }
 
 
@@ -53,7 +53,7 @@ userMediaApiPar = '{{"userId":"{}","count":{},{}"withTweetQuoteCount":false,"inc
 userInfoApiPar = '{{"screen_name":"{}","withHighlightedLabel":false}}'
 
 # re pattern
-p_csrf_token = re.compile(r'ct0=(.+?);?$')
+p_csrf_token = re.compile(r'ct0=(.+?)(?:;|$)')
 p_proxy = re.compile(r'.+?:(\d+)$')
 p_user_id = re.compile(r'"rest_id":"(\d+)"')
 p_twt_id = re.compile(r'conversation_id_str":"(\d+)')
@@ -65,3 +65,6 @@ p_vid_link = re.compile(
     r'(https://video.twimg.com/ext_tw_video/(\d+)/pu/vid/(\d+x\d+)/(.+?\.mp4))')
 p_text_content = re.compile(r'''full_text['"]:\s?['"](.+?)['"]''')
 p_cursor = re.compile(r'value":"(.+?)"')
+
+# http code text warning
+{'403': '本机IP已被推特服务器禁止访问, 请尝试更换代理节点'}
