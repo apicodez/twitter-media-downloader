@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2022-01-24 11:15:50
+LastEditTime: 2022-03-02 14:30:07
 LastEditors: mengzonefire
 Description: 
 '''
@@ -75,6 +75,7 @@ def cmdCommand(command):
                 headers['Cookie'] = cookie
         else:
             headers['Cookie'] = cookie
+            print(cookie_purge_success)
         setContext('headers', headers)
         saveEnv()
     else:
