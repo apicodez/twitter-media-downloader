@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2022-03-03 02:18:07
+LastEditTime: 2022-03-03 02:45:01
 LastEditors: mengzonefire
 Description: 
 '''
@@ -11,7 +11,7 @@ from task.userMediaTask import UserMediaTask
 from typing import List
 from common.text import *
 from common.const import *
-from common.tools import get_token, getUserId, saveEnv
+from common.tools import get_token, getHeader, getUserId, saveEnv
 
 
 def cmdMode():
@@ -77,7 +77,8 @@ def cmdCommand(command):
             else:
                 print(cookie_warning)
         else:
-            headers['Cookie'] = '' # 清除cookie
+            headers['Cookie'] = ''  # 清除cookie
+            getHeader()  # 重新获取游客token
             print(cookie_purge_success)
         setContext('headers', headers)
         saveEnv()
