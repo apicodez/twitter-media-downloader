@@ -105,6 +105,7 @@
 25. ~~已知 UserMedia api 会把已删除的推文一起返回, 占用 count, 导致爬取内容不完整, 尝试修复~~ (完成)
 26. ~~支持输入空配置项(例如cookie设置), 用于重置对应配置~~ (完成, cookie, proxy, ua均已支持)
 27. ~~配置cookie时添加完整的cookie校验, 防止输错cookie导致接口返回403~~ (已修复, 其实是正则写错导致cookie解析错误)
+28. userMedia接口老是缺数据, 将批量爬取的逻辑改为从userMedia提取tw_id, 然后丢到singlePageTask去执行
 
 # preview 预览
 
