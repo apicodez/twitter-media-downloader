@@ -1,42 +1,43 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2022-03-03 02:17:39
+LastEditTime: 2022-05-13 14:39:31
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
 from task.baseTask import Task
-from common.tools import parseData
+from common.tools import getHttpText, parseData
 from common.text import *
 from common.const import *
 
 
 class UserMediaTask(Task):
-    userId = ''
 
     def __init__(self, userName, userId):
+        super(UserMediaTask, self).__init__()
         self.userName = userName
         self.userId = userId
         self.savePath = '{}/{}'.format(getContext('dl_path'), userName)
 
     def getDataList(self, cursor=''):
         cursorPar = cursor and '"cursor":"{}",'.format(cursor)
-        response = getContext('globalSession').post(
-            userMediaApi, params={'variables': userMediaApiPar.format(self.userId, twtCount, cursorPar)}, proxies=getContext(
+        response = getContext('globalSession').get(
+            userMediaApi, params={'variables': userMediaApiPar.format(self.userId, twtCount, cursorPar), 'features': userMediaApiPar2}, proxies=getContext(
                 'proxy'), headers=getContext('headers'))
 
         if response.status_code != 200:
             print(http_warning.format('UserMediaTask.getDataList',
-                                      response.status_code, issue_page))
+                                      response.status_code, getHttpText(response.status_code)))
             return
 
         pageContent = response.text
-        # debug
-        # print(pageContent)
-        if 'UserUnavailable' in pageContent:
+        # print(pageContent)  # debug
+        if '"__typename":"UserUnavailable"' in pageContent:
             print(user_unavailable_warning)
             return
-
+        elif '"text":"Age-restricted adult content.' in pageContent:
+            print(age_restricted_warning)
+            return
         twtIdList = p_twt_id.findall(pageContent)
         if not twtIdList:
             return

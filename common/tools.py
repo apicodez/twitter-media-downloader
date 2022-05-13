@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-03-03 02:32:52
+LastEditTime: 2022-05-13 14:42:34
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -15,6 +15,13 @@ from common.logger import write_log
 from argparse import RawTextHelpFormatter
 if sys.platform in ['win32', 'win64']:
     import winreg
+
+
+def getHttpText(httpCode):
+    httpCode = str(httpCode)
+    if httpCode in httpCodeText:
+        return httpCodeText[httpCode]
+    return f'请前往issue页反馈:\n{issue_page}'
 
 
 def initalArgs():
@@ -156,7 +163,7 @@ def getUserId(userName: str):
         userName)}, proxies=getContext('proxy'), headers=getContext('headers'))
     if response.status_code != 200:
         print(http_warning.format('getUserId',
-              response.status_code, issue_page))
+              response.status_code, getHttpText(response.status_code)))
         return None
     page_content = response.text
     userId = p_user_id.findall(page_content)
@@ -182,7 +189,7 @@ def downloadFile(url, fileName, savePath):
         url, proxies=getContext('proxy'), headers=getContext('headers'), stream=True)
     if response.status_code != 200:
         print(http_warning.format('downloadFile',
-              response.status_code, issue_page))
+              response.status_code, getHttpText(response.status_code)))
         return
     dl_size = 0
     content_size = 0

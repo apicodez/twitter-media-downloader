@@ -11,9 +11,10 @@ user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页�
 token_warning = '运行失败: guest_token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
 cookie_warning = '参数错误: 输入的cookie格式错误, 请参考教程获取cookie:\n{}\n'.format(
     cookie_tips_page)
-http_warning = '提取失败{}: http访问异常, 状态码: {}, 请前往issue页反馈:\n{}'
+http_warning = '提取失败{}: http访问异常, 状态码: {} -> {}'
 proxy_warning = '参数错误: 代理格式错误, 格式: [ip/域名]:[端口], 示例: 127.0.0.1:7890'
 user_unavailable_warning = '提取失败: 该用户已锁定/冻结, 访问锁定用户需要设置已关注账号的cookie'
+age_restricted_warning = '提取失败: 该用户已设置年龄限制, 访问需要设置账号cookie'
 tweet_unavailable_warning = '提取失败: 该推文的用户已锁定/冻结, 访问锁定推文需要设置已关注账号的cookie'
 network_error_warning = '网络连接失败, 请检查代理设置'
 proxy_error_warning = '代理连接错误, 请检查代理设置是否正确'

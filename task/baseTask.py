@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2022-03-03 02:14:55
+LastEditTime: 2022-05-13 13:40:01
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -10,21 +10,20 @@ from common.text import task_finish
 from common.tools import downloadFile, saveText
 
 
-class Task:
-    userName = ''
-    savePath = ''
-    config = {}  # 任务配置列表， 即const.context
+class Task(object):
+    # config = {}  # 任务配置列表， 即const.context
 
-    dataList = {  # 自定义爬取数据结构
-        'picList': {},  # DATA: {serverFileName: {url: , twtId: }}
-        'gifList': {},  # DATA: ↑
-        'vidList': {},  # DATA: ↑
-        'textList': {},  # DATA: {twtId: textContent}
-    }
+    def __init__(self):
+        self.dataList = {  # 自定义爬取数据结构
+            'picList': {},  # DATA: {serverFileName: {url: , twtId: }}
+            'gifList': {},  # DATA: ↑
+            'vidList': {},  # DATA: ↑
+            'textList': {},  # DATA: {twtId: textContent}
+        }
 
     @abstractmethod
     def getDataList(self):
-        pass
+        raise NotImplemented
 
     def start(self):
         self.getDataList()

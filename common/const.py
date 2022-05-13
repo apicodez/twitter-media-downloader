@@ -3,7 +3,7 @@ import os
 import configparser
 import requests
 
-version = '1.2.2'
+version = '1.2.3'
 
 # const
 twtCount = 100  # 推主媒体批量爬取时, 每次api抓取的推文计数
@@ -42,14 +42,15 @@ def getContext(key=None):
 # api url
 hostUrl = 'https://api.twitter.com/1.1/guest/activate.json'
 twtApi = 'https://api.twitter.com/2/timeline/conversation/{}.json'
-userMediaApi = 'https://twitter.com/i/api/graphql/p7Yt7EGxv3YSk7z8MnUNFA/UserMedia'
+userMediaApi = 'https://twitter.com/i/api/graphql/ngkNnhoHF01FpsMjb57TLA/UserMedia'
 userInfoApi = 'https://twitter.com/i/api/graphql/Vf8si2dfZ1zmah8ePYPjDQ/UserByScreenNameWithoutResults'
 checkUpdateApi = 'https://api.github.com/repos/mengzonefire/twitter-media-downloader/releases/latest'
 
 # api parameter
 twtApiPar = {'include_entities': 'false',
              'include_user_entities': 'false', 'tweet_mode': 'extended'}
-userMediaApiPar = '{{"userId":"{}","count":{},{}"withTweetQuoteCount":false,"includePromotedContent":false,"withSuperFollowsUserFields":false,"withUserResults":false,"withBirdwatchPivots":false,"withReactionsMetadata":false,"withReactionsPerspective":false,"withSuperFollowsTweetFields":false,"withClientEventToken":false,"withBirdwatchNotes":false,"withVoice":false}}'
+userMediaApiPar = '{{"userId":"{}","count":{},{}"includePromotedContent":false,"withSuperFollowsUserFields":false,"withDownvotePerspective":false,"withReactionsMetadata":false,"withReactionsPerspective":false,"withSuperFollowsTweetFields":false,"withClientEventToken":false,"withBirdwatchNotes":false,"withVoice":false,"withV2Timeline":true}}'
+userMediaApiPar2 = '{"responsive_web_like_by_author_enabled":false,"dont_mention_me_view_api_enabled":false,"interactive_text_enabled":false,"responsive_web_uc_gql_enabled":false,"responsive_web_edit_tweet_api_enabled":false}'
 userInfoApiPar = '{{"screen_name":"{}","withHighlightedLabel":false}}'
 
 # re pattern
@@ -67,4 +68,4 @@ p_text_content = re.compile(r'''full_text['"]:\s?['"](.+?)['"]''')
 p_cursor = re.compile(r'value":"(.+?)"')
 
 # http code text warning
-{'403': '本机IP已被推特服务器禁止访问, 请尝试更换代理节点'}
+httpCodeText = {'403': '本机IP已被推特服务器禁止访问, 请尝试更换代理节点', '401': '导入的cookie无效, 请重新获取并导入'}
