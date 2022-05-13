@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-05-13 14:42:34
+LastEditTime: 2022-05-14 03:01:36
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -155,6 +155,8 @@ def getEnv():
                     setContext('proxy', eval(item[1]))
                 elif item[0] == 'download_path' and item[1]:
                     setContext('dl_path', item[1])
+                elif item[0] == 'updateInfo' and item[1]:
+                    setContext('updateInfo', item[1])
             setContext('headers', headers)
 
 
@@ -265,9 +267,19 @@ def parseData(strContent, twtId):
 
 
 def checkUpdate():
-    response = requests.get(checkUpdateApi)
-    jsonData = response.json()
-    tag_name = jsonData["tag_name"]
-    name = jsonData["name"]
-    if version != tag_name:
+    updateInfo = getContext('updateInfo')
+    date = time.strftime("%m-%d", time.localtime())
+    tagName = updateInfo['tagName']
+    name = updateInfo['name']
+    if updateInfo['LastCheckDate'] != date:
+        updateInfo['LastCheckDate'] = date
+        response = requests.get(checkUpdateApi, proxies=getContext('proxy'))
+        jsonData = response.json()
+        tagName = jsonData["tag_name"]
+        name = jsonData["name"]
+    if version != tagName:
+        updateInfo['tagName'] = tagName
+        updateInfo['name'] = name
         print("发现新版本: {}\n下载地址: {}\n".format(name, release_page))
+    setContext('updateInfo', updateInfo)
+    saveEnv()

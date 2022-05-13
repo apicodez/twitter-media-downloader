@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2022-03-03 02:32:14
+LastEditTime: 2022-05-13 21:13:58
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
@@ -22,8 +22,8 @@ def main():
     getEnv()
     if len(sys.argv) == 1:  # 命令行参数为空 -> 双击运行程序
         print('version: {}\ndonate page: {}\nissue page: {}\n'.format(version, donate_page, issue_page))
-        checkUpdate()
         getProxy()
+        checkUpdate()
         getHeader()
         cmdMode()
     else:

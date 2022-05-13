@@ -24,7 +24,8 @@ context = {
     'proxy': {},
     'headers': {'authorization': authorization, 'Cookie': '', 'User-Agent': ''},
     'dl_path': './twitter_media_download',
-    'log_path': './log'
+    'log_path': './log',
+    'updateInfo': {'LastCheckDate': '', 'tagName': '', 'name': ''}
 }
 
 
@@ -68,4 +69,5 @@ p_text_content = re.compile(r'''full_text['"]:\s?['"](.+?)['"]''')
 p_cursor = re.compile(r'value":"(.+?)"')
 
 # http code text warning
-httpCodeText = {'403': '本机IP已被推特服务器禁止访问, 请尝试更换代理节点', '401': '导入的cookie无效, 请重新获取并导入'}
+httpCodeText = {'403': '本机IP已被推特服务器禁止访问, 请尝试更换代理节点',
+                '401': '导入的cookie无效, 请重新获取并导入'}
