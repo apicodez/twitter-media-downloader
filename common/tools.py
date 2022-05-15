@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-05-14 03:01:36
+LastEditTime: 2022-05-15 03:10:40
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -80,9 +80,9 @@ def get_token(cookie):
         return None
 
 
-def set_proxy(proxy_str):
-    proxy_match = p_proxy.match(proxy_str)
-    if proxy_match and 1024 <= int(proxy_match.group(1)) <= 65535:
+def setProxy(proxy_str):
+    proxyMatch = pProxy.match(proxy_str)
+    if proxyMatch and 1024 <= int(proxyMatch.group(1)) <= 65535:
         setContext('proxy', {'http': 'http://' + proxy_str,
                    'https': 'https://' + proxy_str})
         print('代理设置为: {}'.format(proxy_str))
@@ -101,7 +101,7 @@ def argsHandler():
         if args.proxy == ' ':
             setContext('proxy', {})
         else:
-            set_proxy(args.proxy)
+            setProxy(args.proxy)
     elif sys.platform in ['win32', 'win64']:
         getProxy()
     if args.cookie:
