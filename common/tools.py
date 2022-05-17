@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-05-15 03:10:40
+LastEditTime: 2022-05-17 15:57:44
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -53,7 +53,7 @@ def getProxy():
     if proxy_enable:
         proxy_server, key_type = winreg.QueryValueEx(key, "ProxyServer")
         setContext('proxy', {'http': 'http://'+proxy_server,
-                   'https': 'https://'+proxy_server})
+                   'https': 'http://'+proxy_server})
 
 
 def getHeader():  # 获取游客token
@@ -127,19 +127,20 @@ def argsHandler():
 
 
 def saveEnv():
-    conf.read(conf_path)
+    conf.read(conf_path, encoding='utf-8')
     if 'global' not in conf.sections():
         conf.add_section('global')
     conf.set("global", "proxy", getContext("proxy"))
     conf.set("global", "download_path", getContext("dl_path"))
     conf.set("global", "user-agent", getContext("headers")["User-Agent"])
     conf.set("global", "cookie", getContext("headers")['Cookie'])
-    conf.write(open(conf_path, 'w'))
+    conf.set("global", "updateinfo", getContext("updateInfo"))
+    conf.write(open(conf_path, 'w', encoding='utf-8'))
 
 
 def getEnv():
     if os.path.exists(conf_path):
-        conf.read(conf_path)
+        conf.read(conf_path, encoding='utf-8')
         if 'global' in conf.sections():
             headers = getContext("headers")
             items = conf.items('global')
@@ -155,8 +156,8 @@ def getEnv():
                     setContext('proxy', eval(item[1]))
                 elif item[0] == 'download_path' and item[1]:
                     setContext('dl_path', item[1])
-                elif item[0] == 'updateInfo' and item[1]:
-                    setContext('updateInfo', item[1])
+                elif item[0] == 'updateinfo' and item[1]:
+                    setContext('updateInfo', eval(item[1]))
             setContext('headers', headers)
 
 
