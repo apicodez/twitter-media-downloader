@@ -2,45 +2,39 @@
 
 用于下载推特页面中包含的媒体文件（支持文本, 图片, 视频, 动图）的脚本工具, 使用推特网页版的 api 获取数据
 
-<br/>
-
 支持输入如下两种种格式的链接:
 
 1. https://<span></span>twitter.com/\*\*\*/status/\*\*\* (推文)
 2. https://<span></span>twitter.com/\*\*\* (推主主页, \*\*\*为推主 id, 用于批量爬取)
 
-<br/>
-
 # donate 赞助
 
 作者开发维护不易, 若喜欢本项目, 欢迎前往 [爱发电](https://afdian.net/@mengzonefire) 支持作者
 
-<br/>
-
 # tips 提示
 
-1. 获取到的媒体文件默认下载到路径下的 twitter_media_download 文件夹
-2. 锁定的推主/推文必须设置 cookie 才能爬取, 设置完成后, cookie自动保存, 下次运行程序会自动读取
-3. 下载文件名格式: {推主 id}\_{推文 id}\_{服务器文件名}, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
+1. 获取到的媒体文件默认下载到程序同目录下的 **twitter_media_download** 文件夹
+2. 设置年龄限制/锁定 的 推主/推文 必须设置 cookie 才能爬取, 设置完成后, cookie会保存到本地, 下次运行程序自动读取
+3. 下载文件名格式: **{推主 id}\_{推文 id}\_{服务器文件名}**, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
 4. 默认使用系统代理，无需配置 (仅 win 平台, 其余平台请手动设置)
 5. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
-6. 支持爬取推文文本, 自动保存为{推主 id}\_{推文 id}.txt
-7. 若出现任何问题/提意见&需求, 请前往 issue 反馈
-8. 程序的默认配置文件路径: linux: ~/tw_media_downloader.conf ; win: %HOMEPATH%/tw_media_downloader.conf
-
-<br/>
+6. 支持爬取推文文本, 自动保存为 **{推主 id}\_{推文 id}.txt**
+7. 若出现任何问题/提意见&需求, 请前往 [issue](https://github.com/mengzonefire/twitter-media-downloader/issues) 反馈
+8. 程序的配置文件路径:
+    * linux: ~/tw_media_downloader.conf
+    * win: %userprofile%/tw_media_downloader.conf
 
 # usage 使用方法
 
-直接运行程序:  
+1. 直接运行程序:  
 运行后根据提示输入 命令 或 推文/推主链接即可.
-
+    ```
     python3 twitter-media-downloader.py
+    ```
+    <img src="https://pic.rmb.bdstatic.com/bjh/08934029f23df12817604a44d48fb01d.png">
 
-<img src="https://pic.rmb.bdstatic.com/bjh/08934029f23df12817604a44d48fb01d.png">
-
-命令行调用:
-
+2. 命令行调用:
+    ```
     usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
                                       [-d DIR] [-v]
                                       [url [url ...]]
@@ -61,9 +55,7 @@
                             set user-agent, input " " to clear
       -d DIR, --dir DIR     set download path
       -v, --version         show version
-
-<br/>
-
+    ```
 # dev note 开发记录
 
 1. ~~发现有个同名的插件, 而且还更好用, 故本项目停止开发.~~ (发现自己的脚本还是有点优势的, 继续开发吧)
@@ -71,8 +63,6 @@
    (插件地址: [谷歌插件商店](https://chrome.google.com/webstore/detail/twitter-media-downloader/cblpjenafgeohmnjknfhpdbdljfkndig))
 
 2. 废弃 TODO#9, 因为考虑到脚本的主要耗时是下载而非解析数据, 故用 TODO#22 作为替代
-
-<br/>
 
 # TODO 待实现需求
 
