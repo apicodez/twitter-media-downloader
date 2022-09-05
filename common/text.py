@@ -22,6 +22,7 @@ wrong_url_warning = '提取失败: 错误的推文/推主主页链接'
 not_exist_warning = '提取失败: 该推文已删除/不存在'
 tw_id_waring = '格式错误: 推文id必须为纯数字串'
 input_warning = '解析失败: 错误的链接或命令'
+check_update_warning = '检查更新失败, 程序继续运行, 失败信息:\n{}'
 
 # normal str
 task_finish = '全部文件下载完成, 保存到路径: {}\n'
