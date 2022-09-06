@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-09-05 11:33:53
+LastEditTime: 2022-09-06 20:05:52
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -268,28 +268,31 @@ def parseData(strContent, twtId):
 
 
 def checkUpdate():
+    # 从本地缓存获取更新信息
     updateInfo = getContext('updateInfo')
     date = time.strftime("%m-%d", time.localtime())
     tagName = updateInfo['tagName']
     name = updateInfo['name']
+
     if updateInfo['LastCheckDate'] != date:
-        updateInfo['LastCheckDate'] = date
+        # 从api获取更新信息
         response = requests.get(checkUpdateApi, proxies=getContext('proxy'))
         jsonData = response.json()
+
+        # api返回数据不正确, 一般是触发频限被ban ip了
+        if "tag_name" not in jsonData:
+            print(check_update_warning.format(jsonData))
+            return
+
         tagName = jsonData["tag_name"]
         name = jsonData["name"]
-    if version != tagName:
+        updateInfo['LastCheckDate'] = date
+
+    # 存在新版本，弹出更新文本提示
+    if tagName and version != tagName:
+        print("发现新版本: {}\n下载地址: {}\n".format(name, release_page))
+        # 覆盖本地缓存数据
         updateInfo['tagName'] = tagName
         updateInfo['name'] = name
-
-    # api返回信息不正确, 一般是触发频限被banIP了
-    if "tag_name" not in jsonData:
-        print(check_update_warning.format(jsonData))
-        return
-
-    tag_name = jsonData["tag_name"]
-    name = jsonData["name"]
-    if version != tag_name:
-        print("发现新版本: {}\n下载地址: {}\n".format(name, release_page))
-    setContext('updateInfo', updateInfo)
-    saveEnv()
+        setContext('updateInfo', updateInfo)
+        saveEnv()
