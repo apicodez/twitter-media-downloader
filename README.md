@@ -20,7 +20,7 @@
 5. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
 6. 支持爬取推文文本, 自动保存为 **{推主 id}\_{推文 id}.txt**
 7. 若出现任何问题/提意见&需求, 请前往 [issue](https://github.com/mengzonefire/twitter-media-downloader/issues) 反馈
-8. 程序的配置文件路径:
+8. 程序的配置文件路径: * 配置文件内含proxy(代理)，download_path(下载路径)，UA和cookie四项配置
     * linux: ~/tw_media_downloader.conf
     * win: %userprofile%/tw_media_downloader.conf
 
