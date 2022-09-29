@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:22:57
-LastEditTime: 2022-05-15 10:35:09
+LastEditTime: 2022-09-29 20:21:35
 LastEditors: mengzonefire
 Description: 异常处理模块
 '''
@@ -17,6 +17,5 @@ def except_handler(err):
     elif 'Cannot connect to proxy' in err:
         print(proxy_error_warning)
     else:
-        # debug
-        traceback.print_exc()
+        traceback.print_exc() # debug
         write_log('crash', traceback.format_exc())

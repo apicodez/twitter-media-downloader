@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-09-29 18:04:10
+LastEditTime: 2022-09-29 20:29:05
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -213,6 +213,8 @@ def downloadFile(url, fileName, savePath):
 
 
 def saveText(content, fileName, savePath):
+    if p_tw_link_text.match(content):  # 跳过空的文本内容
+        return
     filePath = '{}/{}'.format(savePath, fileName)
     if not os.path.exists(savePath):
         os.makedirs(savePath)

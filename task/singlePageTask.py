@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2022-05-13 14:39:15
+LastEditTime: 2022-09-29 20:14:27
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -23,7 +23,7 @@ class SinglePageTask(Task):
         self.savePath = getContext('dl_path')
 
     def getDataList(self):
-        response = getContext('globalSession').get(twtApi.format(self.twtId), params=twtApiPar, proxies=getContext(
+        response = getContext('globalSession').get(singlePageApi, params={'variables': singlePageApiPar.format(self.twtId), 'features': singlePageApiPar2}, proxies=getContext(
             'proxy'), headers=getContext('headers'))
 
         if response.status_code != 200:
@@ -32,23 +32,26 @@ class SinglePageTask(Task):
             return
 
         page_content = response.text
+        # write_log(self.twtId, page_content)  # debug
+
+        # response data error
+        if 'Age-restricted adult content' in page_content:
+            print(age_restricted_warning)
+            return
+        elif 'Sorry, that page does not exist' in page_content:
+            print(not_exist_warning)
+            return
+        elif 'unable to view this Tweet' in page_content:
+            print(tweet_unavailable_warning)
+            return
+            
         # response data correct
-        if '"{}":'.format(self.twtId) in page_content:
+        elif '"tweet-{}"'.format(self.twtId) in page_content:
             tw_content = str(json.loads(page_content)[
-                'globalObjects']['tweets'][self.twtId])
-            # debug
-            # print(tw_content)
+                'data']['threaded_conversation_with_injections_v2']['instructions'][0]['entries'][0]['content'])
             self.dataList['picList'], self.dataList['gifList'], self.dataList['vidList'], self.dataList['textList'] = parseData(
                 tw_content, self.twtId)
 
-        # response data error
-        elif 'Sorry, that page does not exist' in page_content:
-            print(not_exist_warning)
-        elif 'unable to view this Tweet' in page_content:
-            print(tweet_unavailable_warning)
-        elif '"text":"Age-restricted adult content.' in page_content:
-            print(age_restricted_warning)
-            return
         else:
             print(api_warning)
             write_log(self.twtId, page_content)

@@ -26,10 +26,10 @@
 
 # usage 使用方法
 
-* 若使用python3环境运行py代码，注意先安装依赖：
+* 若使用python3环境运行py代码，运行前注意先安装依赖：
 
     ```
-    pip install requests
+    pip install -r requirements.txt
     ```
 
 1. 直接运行程序:  

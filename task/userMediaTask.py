@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2022-05-13 14:39:31
+LastEditTime: 2022-09-29 20:21:42
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
@@ -32,11 +32,14 @@ class UserMediaTask(Task):
 
         pageContent = response.text
         # print(pageContent)  # debug
-        if '"__typename":"UserUnavailable"' in pageContent:
+        if 'UserUnavailable' in pageContent:
             print(user_unavailable_warning)
             return
-        elif '"text":"Age-restricted adult content.' in pageContent:
+        elif 'Age-restricted adult content' in pageContent:
             print(age_restricted_warning)
+            return
+        elif '"timeline_v2":{}' in pageContent:
+            print(need_cookie_warning)
             return
         twtIdList = p_twt_id.findall(pageContent)
         if not twtIdList:

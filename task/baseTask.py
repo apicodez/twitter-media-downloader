@@ -1,12 +1,12 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2022-05-13 13:40:01
+LastEditTime: 2022-09-29 20:19:57
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
 from abc import abstractmethod
-from common.text import task_finish
+from common.text import task_finish, dl_nothing_warning
 from common.tools import downloadFile, saveText
 
 
@@ -26,6 +26,7 @@ class Task(object):
         raise NotImplemented
 
     def start(self):
+        dlNothing = True
         self.getDataList()
 
         for key in ['picList', 'gifList', 'vidList']:
@@ -34,11 +35,16 @@ class Task(object):
                 fileName = '{}_{}_{}'.format(
                     self.userName, self.dataList[key][serverFileName]['twtId'], serverFileName)
                 downloadFile(url, fileName, self.savePath)
+                dlNothing = False
 
         for twtId in self.dataList['textList']:
             content = self.dataList['textList'][twtId]
             fileName = '{}_{}.txt'.format(
                 self.userName, twtId)
             saveText(content, fileName, self.savePath)
+            dlNothing = False
 
-        print(task_finish.format(self.savePath))
+        if not dlNothing:
+            print(task_finish.format(self.savePath))
+        else:
+            print(dl_nothing_warning)
