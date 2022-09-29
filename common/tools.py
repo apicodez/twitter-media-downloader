@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-09-29 18:02:25
+LastEditTime: 2022-09-29 18:04:10
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -277,8 +277,7 @@ def checkUpdate():
 
     if updateInfo['LastCheckDate'] != date:
         # 从api获取更新信息
-        response = requests.get(checkUpdateApi, proxies=getContext(
-            'proxy'), headers=githubAuthHeader)
+        response = requests.get(checkUpdateApi, proxies=getContext('proxy'))
         jsonData = response.json()
 
         # api返回数据不正确, 一般是触发频限了

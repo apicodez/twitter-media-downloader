@@ -53,8 +53,6 @@ twtApiPar = {'include_entities': 'false',
 userMediaApiPar = '{{"userId":"{}","count":{},{}"includePromotedContent":false,"withSuperFollowsUserFields":false,"withDownvotePerspective":false,"withReactionsMetadata":false,"withReactionsPerspective":false,"withSuperFollowsTweetFields":false,"withClientEventToken":false,"withBirdwatchNotes":false,"withVoice":false,"withV2Timeline":true}}'
 userMediaApiPar2 = '{"responsive_web_like_by_author_enabled":false,"dont_mention_me_view_api_enabled":false,"interactive_text_enabled":false,"responsive_web_uc_gql_enabled":false,"responsive_web_edit_tweet_api_enabled":false}'
 userInfoApiPar = '{{"screen_name":"{}","withHighlightedLabel":false}}'
-githubAuthHeader = {
-    'Authorization': 'token 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'}  # 添加token提高检查更新api的访问频限
 
 # re pattern
 p_csrf_token = re.compile(r'ct0=(.+?)(?:;|$)')
