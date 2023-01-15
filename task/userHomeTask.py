@@ -1,10 +1,7 @@
-'''
-Author: mengzonefire
-Date: 2021-09-21 09:19:02
-LastEditTime: 2022-09-29 20:21:42
-LastEditors: mengzonefire
-Description: 推主推文批量爬取任务类
-'''
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# @Time    : 2023/1/13 19:27
+# @Author  : 178
 import time
 import httpx
 
@@ -14,10 +11,10 @@ from common.tools import getHttpText, parseData
 from task.baseTask import Task
 
 
-class UserMediaTask(Task):
+class UserHomeTask(Task):
 
     def __init__(self, userName, userId):
-        super(UserMediaTask, self).__init__()
+        super(UserHomeTask, self).__init__()
         self.userName = userName
         self.userId = userId
         self.savePath = '{}/{}'.format(getContext('dl_path'), userName)
@@ -31,9 +28,9 @@ class UserMediaTask(Task):
             for i in range(1, 6):
                 try:
                     with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
-                        response = client.get(userMediaApi, params={
-                            'variables': userMediaApiPar.format(self.userId, twtCount, cursorPar),
-                            'features': userMediaApiPar2})
+                        response = client.get(userHomeApi, params={
+                            'variables': userHomeApiPar.format(self.userId, twtCount, cursorPar),
+                            'features': userHomeApiPar2})
                     break
                 except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
                     print(timeout_warning.format(i))
@@ -42,7 +39,7 @@ class UserMediaTask(Task):
                 self.stopGetDataList()
                 return
             if response.status_code != httpx.codes.OK:
-                print(http_warning.format('UserMediaTask.getDataList',
+                print(http_warning.format('UserHomeTask.getDataList',
                                           response.status_code, getHttpText(response.status_code)))
                 self.stopGetDataList()
                 return
@@ -51,3 +48,4 @@ class UserMediaTask(Task):
             if not cursor:
                 self.stopGetDataList()
                 return
+

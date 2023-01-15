@@ -5,13 +5,9 @@ LastEditTime: 2022-05-13 21:13:58
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
-import sys
-import os
-from common.const import *
-from common.text import *
-from common.tools import *
 from common.console import cmdMode, startCrawl
 from common.exceptHandler import except_handler
+from common.tools import *
 
 
 def main():
