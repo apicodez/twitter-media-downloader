@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2022-09-29 20:19:57
+LastEditTime: 2023-01-16 00:31:06
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -67,12 +67,14 @@ class Task(object):
         if not os.path.exists(self.savePath):
             os.makedirs(self.savePath)
         start = time.perf_counter()
-        t1, t2 = threading.Thread(target=self.getDataList), threading.Thread(target=self.progressBar, args=(start,))
+        t1, t2 = threading.Thread(target=self.getDataList), threading.Thread(
+            target=self.progressBar, args=(start,))
         t1.start()
         t2.start()
         with ThreadPoolExecutor(max_workers=getContext('concurrency')) as executor:
             for _ in range(getContext('concurrency')):
-                task = executor.submit(downloadFile, self.savePath, self.dataList, self.done)
+                task = executor.submit(
+                    downloadFile, self.savePath, self.dataList, self.done)
                 self.tasks.add(task)
         wait(self.tasks)
         self.stop = True

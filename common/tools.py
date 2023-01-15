@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2022-09-29 20:29:05
+LastEditTime: 2023-01-16 00:26:25
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -59,9 +59,9 @@ def getProxy():
         return
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                          r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
-    proxy_enable, key_type = winreg.QueryValueEx(key, "ProxyEnable")
+    proxy_enable, _ = winreg.QueryValueEx(key, "ProxyEnable")
     if proxy_enable:
-        proxy_server, key_type = winreg.QueryValueEx(key, "ProxyServer")
+        proxy_server, _ = winreg.QueryValueEx(key, "ProxyServer")
         setContext('proxy', {'http://': 'http://' + proxy_server,
                              'https://': 'http://' + proxy_server})
 
@@ -225,7 +225,8 @@ def downloader(client, url, filePath, fileName):
         try:
             with client.stream('GET', url) as response:
                 if response.status_code != httpx.codes.OK:
-                    print(http_warning.format('downloadFile', response.status_code, getHttpText(response.status_code)))
+                    print(http_warning.format(
+                        'downloadFile', response.status_code, getHttpText(response.status_code)))
                     return False
                 with open(f'{filePath}.cache', 'wb') as f:
                     for chunk in response.iter_bytes(chunk_size=1024*128):
@@ -290,7 +291,7 @@ def saveText(filePath, content, date):
 
 
 def getResult(tweet):
-    getresult = lambda result: result if result['__typename'] == 'Tweet' else \
+    def getresult(result): return result if result['__typename'] == 'Tweet' else \
         (result['tweet'] if result['__typename'] == 'TweetWithVisibilityResults' else
          (None if result['__typename'] == 'TweetTombstone' else None))
     if 'entryId' not in tweet:
@@ -298,14 +299,16 @@ def getResult(tweet):
     if tweet['content']['entryType'] == 'TimelineTimelineItem':
         if 'tweetDisplayType' in tweet['content']['itemContent'] and \
                 tweet['content']['itemContent']['tweetDisplayType'] == 'Tweet':
-            result = getresult(tweet['content']['itemContent']['tweet_results']['result'])
+            result = getresult(
+                tweet['content']['itemContent']['tweet_results']['result'])
             return result
         else:
             return None
     elif tweet['content']['entryType'] == 'TimelineTimelineModule':
         if 'tweetDisplayType' in tweet['content'] and \
                 tweet['content']['tweetDisplayType'] == 'VerticalConversation':
-            result = getresult(tweet['content']['items'][-1]['item']['tweet_results']['result'])
+            result = getresult(tweet['content']['items']
+                               [-1]['item']['tweet_results']['result'])
             return result
         else:
             return None
@@ -342,11 +345,13 @@ def getTweet(pageContent, cursor=None, isfirst=False):
         for instruction in instructions:
             if instruction['type'] == 'TimelineAddEntries':
                 entries = instruction['entries']
-                cursor = entries[-1]['content']['value'] if len(entries) != 0 else None
+                cursor = entries[-1]['content']['value'] if len(
+                    entries) != 0 else None
                 break
     elif 'threaded_conversation_with_injections_v2' in pageContent['data']:
         entries = pageContent['data']['threaded_conversation_with_injections_v2']['instructions'][0]['entries']
-    if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-1] and 'cursor-bottom' in entries[-1]['entryId']:  # 搜索接口返回的entries不包括cursor
+    # 搜索接口返回的entries不包括cursor
+    if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-1] and 'cursor-bottom' in entries[-1]['entryId']:
         return None, None
     tweets = []
     for tweet in entries:
@@ -374,20 +379,25 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
         result = getResult(tweet)
         if not result:
             continue
-        if 'legacy' in result and 'retweeted_status_result' in result['legacy']:  # 转推
+        # 转推
+        if 'legacy' in result and 'retweeted_status_result' in result['legacy']:
             if getContext('retweeted'):
                 result = result['legacy']['retweeted_status_result']['result']['tweet'] \
                     if 'tweet' in result['legacy']['retweeted_status_result']['result'] \
                     else result['legacy']['retweeted_status_result']['result']
             else:
                 continue
-        legacylist = [[result['rest_id'] if 'rest_id' in result else result['id_str'], result['legacy'] if 'legacy' in result else result]]
+        legacylist = [[result['rest_id'] if 'rest_id' in result else result['id_str'],
+                       result['legacy'] if 'legacy' in result else result]]
         media_type = getContext('type').split('&')
         if getContext('quoted'):  # 包括引用，如 https://twitter.com/Liyu0109/status/1611734998402633728
-            if 'quoted_status_result' in result and 'legacy' in result['quoted_status_result']['result']:  # 判断是否有引用，以及引用是否能查看，搜索接口的引用tweet直接在tweet_list里面，其他接口则嵌套在result里面
-                legacylist.append([result['quoted_status_result']['result']['rest_id'], result['quoted_status_result']['result']['legacy']])
+            # 判断是否有引用，以及引用是否能查看，搜索接口的引用tweet直接在tweet_list里面，其他接口则嵌套在result里面
+            if 'quoted_status_result' in result and 'legacy' in result['quoted_status_result']['result']:
+                legacylist.append([result['quoted_status_result']['result']
+                                  ['rest_id'], result['quoted_status_result']['result']['legacy']])
         else:
-            if 'quoted_status_id_str' in result and result['user_id_str'] != user_id:  # 搜索接口的去除引用的方法是对比tweet的user_id_str是否等于userId,仅限@user等于from：user
+            # 搜索接口的去除引用的方法是对比tweet的user_id_str是否等于userId,仅限@user等于from：user
+            if 'quoted_status_id_str' in result and result['user_id_str'] != user_id:
                 continue
         for twtId, legacy in legacylist:
             if twtId in rest_id_list:
@@ -396,19 +406,23 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                 rest_id_list.append(twtId)
             if 'extended_entities' in legacy:
                 for media in legacy['extended_entities']['media']:
+
                     # get pic links
                     if media['type'] == 'photo' and media['type'] in media_type:  # photo
                         # get {'url', url}, add query '?name=orig' can get original pic file
                         url = media['media_url_https']
-                        picDic[url.split('/')[-1]] = {'url': url + '?name=orig', 'twtId': twtId}
+                        picDic[url.split(
+                            '/')[-1]] = {'url': url + '?name=orig', 'twtId': twtId}
                         if url:
                             total.put('add')
+
                     # get gif links(.mp4)
                     elif media['type'] == 'animated_gif' and media['type'] in media_type:  # gif
                         # [{'bitrate':filesize',url':url}]
                         variants = media['video_info']['variants'][0]
                         url = variants['url']
-                        gifDic[url.split('/')[-1]] = {'url': url, 'twtId': twtId}
+                        gifDic[url.split('/')[-1]
+                               ] = {'url': url, 'twtId': twtId}
                         if url:
                             total.put('add')
 
@@ -418,10 +432,11 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                         variants = sorted(media['video_info']['variants'],
                                           key=lambda s: s['bitrate'] if 'bitrate' in s else 0, reverse=True)[0]
                         url = variants['url']
-                        vidDic[url.split('/')[-1].split('?')[0]] = {'url': url, 'twtId': twtId}
+                        vidDic[url.split('/')[-1].split('?')[0]
+                               ] = {'url': url, 'twtId': twtId}
                         if url:
                             total.put('add')
-
+                    # fail
                     elif media['type'] and media['type'] not in ['video', 'animated_gif', 'photo']:
                         print('解析失败：', media)
 
@@ -455,7 +470,8 @@ def checkUpdate():
     if updateInfo['LastCheckDate'] != date:
         # 从api获取更新信息
         try:
-            response = httpx.get(checkUpdateApi, proxies=getContext('proxy'), verify=False)
+            response = httpx.get(
+                checkUpdateApi, proxies=getContext('proxy'), verify=False)
             jsonData = response.json()
         except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError) as e:
             print(check_update_warning.format(e))

@@ -8,3 +8,5 @@ log
 twitter_media_download
 sample
 test
+venv
+.vscode

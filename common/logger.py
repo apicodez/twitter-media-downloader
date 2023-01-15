@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:23:35
-LastEditTime: 2022-03-03 02:25:03
+LastEditTime: 2023-01-15 23:50:35
 LastEditors: mengzonefire
 Description: log模块
 '''
@@ -16,7 +16,7 @@ def write_log(log_name, log_content):
     if not os.path.exists(log_path):
         os.mkdir(log_path)
     file_path = re.sub(
-        r'[:*?"<>|]', '', '{}/{}.log'.format(log_path, log_name)) # 去除路径内的非法字符
+        r'[:*?"<>|]', '', '{}/{}.log'.format(log_path, log_name))  # 去除路径内的非法字符
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(log_content)
         print(log_warning.format(file_path))

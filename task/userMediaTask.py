@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2022-09-29 20:21:42
+LastEditTime: 2023-01-16 00:31:17
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
@@ -47,7 +47,8 @@ class UserMediaTask(Task):
                 self.stopGetDataList()
                 return
             pageContent = response.json()
-            cursor, rest_id_list = parseData(pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list)
+            cursor, rest_id_list = parseData(
+                pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list)
             if not cursor:
                 self.stopGetDataList()
                 return

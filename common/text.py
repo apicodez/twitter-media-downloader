@@ -9,7 +9,8 @@ log_warning = '\n运行错误: log文件已保存到 {}\n'
 # api_warning = '提取失败: 数据解析失败, 请将log文件反馈到issue页:\n{}'.format(issue_page)
 user_warning = '提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{}'.format(issue_page)
 token_warning = '运行失败: guest_token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
-parse_warning = '解析失败: 跳过解析此数据, 请带上错误数据信息前往issue页反馈:\n{}\n{}'.format(issue_page, '{}')
+parse_warning = '解析失败: 跳过解析此数据, 请带上错误数据信息前往issue页反馈:\n{}\n{}'.format(
+    issue_page, '{}')
 cookie_warning = '参数错误: 输入的cookie格式错误, 请参考教程获取cookie:\n{}\n'.format(
     cookie_tips_page)
 http_warning = '\r提取失败{}: http访问异常, 状态码: {} -> {}'

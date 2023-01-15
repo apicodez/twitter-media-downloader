@@ -33,7 +33,8 @@ class UserSearchTask(Task):
                 q = f'(from:{self.userName}) until:{self.date[1]} since:{self.date[0]} -filter:replies'
             else:
                 q = f'(from:{self.userName}) -filter:replies'
-            params = json.loads(userSearchApiPar.format(q, twtCount, cursorPar))
+            params = json.loads(
+                userSearchApiPar.format(q, twtCount, cursorPar))
             response = None
             for i in range(1, 6):
                 try:
@@ -52,7 +53,8 @@ class UserSearchTask(Task):
                 self.stopGetDataList()
                 return
             pageContent = response.json()
-            cursor, rest_id_list = parseData(pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor)
+            cursor, rest_id_list = parseData(
+                pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor)
             if not cursor:
                 self.stopGetDataList()
                 return

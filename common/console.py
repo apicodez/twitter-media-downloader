@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2022-03-03 02:45:01
+LastEditTime: 2023-01-15 23:44:07
 LastEditors: mengzonefire
 Description: 
 '''
@@ -16,8 +16,9 @@ from common.const import *
 from common.tools import get_token, getHeader, getUserId, saveEnv
 
 
-def cmdMode():
-    clear()
+def cmdMode(clearScreen=True):
+    if clearScreen:
+        clear()
     url_list = []
     print(input_ask)
     while True:
@@ -219,7 +220,8 @@ def urlHandler(url: str):
         elif '&' in url and len(url.split('&')) == 2:
             advanced = None
             userName = url.split('&')[0].replace('@', '')
-            date = [url.split('&')[1].split('|')[0], url.split('&')[1].split('|')[1]]
+            date = [url.split('&')[1].split('|')[0],
+                    url.split('&')[1].split('|')[1]]
         elif '&' not in url:
             advanced = None
             userName = url[1:]
