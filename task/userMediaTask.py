@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2023-01-16 00:31:17
+LastEditTime: 2023-02-22 03:02:59
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
@@ -15,8 +15,9 @@ from task.baseTask import Task
 
 
 class UserMediaTask(Task):
+    userId: int
 
-    def __init__(self, userName, userId):
+    def __init__(self, userName: str, userId: int):
         super(UserMediaTask, self).__init__()
         self.userName = userName
         self.userId = userId

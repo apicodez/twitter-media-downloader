@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-01-16 00:26:25
+LastEditTime: 2023-02-22 02:51:00
 LastEditors: mengzonefire
 Description: 工具模块
 '''
@@ -148,6 +148,11 @@ def argsHandler():
     setContext('header', headers)
 
 
+'''
+description: 保存配置到本地
+'''
+
+
 def saveEnv():
     conf.read(conf_path, encoding='utf-8')
     if 'global' not in conf.sections():
@@ -162,6 +167,11 @@ def saveEnv():
     conf.set("global", "quoted", getContext("quoted"))
     conf.set("global", "retweeted", getContext("retweeted"))
     conf.write(open(conf_path, 'w', encoding='utf-8'))
+
+
+'''
+description: 从本地读取配置
+'''
 
 
 def getEnv():
@@ -195,7 +205,14 @@ def getEnv():
             setContext('headers', headers)
 
 
-def getUserId(userName: str):
+'''
+description: 从推主名获取推主id(用于接口请求参数)
+param {str} userName 推主昵称
+return {int|None} userId 推主id
+'''
+
+
+def getUserId(userName: str) -> int | None:
     with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
         for i in range(1, 6):
             try:
@@ -213,15 +230,25 @@ def getUserId(userName: str):
     userId = p_user_id.findall(page_content)
     if userId:
         userId = userId[0]
-        return userId
+        return int(userId)
     else:
         print(user_warning)
         write_log(userName, page_content)
         return None
 
 
-def downloader(client, url, filePath, fileName):
-    for i in range(1, 6):
+'''
+description: 从直链下载文件
+param {*} client
+param {str} url 直链
+param {str} filePath 下载文件路径
+param {str} fileName 文件名
+return {bool} True下载成功, False下载失败
+'''
+
+
+def downloader(client, url: str, filePath: str, fileName: str) -> bool:
+    for _ in range(1, 6):
         try:
             with client.stream('GET', url) as response:
                 if response.status_code != httpx.codes.OK:
@@ -242,7 +269,15 @@ def downloader(client, url, filePath, fileName):
     return False
 
 
-def downloadFile(savePath, dataList, done):
+'''
+description: 下载任务队列中的文件
+param {str} savePath 下载路径
+param {queue} dataList 任务队列
+param {queue} done 已完成队列
+'''
+
+
+def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
     while True:
         if dataList.qsize():
             break
@@ -281,7 +316,15 @@ def downloadFile(savePath, dataList, done):
                             done.put('done')
 
 
-def saveText(filePath, content, date):
+'''
+description: 保存推文文本内容
+param {str} filePath 写入文件路径
+param {str} content 推文内容(文本)
+param {str} date 推文发布日期
+'''
+
+
+def saveText(filePath: str, content: str, date: str):
     if os.path.exists(filePath):
         return True
     with open(filePath, 'w', encoding='utf-8') as f:

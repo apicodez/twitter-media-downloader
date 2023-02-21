@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2022-09-29 20:14:27
+LastEditTime: 2023-02-21 12:10:26
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -15,9 +15,8 @@ from task.baseTask import Task
 
 
 class SinglePageTask(Task):
-    twtId = ''
 
-    def __init__(self, userName, twtId):
+    def __init__(self, userName: str, twtId: int):
         super(SinglePageTask, self).__init__()
         self.twtId = twtId
         self.userName = userName

@@ -13,7 +13,7 @@ from task.baseTask import Task
 
 class UserHomeTask(Task):
 
-    def __init__(self, userName, userId):
+    def __init__(self, userName: str, userId: int):
         super(UserHomeTask, self).__init__()
         self.userName = userName
         self.userId = userId

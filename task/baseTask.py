@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-01-16 00:31:06
+LastEditTime: 2023-02-22 03:03:42
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -18,12 +18,18 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 
 class Task(object):
+    savePath: str
+    userName: str
+    twtId: int
+    userId: int
     # config = {}  # 任务配置列表， 即const.context
 
     def __init__(self):
         self.tasks = set()
-        self.userName = None
-        self.savePath = None
+        self.userName = ''
+        self.savePath = ''
+        self.twtId = 0
+        self.userId = 0
         self.stop = False  # 进度条与生产者停止信号
         self.total = Queue()  # 总媒体数量
         self.done = Queue()  # 已下载媒体数量

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-01-15 23:44:07
+LastEditTime: 2023-02-21 12:10:43
 LastEditors: mengzonefire
 Description: 
 '''
@@ -207,7 +207,7 @@ def urlHandler(url: str):
     twt_link = p_twt_link.findall(url)
     if twt_link:
         userName = twt_link[0][0]
-        twtId = twt_link[0][1]
+        twtId = int(twt_link[0][1])
         SinglePageTask(userName, twtId).start()
         return
 
