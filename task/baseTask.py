@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-02-22 03:03:42
+LastEditTime: 2023-03-01 08:28:51
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -22,7 +22,7 @@ class Task(object):
     userName: str
     twtId: int
     userId: int
-    # config = {}  # 任务配置列表， 即const.context
+    media: bool
 
     def __init__(self):
         self.tasks = set()
@@ -30,18 +30,11 @@ class Task(object):
         self.savePath = ''
         self.twtId = 0
         self.userId = 0
+        self.media = False
         self.stop = False  # 进度条与生产者停止信号
-        self.total = Queue()  # 总媒体数量
-        self.done = Queue()  # 已下载媒体数量
-        self.dataList = Queue()  # 媒体下载队列
-        # {
-        #     'userName': {       # 自定义爬取数据结构
-        #         'picList': {},  # DATA: {serverFileName: {url: , twtId: }}
-        #         'gifList': {},  # DATA: ↑
-        #         'vidList': {},  # DATA: ↑
-        #         'textList': {}  # DATA: {twtId: textContent}
-        #     }
-        # }
+        self.total = Queue()  # 任务总量计数器
+        self.done = Queue()  # 已完成任务计数器
+        self.dataList = Queue()  # 任务数据队列
 
     @abstractmethod
     def getDataList(self):
@@ -80,7 +73,7 @@ class Task(object):
         with ThreadPoolExecutor(max_workers=getContext('concurrency')) as executor:
             for _ in range(getContext('concurrency')):
                 task = executor.submit(
-                    downloadFile, self.savePath, self.dataList, self.done)
+                    downloadFile, self.savePath, self.dataList, self.done, self.media)
                 self.tasks.add(task)
         wait(self.tasks)
         self.stop = True

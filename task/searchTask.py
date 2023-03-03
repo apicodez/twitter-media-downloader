@@ -14,13 +14,14 @@ from task.baseTask import Task
 
 class UserSearchTask(Task):
 
-    def __init__(self, userName, userId, date, advanced):
+    def __init__(self, userName, userId, date, advanced, media):
         super(UserSearchTask, self).__init__()
         self.date = date
         self.advanced = advanced
         self.userName = userName
         self.userId = userId
-        self.savePath = '{}/{}'.format(getContext('dl_path'), userName)
+        self.media = media
+        self.savePath = os.path.join(getContext('dl_path'), userName)
 
     def getDataList(self, cursor='', rest_id_list=None):
         while True:

@@ -1,19 +1,19 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-02-21 12:10:43
+LastEditTime: 2023-03-03 10:32:52
 LastEditors: mengzonefire
 Description: 
 '''
 import sys
 from task.singlePageTask import SinglePageTask
-from task.userMediaTask import UserMediaTask
 from task.searchTask import UserSearchTask
-from task.userHomeTask import UserHomeTask
 from typing import List
 from common.text import *
 from common.const import *
-from common.tools import get_token, getHeader, getUserId, saveEnv
+from common.tools import getToken, getHeader, getUserId, saveEnv, showConfig
+from task.userFollowingTask import UserFollowingTask
+from task.userLikesTask import UserLikesTask
 
 
 def cmdMode(clearScreen=True):
@@ -31,7 +31,8 @@ def cmdMode(clearScreen=True):
             setCookie()
             print(input_ask)
         elif temp == '2':
-            downloadSettings()
+            config()
+            showConfig()
             print(input_ask)
         elif '//t.co/' in temp or '//twitter.com/' in temp:
             url_list.append(temp)
@@ -51,7 +52,7 @@ def setCookie():  # 设置cookie
     headers = getContext("headers")
     cookie = input(input_cookie_ask).strip()
     if cookie:
-        token = get_token(cookie)
+        token = getToken(cookie)
         if token:
             headers['x-csrf-token'] = token
             headers['Cookie'] = cookie
@@ -67,7 +68,7 @@ def setCookie():  # 设置cookie
     clear()
 
 
-def downloadSettings():  # 设置菜单
+def config():  # 设置菜单
     clear()
     while True:
         set = input(download_settings_ask)
@@ -136,6 +137,24 @@ def maxConcurrency():  # 设置线程数
                 input(input_num_warning)
 
 
+def mediatatus():  # 设置非媒体
+    clear()
+    while True:
+        set = input(media_status_ask)
+        if set == '0':
+            return
+        elif set == '1':
+            setContext('media', False)
+            saveEnv()
+            break
+        elif set == '2':
+            setContext('media', True)
+            saveEnv()
+            break
+        else:
+            input(input_num_warning)
+
+
 def quotedStatus():  # 设置引用
     clear()
     while True:
@@ -190,18 +209,24 @@ def startCrawl(url_list: List):
 
 
 def urlHandler(url: str):
+    media = getContext('media')
     user_link = p_user_link.findall(url)
     if user_link:
+        # userHomePage
+        func = url.split('/')[-1]
         userName = user_link[0]
-        userId = getUserId(userName)
-        if userId:
-            if url.split('/')[-1] == 'media':
-                # userMediaPage
-                UserMediaTask(userName, userId).start()
-            else:
-                # userHomePage
-                UserHomeTask(userName, userId).start()
-        return
+        url = f'@{userName}'
+        if func == 'media':
+            # userMediaPage
+            media = True
+        elif func == 'likes':
+            # userLikesPage
+            UserLikesTask(userName, twtId, media).start()
+            return
+        elif func == 'following':
+            # userFollowingPage
+            UserFollowingTask(userName, twtId).start()
+            return
 
     # SinglePage
     twt_link = p_twt_link.findall(url)
@@ -232,7 +257,7 @@ def urlHandler(url: str):
         if userName:
             userId = getUserId(userName)
             if userId:
-                UserSearchTask(userName, userId, date, advanced).start()
+                UserSearchTask(userName, userId, date, advanced, media).start()
         elif advanced:
             userName = 'advanced_search'
-            UserSearchTask(userName, None, date, advanced).start()
+            UserSearchTask(userName, None, date, advanced, media).start()

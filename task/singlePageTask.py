@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-02-21 12:10:26
+LastEditTime: 2023-03-01 13:35:59
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -20,7 +20,7 @@ class SinglePageTask(Task):
         super(SinglePageTask, self).__init__()
         self.twtId = twtId
         self.userName = userName
-        self.savePath = '{}/{}'.format(getContext('dl_path'), userName)
+        self.savePath = os.path.join(getContext('dl_path'), userName)
 
     def getDataList(self):
         response = None

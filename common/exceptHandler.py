@@ -10,7 +10,7 @@ from common.text import *
 from common.logger import write_log
 
 
-def except_handler(err):
+def exceptHandler(err):
     err = str(err)
     if 'ConnectTimeoutError' in err or 'SSLError' in err:
         print(network_error_warning)

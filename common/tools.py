@@ -1,26 +1,26 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-02-22 02:51:00
+LastEditTime: 2023-03-03 10:45:52
 LastEditors: mengzonefire
 Description: 工具模块
 '''
 import sys
 import time
 import queue
+from typing import List
 import httpx
 import argparse
 from common.text import *
 from common.const import *
 from common.logger import write_log
 from argparse import RawTextHelpFormatter
-
-if sys.platform in ['win32', 'win64']:
+isWinPlatform = sys.platform in ['win32', 'win64']
+if isWinPlatform:
     import winreg
 
 
-def getHttpText(httpCode):
-    httpCode = str(httpCode)
+def getHttpText(httpCode: int):
     if httpCode in httpCodeText:
         return httpCodeText[httpCode]
     return f'请前往issue页反馈:\n{issue_page}'
@@ -32,17 +32,19 @@ def initalArgs():
     parser.add_argument('-c', '--cookie', dest='cookie', type=str,
                         help='set cookie to access locked users or tweets, input " " to clear')
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
-                        help='set network proxy, must be http proxy, input " " to clear')
+                        help='set network proxy, support http and socks5, input " " to clear')
     parser.add_argument('-u', '--user_agent', dest='user_agent',
                         type=str, help='set user-agent, input " " to clear')
     parser.add_argument('-d', '--dir', dest='dir',
                         type=str, help='set download path')
     parser.add_argument('-n', '--num', dest='concurrency', type=int,
                         help='set the downloader concurrency')
+    parser.add_argument('-m', '--meida', action="store_true", dest='meida',
+                        help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',
-                        help='set whether to include quoted tweets')
+                        help='exclude quoted tweets')
     parser.add_argument('-r', '--retweeted', action="store_true", dest='retweeted',
-                        help='set whether to include retweeted')
+                        help='exclude retweeted')
     parser.add_argument('-t', '--type', dest='type', type=str,
                         help='set the desired media type, optional: photo&animated_gif&video&full_text')
     parser.add_argument('-v', '--version', action='store_true',
@@ -52,23 +54,9 @@ def initalArgs():
     setContext('args', args)
 
 
-def getProxy():
-    if getContext('proxy'):  # proxy已配置
-        return
-    if sys.platform not in ['win32', 'win64']:
-        return
-    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
-    proxy_enable, _ = winreg.QueryValueEx(key, "ProxyEnable")
-    if proxy_enable:
-        proxy_server, _ = winreg.QueryValueEx(key, "ProxyServer")
-        setContext('proxy', {'http://': 'http://' + proxy_server,
-                             'https://': 'http://' + proxy_server})
-
-
 def getHeader():  # 获取游客token
     headers = getContext('headers')
-    if headers['Cookie']:  # 已设置cookie, 无需游客token
+    if headers['Cookie']:  # 已配置cookie, 无需游客token
         return
     with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), timeout=5, verify=False) as client:
         for i in range(1, 6):
@@ -88,7 +76,7 @@ def getHeader():  # 获取游客token
         exit()
 
 
-def get_token(cookie):
+def getToken(cookie):
     csrf_token = p_csrf_token.findall(cookie)
     if len(csrf_token) != 0:
         return csrf_token[0]
@@ -96,55 +84,80 @@ def get_token(cookie):
         return None
 
 
+def getProxy():
+    if getContext('proxy'):  # 已配置, 跳过
+        return
+    if isWinPlatform:  # 非win平台, 跳过
+        return
+    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
+    proxy_enable, _ = winreg.QueryValueEx(key, "ProxyEnable")
+    if proxy_enable:
+        proxy_server, _ = winreg.QueryValueEx(key, "ProxyServer")
+        setContext('proxy', f'http://{proxy_server}')
+
+
 def setProxy(proxy_str):
     proxyMatch = pProxy.match(proxy_str)
-    if proxyMatch and 1024 <= int(proxyMatch.group(1)) <= 65535:
-        setContext('proxy', {'http://': 'http://' + proxy_str,
-                             'https://': 'https://' + proxy_str})
+    proxyMatch2 = pProxy2.match(proxy_str)
+    if proxyMatch2:
+        setContext('proxy', proxy_str)
         print('代理设置为: {}'.format(proxy_str))
+        return True
+    elif proxyMatch:  # 不写协议默认为http
+        setContext('proxy', f'http://{proxy_str}')
+        print('代理设置为: {}'.format(f'http://{proxy_str}'))
+        return True
     else:
         print(proxy_warning)
+        return False
 
 
 def argsHandler():
     args = getContext('args')
     headers = getContext('headers')
+
     if args.version:
         print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
             version, donate_page, issue_page))
         return
+
     if args.proxy:
         if args.proxy == ' ':
             setContext('proxy', {})
-        else:
-            setProxy(args.proxy)
+        elif not setProxy(args.proxy):
+            return
     elif sys.platform in ['win32', 'win64']:
         getProxy()
+
     if args.cookie:
         if args.cookie == ' ':
             headers['Cookie'] = ''  # 清除cookie
         else:
             args.cookie = args.cookie.strip()
-            token = get_token(args.cookie)
+            token = getToken(args.cookie)
             if token:
                 headers['x-csrf-token'] = token
                 headers['Cookie'] = args.cookie
             else:
                 print(cookie_warning)
                 return
+
     if args.user_agent:
         if args.user_agent == ' ':
             headers['User-Agent'] = ''
         else:
             headers['User-Agent'] = args.user_agent
+
     if args.dir:
         setContext('dl_path', args.dir)
     if args.concurrency:
         setContext('concurrency', args.concurrency)
     if args.type:
         setContext('type', args.type)
-    setContext('quoted', args.quoted)
-    setContext('retweeted', args.retweeted)
+    setContext('media', args.media)
+    setContext('quoted', not args.quoted)
+    setContext('retweeted', not args.retweeted)
     setContext('header', headers)
 
 
@@ -182,7 +195,7 @@ def getEnv():
             items = conf.items('global')
             for item in items:
                 if item[0] == 'cookie' and item[1]:
-                    token = get_token(item[1])
+                    token = getToken(item[1])
                     if token:
                         headers['x-csrf-token'] = token
                         headers['Cookie'] = item[1]
@@ -198,6 +211,8 @@ def getEnv():
                     setContext('concurrency', eval(item[1]))
                 elif item[0] == 'type' and item[1]:
                     setContext('type', item[1])
+                elif item[0] == 'media' and item[1]:
+                    setContext('meida', item[1])
                 elif item[0] == 'quoted' and item[1]:
                     setContext('quoted', item[1])
                 elif item[0] == 'retweeted' and item[1]:
@@ -206,8 +221,8 @@ def getEnv():
 
 
 '''
-description: 从推主名获取推主id(用于接口请求参数)
-param {str} userName 推主昵称
+description: 推主名 -> 推主id (用于接口请求参数)
+param {str} userName 推主名
 return {int|None} userId 推主id
 '''
 
@@ -239,8 +254,8 @@ def getUserId(userName: str) -> int | None:
 
 '''
 description: 从直链下载文件
-param {*} client
-param {str} url 直链
+param {*} client 下载器对象
+param {str} url 媒体直链
 param {str} filePath 下载文件路径
 param {str} fileName 文件名
 return {bool} True下载成功, False下载失败
@@ -270,14 +285,15 @@ def downloader(client, url: str, filePath: str, fileName: str) -> bool:
 
 
 '''
-description: 下载任务队列中的文件
+description: 下载任务队列中的直链
 param {str} savePath 下载路径
 param {queue} dataList 任务队列
 param {queue} done 已完成队列
 '''
 
 
-def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
+def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue, media: bool):
+    isMediaTw = False
     while True:
         if dataList.qsize():
             break
@@ -296,6 +312,7 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
             for datatype, typelayer in datalist.get(userName).items():
                 if datatype in ['picList', 'gifList', 'vidList']:
                     for serverFileName, datalayer in typelayer.items():
+                        isMediaTw = True
                         url = datalayer.get('url')
                         fileName = '{}_{}_{}'.format(
                             userName, datalayer.get('twtId'), serverFileName)
@@ -312,7 +329,9 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
                         fileName = '{}_{}.txt'.format(
                             userName, twtId)
                         filePath = '{}/{}'.format(savePath, fileName)
-                        if saveText(filePath, content['content'], content['date']):
+                        if media and not isMediaTw:  # 过滤非媒体推文
+                            done.put('done')
+                        elif saveText(filePath, content['content'], content['date']):
                             done.put('done')
 
 
@@ -331,6 +350,13 @@ def saveText(filePath: str, content: str, date: str):
         f.write(f'{date}\n\n')
         f.write(content)
     return True
+
+
+'''
+description: 单条推文数据解析器
+param {*} tweet 单条推文元数据
+return {*} 解析出的目标数据(内含媒体url)
+'''
 
 
 def getResult(tweet):
@@ -358,6 +384,43 @@ def getResult(tweet):
     else:
         print(parse_warning.format(tweet))
         return None
+
+
+'''
+description: 从列表api元数据解析follow用户名列表
+param {Dict} pageContent api返回的元数据
+param {int} cursor api翻页锚点参数
+param {List} dataList 数据容器
+'''
+
+
+def getFollower(pageContent, dataList: list, cursor=None):
+    if 'user' in pageContent['data']:
+        result = pageContent['data']['user']['result']
+        if result['__typename'] == 'UserUnavailable':
+            return
+        instructions = result['timeline']['timeline']['instructions']
+        for instruction in instructions:
+            if instruction['type'] == 'TimelineAddEntries':
+                entries = instruction['entries']
+                if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-2] and 'cursor-bottom' in entries[-2]['entryId']:
+                    # 翻页完成, 无内容, 两个fo接口的entries[-1]为cursor-top, [-2]为cursor-bottom
+                    return None
+                cursor = entries[-2]['content']['value'] if len(
+                    entries) != 0 else None
+                break
+    for entry in entries:
+        dataList.append(entry['content']['itemContent']
+                        ['user_results']['result']['legacy']['screen_name'])
+    return cursor
+
+
+'''
+description: 从列表api元数据解析推文id列表
+param {Dict} pageContent api返回的元数据
+param {int} cursor api翻页锚点参数
+param {bool} isfirst 是否为第一页
+'''
 
 
 def getTweet(pageContent, cursor=None, isfirst=False):
@@ -395,6 +458,7 @@ def getTweet(pageContent, cursor=None, isfirst=False):
         entries = pageContent['data']['threaded_conversation_with_injections_v2']['instructions'][0]['entries']
     # 搜索接口返回的entries不包括cursor
     if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-1] and 'cursor-bottom' in entries[-1]['entryId']:
+        # 翻页完成, 无内容, 搜索/主页/媒体 接口的entries[-1]为cursor-bottom, [-2]为cursor-top
         return None, None
     tweets = []
     for tweet in entries:
@@ -403,6 +467,18 @@ def getTweet(pageContent, cursor=None, isfirst=False):
         elif 'entryId' not in tweet:
             tweets.append(tweet)
     return tweets, cursor
+
+
+'''
+description: api数据解析
+param {*} pageContent api返回的元数据
+param {*} total 任务总量计数器
+param {*} userName 推主名
+param {*} dataList 任务数据队列
+param {*} user_id 推主id
+param {*} rest_id_list 推文id列表
+param {*} cursor api翻页锚点参数
+'''
 
 
 def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list=None, cursor=None):
@@ -502,6 +578,11 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
     return cursor, rest_id_list
 
 
+'''
+description: 从github api获取新版本信息
+'''
+
+
 def checkUpdate():
     # 从本地缓存获取更新信息
     updateInfo = getContext('updateInfo')
@@ -530,7 +611,7 @@ def checkUpdate():
         updateInfo['LastCheckDate'] = date
 
     # 存在新版本，弹出更新文本提示
-    if tagName and version != tagName:
+    if tagName and compare_version(version, tagName) == 2:
         print("发现新版本: {}\n下载地址: {}\n".format(name, release_page))
         # 覆盖本地缓存数据
         updateInfo['tagName'] = tagName
@@ -538,3 +619,72 @@ def checkUpdate():
 
     setContext('updateInfo', updateInfo)
     saveEnv()
+
+
+'''
+description: 显示配置
+'''
+
+
+def showConfig():
+    print()
+
+
+'''
+description: 
+param {str} version1 版本号1
+param {str} version2 版本号2
+param {str} split_flag 版本号分隔符
+return {int} 0 1 2: 0为相等， 1为1大， 2为2大
+'''
+
+
+def compare_version(version1=None, version2=None, split_flag="."):
+    # 如果存在有为空的情况则进入
+    if (version1 is None) or (version1 == "") or (version2 is None) or (version2 == ""):
+        # version1为空且version2不为空，则返回version2大
+        if ((version1 is None) or (version1 == "")) and (version2 is not None) and (version2 != ""):
+            return 2
+        # version2为空且version1不为空，则返回version1大
+        if ((version2 is None) or (version2 == "")) and (version1 is not None) and (version1 != ""):
+            return 1
+
+    # 如果版本字符串相等，那么直接返回相等，这句会且只会在第一次比较时才可能进入
+    # version1和version2都为空时也会进入这里
+    if version1 == version2:
+        return 0
+
+    # 对版本字符串从左向右查找"."，第一个"."之前的字符串即为此次要比较的版本
+    # 如1.3.5中的1
+    try:
+        current_section_version1 = version1[:version1.index(split_flag)]
+    except:
+        current_section_version1 = version1
+    try:
+        current_section_version2 = version2[:version2.index(split_flag)]
+    except:
+        current_section_version2 = version2
+    # 对本次要比较的版本字符转成整型进行比较
+    if int(current_section_version1) > int(current_section_version2):
+        return 1
+    elif int(current_section_version1) < int(current_section_version2):
+        return 2
+
+    # 如果本次传来版本字符串中已没有版本号分隔符，那说明本次比较的版本号已是最后一位版本号，下次比较值赋空
+    # 如本次传来的是5，那下次要比较的只能赋空
+    try:
+        other_section_version1 = version1[version1.index(split_flag)+1:]
+    except:
+        other_section_version1 = ""
+    try:
+        other_section_version2 = version2[version2.index(split_flag) + 1:]
+    except:
+        other_section_version2 = ""
+
+    # 递归调用比较
+    return compare_version(other_section_version1, other_section_version2)
+
+
+# 模块测试入口
+if __name__ == '__main__':
+    getProxy()
