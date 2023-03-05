@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-06 03:25:23
+LastEditTime: 2023-03-06 04:19:48
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -80,7 +80,7 @@ def setType():  # 设置下载类型
     while True:
         only = ''.join(set(list(input(set_type_ask))))
         if only == '0':
-            return
+            break
         elif set(only) <= set('1234'):
             type = []
             for i in only:
@@ -110,7 +110,7 @@ def maxConcurrency():  # 设置线程数
     while True:
         num = input(max_concurrency_ask)
         if num == '0':
-            return
+            break
         else:
             try:
                 setContext('concurrency', int(num))
@@ -127,7 +127,7 @@ def mediaStatus():  # 设置非媒体
     while True:
         set = input(media_status_ask)
         if set == '0':
-            return
+            break
         elif set == '1':
             setContext('media', False)
             saveEnv()
@@ -146,7 +146,7 @@ def quotedStatus():  # 设置引用
     while True:
         set = input(quoted_status_ask)
         if set == '0':
-            return
+            break
         elif set == '1':
             setContext('quoted', True)
             saveEnv()
@@ -165,7 +165,7 @@ def retweetedStatus():  # 设置转推
     while True:
         set = input(retweeted_status_ask)
         if set == '0':
-            return
+            break
         elif set == '1':
             setContext('retweeted', True)
             saveEnv()

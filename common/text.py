@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-06 03:58:49
+LastEditTime: 2023-03-06 04:20:23
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -25,7 +25,9 @@ timeout_warning = '\r网络超时: 服务器未响应或断开链接, 正在重�
 download_timeout_warning = '\r{} {}{}'
 proxy_input_warning = '代理格式错误（回车继续）'
 cookie_input_warning = 'cookie格式错误（回车继续）'
-proxy_arg_warning = '参数错误: 代理格式错误, 格式:\n[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5'
+proxy_arg_warning = \
+    '参数错误: 代理格式错误, 格式:\n' \
+    '[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5'
 cookie_arg_warning = '参数错误: cookie格式错误, 请参考教程获取cookie:\n{}\n'.format(
     cookie_tips_page)
 user_unavailable_warning = '\r提取失败: 该用户已锁定/冻结, 访问锁定用户需要设置已关注账号的cookie'
@@ -41,50 +43,64 @@ input_num_warning = '请输入正确数字（回车继续）'
 # normal text
 task_finish = '\r文件下载任务已完成 {}/{}, 用时 {}s, 保存路径: {}'
 fo_Task_finish = '\r关注列表爬取任务已完成, 保存路径: {}'
-input_cookie_ask = f'请输入cookie, 单击回车确认 (输入0返回, 留空直接回车清除cookie)\n* cookie获取教程：{cookie_tips_page}\n'
-input_proxy_ask = '请输入代理, 单击回车确认 (输入0返回), 格式:\n[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5\n'
-max_concurrency_ask = '下载线程数过高会使下载变慢，请勿设置过大\n\n' \
-                      '0.返回\n\n' \
-                      '请输入下载线程数，建议设置1~32之间（默认8）：'
-set_type_ask = '输入数字选择，可多选，如“13”就是包含图片和视频\n\n' \
-               '0.返回\n' \
-               '1.下载图片\n' \
-               '2.下载动图\n' \
-               '3.下载视频\n' \
-               '4.下载文本\n' \
-               '5.所有\n\n' \
-               '请输入（默认所有）：'
-retweeted_status_ask = '是否下载转推\n\n' \
-                       '0.返回\n' \
-                       '1.是\n' \
-                       '2.否\n' \
-                       '请输入：\n\n'
-quoted_status_ask = '是否下载引用推文\n\n' \
-                    '0.返回\n' \
-                    '1.是\n' \
-                    '2.否\n' \
-                    '请输入：\n\n'
-media_status_ask = '是否下载非媒体(纯文本)推文\n\n' \
-                   '0.返回\n' \
-                   '1.是\n' \
-                   '2.否\n' \
-                   '请输入：\n\n'
-download_settings_ask = '输入数字\n\n' \
-                        '0.返回\n' \
-                        '1.设置下载类型\n' \
-                        '2.设置下载线程数\n' \
-                        '3.设置是否下载引用推文\n' \
-                        '4.设置是否下载转推\n\n' \
-                        '5.设置是否下载非媒体\n\n' \
-                        '请输入：'
+input_cookie_ask = \
+    '请输入cookie, 单击回车确认 (输入0返回, 留空直接回车清除cookie)\n' \
+    f'* cookie获取教程：{cookie_tips_page}\n' \
+    '请输入：'
+input_proxy_ask = \
+    '请输入代理, 单击回车确认 (输入0返回), 格式:\n' \
+    '[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5\n' \
+    '请输入：'
+max_concurrency_ask = \
+    '下载线程数过高会使下载变慢，请勿设置过大\n\n' \
+    '0.返回\n\n' \
+    '请输入下载线程数，建议设置1~32之间（默认8）：'
+set_type_ask = \
+    '输入数字选择，可多选，如“13”就是包含图片和视频\n\n' \
+    '0.返回\n' \
+    '1.下载图片\n' \
+    '2.下载动图\n' \
+    '3.下载视频\n' \
+    '4.下载文本\n' \
+    '5.所有\n\n' \
+    '请输入（默认所有）：'
+retweeted_status_ask = \
+    '是否下载转推\n\n' \
+    '0.返回\n' \
+    '1.是\n' \
+    '2.否\n\n' \
+    '请输入：'
+quoted_status_ask = \
+    '是否下载引用推文\n\n' \
+    '0.返回\n' \
+    '1.是\n' \
+    '2.否\n\n' \
+    '请输入：'
+media_status_ask = \
+    '是否下载非媒体(纯文本)推文\n\n' \
+    '0.返回\n' \
+    '1.是\n' \
+    '2.否\n\n' \
+    '请输入：'
+download_settings_ask = \
+    '输入数字\n\n' \
+    '0.返回\n' \
+    '1.设置下载类型\n' \
+    '2.设置下载线程数\n' \
+    '3.设置是否下载引用推文\n' \
+    '4.设置是否下载转推\n' \
+    '5.设置是否下载非媒体\n\n' \
+    '请输入：'
 continue_ask = '单击回车键->退出程序, 输入任意内容+回车->继续提取\n'
-input_ask = '输入命令数字或链接 (支持批量, 一行一条, 双击回车确认)\n\n' \
-            '0.退出脚本\n' \
-            '1.设置cookie\n' \
-            '2.设置网络代理\n' \
-            '3.设置下载参数\n\n' \
-            '请输入命令或链接：'
+input_ask = \
+    '输入命令数字或链接 (支持批量, 一行一条, 双击回车确认)\n\n' \
+    '0.退出脚本\n' \
+    '1.设置cookie\n' \
+    '2.设置网络代理\n' \
+    '3.设置下载参数\n\n' \
+    '请输入命令或链接：'
 exit_ask = '\n单击回车键退出程序\n'
-config_info = '已设置cookie: {cookie}, 排除转推: {retweeted}, 排除引用: {quoted}, 排除非媒体: {meida}, 爬取类型: {type}\n' \
-              '线程数: {concurrency}, 代理: {proxy}\n' \
-              '下载路径: {dl_path}'
+config_info = \
+    '排除转推: {retweeted}, 排除引用: {quoted}, 排除非媒体: {meida}, 爬取类型: {type}\n' \
+    '线程数: {concurrency}, 已设置cookie: {cookie}, 代理: {proxy}\n' \
+    '下载路径: {dl_path}'

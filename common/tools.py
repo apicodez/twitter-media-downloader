@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-06 03:25:40
+LastEditTime: 2023-03-06 04:04:26
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -132,13 +132,14 @@ def setCookie(cookie=''):  # 设置cookie
     inputFlag = False
     headers = getContext("headers")
     if not cookie:  # 输入cookie
-        clear()
         inputFlag = True
+        clear()
         cookie = input(input_cookie_ask).strip()
+        clear()
+        if cookie == '0':
+            return True
     elif cookie == ' ':  # 清除cookie
         cookie = ''
-    elif cookie == '0':
-        return True
     else:
         cookie = cookie.strip()
     if cookie:   # 设置cookie
@@ -164,12 +165,12 @@ def setCookie(cookie=''):  # 设置cookie
 def setProxy(proxy=''):
     inputFlag = False
     if not proxy:  # 输入代理
-        clear()
         inputFlag = True
+        clear()
         proxy = input(input_proxy_ask).strip()
         clear()
-    elif proxy == '0':
-        return True
+        if proxy == '0':
+            return True
     else:
         proxy = proxy.strip()
     proxyMatch = pProxy.match(proxy)
