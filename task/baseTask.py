@@ -1,10 +1,11 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-01 08:28:51
+LastEditTime: 2023-03-06 00:28:23
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
+
 import os
 import math
 import time
@@ -18,11 +19,16 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 
 class Task(object):
-    savePath: str
-    userName: str
-    twtId: int
-    userId: int
-    media: bool
+    savePath: str  # 下载路径
+    userName: str  # 推主id（不是昵称）
+    twtId: int  # 推文id
+    userId: int  # 推主rest_id
+    media: bool  # 爬取media页的时候会强制覆盖全局media配置，故在类成员内添加标记
+    stop: bool   # 进度条与生产者停止信号
+    total: Queue   # 任务总量计数器
+    done: Queue   # 已完成任务计数器
+    dataList: Queue   # 任务数据队列
+    tasks: set  # 任务线程对象容器
 
     def __init__(self):
         self.tasks = set()
@@ -31,10 +37,10 @@ class Task(object):
         self.twtId = 0
         self.userId = 0
         self.media = False
-        self.stop = False  # 进度条与生产者停止信号
-        self.total = Queue()  # 任务总量计数器
-        self.done = Queue()  # 已完成任务计数器
-        self.dataList = Queue()  # 任务数据队列
+        self.stop = False
+        self.total = Queue()
+        self.done = Queue()
+        self.dataList = Queue()
 
     @abstractmethod
     def getDataList(self):

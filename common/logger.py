@@ -1,10 +1,11 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:23:35
-LastEditTime: 2023-01-15 23:50:35
+LastEditTime: 2023-03-06 00:19:50
 LastEditors: mengzonefire
-Description: log模块
+Description: 日志模块
 '''
+
 import os
 import re
 from common.const import getContext

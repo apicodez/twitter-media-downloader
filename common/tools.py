@@ -1,9 +1,9 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-05 21:11:48
+LastEditTime: 2023-03-06 03:25:40
 LastEditors: mengzonefire
-Description: 工具模块
+Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
 import sys
 import time
@@ -38,20 +38,18 @@ def initalArgs():
                         help='for access locked users&tweets, will save to cfg file, input " " to clear')
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
                         help="support http&socks5, default use system proxy(win only)")
-    parser.add_argument('-u', '--user_agent', dest='user_agent',
-                        type=str, help='will save to cfg file, input " " to clear')
     parser.add_argument('-d', '--dir', dest='dir',
                         type=str, help='set download path')
     parser.add_argument('-n', '--num', dest='concurrency', type=int,
                         help='downloader concurrency')
+    parser.add_argument('-t', '--type', dest='type', type=str,
+                        help='desired media type, optional: photo&animated_gif&video&full_text')
     parser.add_argument('-m', '--meida', action="store_true", dest='meida',
                         help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',
                         help='exclude quoted tweets')
     parser.add_argument('-r', '--retweeted', action="store_true", dest='retweeted',
                         help='exclude retweeted')
-    parser.add_argument('-t', '--type', dest='type', type=str,
-                        help='desired media type, optional: photo&animated_gif&video&full_text')
     parser.add_argument('-v', '--version', action='store_true',
                         help='show version and check update')
     parser.add_argument('url', type=str, nargs='*', help=url_args_help)
@@ -61,7 +59,6 @@ def initalArgs():
 
 def argsHandler():
     args = getContext('args')
-    headers = getContext('headers')
     if args.version:
         print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
             version, donate_page, issue_page))
@@ -73,22 +70,10 @@ def argsHandler():
     else:
         getSysProxy()
     if args.cookie:
-        if args.cookie == ' ':
-            headers['Cookie'] = ''  # 清除cookie
-        else:
-            args.cookie = args.cookie.strip()
-            token = getToken(args.cookie)
-            if token:
-                headers['x-csrf-token'] = token
-                headers['Cookie'] = args.cookie
-            else:
-                print(cookie_warning)
-                return
-    if args.user_agent:
-        if args.user_agent == ' ':
-            headers['User-Agent'] = ''
-        else:
-            headers['User-Agent'] = args.user_agent
+        if not setCookie(args.cookie):
+            return
+    else:
+        getGuestCookie()
     if args.dir:
         setContext('dl_path', args.dir)
     if args.concurrency:
@@ -98,7 +83,6 @@ def argsHandler():
     setContext('media', args.media)
     setContext('quoted', not args.quoted)
     setContext('retweeted', not args.retweeted)
-    setContext('header', headers)
 
 
 def getGuestCookie():  # 获取游客token
@@ -144,53 +128,65 @@ def getSysProxy():
         setContext('proxy', f'http://{proxy_server}')
 
 
-def setCookie(cookie_str=''):  # 设置cookie
-    if cookie_str == '':  # 输入代理
-        pass
-    elif cookie_str == ' ':
-        setContext('proxy', '')
-        print('清空代理设置')
-        return True
-    clear()
+def setCookie(cookie=''):  # 设置cookie
+    inputFlag = False
     headers = getContext("headers")
-    cookie = input(input_cookie_ask).strip()
-    if cookie:
+    if not cookie:  # 输入cookie
+        clear()
+        inputFlag = True
+        cookie = input(input_cookie_ask).strip()
+    elif cookie == ' ':  # 清除cookie
+        cookie = ''
+    elif cookie == '0':
+        return True
+    else:
+        cookie = cookie.strip()
+    if cookie:   # 设置cookie
         token = getToken(cookie)
         if token:
             headers['x-csrf-token'] = token
             headers['Cookie'] = cookie
-            print(cookie_success)
-        else:
-            print(cookie_warning)
+        else:  # 格式错误
+            if inputFlag:
+                input(cookie_input_warning)
+                return setCookie()
+            else:
+                print(cookie_arg_warning)
+                return False
     else:
-        headers['Cookie'] = ''  # 清除cookie
+        headers['Cookie'] = ''
         getGuestCookie()  # 重新获取游客token
-        print(cookie_purge_success)
     setContext('headers', headers)
     saveEnv()
-    clear()
+    return True
 
 
-def setProxy(proxy_str=''):
-    if proxy_str == '':  # 输入代理
-        pass
-    elif proxy_str == ' ':
-        setContext('proxy', '')
-        print('清空代理设置')
-        return True
-    proxyMatch = pProxy.match(proxy_str)
-    proxyMatch2 = pProxy2.match(proxy_str)
-    if proxyMatch2:
-        setContext('proxy', proxy_str)
-        print('代理设置为: {}'.format(proxy_str))
-        return True
-    elif proxyMatch:  # 不写协议默认为http
-        setContext('proxy', f'http://{proxy_str}')
-        print('代理设置为: {}'.format(f'http://{proxy_str}'))
+def setProxy(proxy=''):
+    inputFlag = False
+    if not proxy:  # 输入代理
+        clear()
+        inputFlag = True
+        proxy = input(input_proxy_ask).strip()
+        clear()
+    elif proxy == '0':
         return True
     else:
-        print(proxy_warning)
-        return False
+        proxy = proxy.strip()
+    proxyMatch = pProxy.match(proxy)
+    proxyMatch2 = pProxy2.match(proxy)
+    if proxyMatch2:
+        setContext('proxy', proxy)
+        return True
+    elif proxyMatch:  # 不带协议默认为http
+        setContext('proxy', f'http://{proxy}')
+        return True
+    else:  # 格式错误
+        if inputFlag:
+            input(proxy_input_warning)
+            return setProxy()
+        else:
+            print(proxy_arg_warning)
+            return False
 
 
 '''
@@ -203,7 +199,6 @@ def saveEnv():
     if 'global' not in conf.sections():
         conf.add_section('global')
     conf.set("global", "download_path", getContext("dl_path"))
-    conf.set("global", "user-agent", getContext("headers")["User-Agent"])
     conf.set("global", "cookie", getContext("headers")['Cookie'])
     conf.set("global", "updateinfo", getContext("updateInfo"))
     conf.set("global", "concurrency", getContext("concurrency"))
@@ -231,8 +226,6 @@ def getEnv():
                     if token:
                         headers['x-csrf-token'] = token
                         headers['Cookie'] = item[1]
-                elif item[0] == 'user-agent' and item[1]:
-                    headers['User-Agent'] = item[1]
                 elif item[0] == 'download_path' and item[1]:
                     setContext('dl_path', item[1])
                 elif item[0] == 'updateinfo' and item[1]:
@@ -646,6 +639,8 @@ def checkUpdate():
         # 覆盖本地缓存数据
         updateInfo['tagName'] = tagName
         updateInfo['name'] = name
+    else:
+        print("当前版本已是最新")
 
     setContext('updateInfo', updateInfo)
     saveEnv()

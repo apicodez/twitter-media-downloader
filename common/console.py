@@ -1,10 +1,11 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-05 22:00:19
+LastEditTime: 2023-03-06 03:25:23
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
+
 from task.singlePageTask import SinglePageTask
 from task.searchTask import UserSearchTask
 from typing import List
@@ -29,22 +30,26 @@ def cmdMode(clearScreen=True):
             return
         elif temp == '1':
             setCookie()
+            showConfig()
             print(input_ask)
         elif temp == '2':
             setProxy()
+            showConfig()
+            print(input_ask)
         elif temp == '3':
             config()
             showConfig()
             print(input_ask)
-        elif '//twitter.com/' in temp:
+        elif urlChecker(temp):
             url_list.append(temp)
-        elif temp and temp[0] == '@':
-            url_list.append(temp)
-        else:
-            print(input_warning)
+        else:  # 输入错误, 重置
+            input(input_warning)
+            clear()
+            showConfig()
+            print(input_ask)
+            url_list = []
     if url_list:
         startCrawl(url_list)
-
     if input(continue_ask):
         cmdMode()
 
@@ -54,24 +59,20 @@ def config():  # 设置菜单
     while True:
         set = input(download_settings_ask)
         if set == '0':
-            return
+            break
         elif set == '1':
             setType()
-            clear()
         elif set == '2':
             maxConcurrency()
-            clear()
         elif set == '3':
             quotedStatus()
-            clear()
         elif set == '4':
             retweetedStatus()
-            clear()
         elif set == '5':
             mediaStatus()
-            clear()
         else:
             input(input_num_warning)
+    clear()
 
 
 def setType():  # 设置下载类型
@@ -92,17 +93,16 @@ def setType():  # 设置下载类型
                 elif i == '4':
                     type.append('full_text')
             setContext('type', '&'.join(type))
-            clear()
             saveEnv()
             break
         elif only == '5':
             type = ['photo', 'animated_gif', 'video', 'full_text']
             setContext('type', '&'.join(type))
-            clear()
             saveEnv()
             break
         else:
             input(input_num_warning)
+    clear()
 
 
 def maxConcurrency():  # 设置线程数
@@ -119,6 +119,7 @@ def maxConcurrency():  # 设置线程数
                 break
             except ValueError:
                 input(input_num_warning)
+    clear()
 
 
 def mediaStatus():  # 设置非媒体
@@ -137,6 +138,7 @@ def mediaStatus():  # 设置非媒体
             break
         else:
             input(input_num_warning)
+    clear()
 
 
 def quotedStatus():  # 设置引用
@@ -155,6 +157,7 @@ def quotedStatus():  # 设置引用
             break
         else:
             input(input_num_warning)
+    clear()
 
 
 def retweetedStatus():  # 设置转推
@@ -173,15 +176,25 @@ def retweetedStatus():  # 设置转推
             break
         else:
             input(input_num_warning)
+    clear()
 
 
-def startCrawl(url_list: List):
+def startCrawl(urlList: List):
     dl_path = getContext('dl_path')
     if not os.path.exists(dl_path):
         os.mkdir(dl_path)
-    for page_url in url_list:
-        print('\n正在提取: {}'.format(page_url))
-        urlHandler(page_url)
+    for url in urlList:
+        if not url:
+            continue
+        if urlChecker(url):
+            print('\n不支持: {}'.format(url))
+        else:
+            print('\n正在提取: {}'.format(url))
+            urlHandler(url)
+
+
+def urlChecker(url: str):
+    return p_twt_link.findall(url) or p_user_link.findall(url) or url[0] == '@'
 
 
 def urlHandler(url: str):

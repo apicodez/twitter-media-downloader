@@ -1,3 +1,11 @@
+'''
+Author: mengzonefire
+Date: 2023-01-15 23:14:36
+LastEditTime: 2023-03-06 01:38:35
+LastEditors: mengzonefire
+Description: 存放全局常量
+'''
+
 import re
 import os
 import configparser
@@ -9,7 +17,7 @@ url_args_help = \
     '''tw url to collect, must be like:
     1. https://twitter.com/***/status/***
     2. https://twitter.com/***(/media|likes|following) (user page, *** is user_id)
-    3. @*** (for extension search, plz check README)'''
+    3. @*** (search page, plz check README)'''
 conf = configparser.RawConfigParser()
 conf_path = os.path.expanduser('~') + '/tw_media_downloader.conf'
 
@@ -18,8 +26,8 @@ authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4p
 
 # context/config
 context = {
-    'proxy': "",  # 可拓展支持socks代理和密码验证代理，详情看https://www.python-httpx.org/advanced/#socks 暂时没需求先不做
-    'headers': {'authorization': authorization, 'Cookie': '', 'User-Agent': ''},
+    'proxy': None,
+    'headers': {'authorization': authorization, 'Cookie': ''},
     'dl_path': './twitter_media_download',
     'log_path': './log',
     'updateInfo': {'LastCheckDate': '', 'tagName': '', 'name': ''},

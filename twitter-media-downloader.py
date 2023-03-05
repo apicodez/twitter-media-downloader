@@ -1,10 +1,11 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2023-03-05 21:13:49
+LastEditTime: 2023-03-06 02:28:41
 LastEditors: mengzonefire
-Description: 程序主函数入口
+Description: 主函数入口
 '''
+
 import traceback
 from common.console import cmdMode, startCrawl
 from common.tools import *
@@ -25,7 +26,6 @@ def main():
         cmdMode(False)
     else:
         argsHandler()
-        getGuestCookie()
         startCrawl(getContext('args').url)
     saveEnv()
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print('退出程序')
-    except Exception as e:  # 缺失异常处理
+        pass
+    except Exception:  # 缺失异常处理
         traceback.print_exc()
-        write_log('crash', f'{e} :\ntraceback.format_exc()')
+        write_log('crash', traceback.format_exc())

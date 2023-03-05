@@ -1,3 +1,11 @@
+'''
+Author: mengzonefire
+Date: 2023-01-15 23:14:36
+LastEditTime: 2023-03-06 02:18:38
+LastEditors: mengzonefire
+Description: 存放公用提示文本和链接
+'''
+
 # external
 donate_page = 'https://afdian.net/@mengzonefire'
 issue_page = 'https://github.com/mengzonefire/twitter-media-downloader/issues'
@@ -5,22 +13,25 @@ release_page = 'https://github.com/mengzonefire/twitter-media-downloader/release
 cookie_tips_page = 'https://git.io/how_to_get_cookies_cn'
 
 # warning text
-log_warning = '\r运行错误: log文件已保存到 {}\n'
+log_warning = '\r未知错误: log文件已保存到 {}\n'
 user_warning = '\r提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{}'.format(issue_page)
-token_warning = '\r运行失败: guest_token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
+token_warning = '\r运行失败: Guest Token获取失败, 请前往issue页反馈:\n{}'.format(issue_page)
 parse_warning = '\r解析失败: 跳过解析此数据, 请带上错误数据信息前往issue页反馈:\n{}\n错误信息: {}'.format(
     issue_page, '{}')
-cookie_warning = '\r参数错误: 输入的cookie格式错误, 请参考教程获取cookie:\n{}\n'.format(
-    cookie_tips_page)
+
+
 http_warning = '\r提取失败{}: http访问异常, 状态码: {} -> {}'
 timeout_warning = '\r网络超时: 服务器未响应或断开链接, 正在重试...{}'
 download_timeout_warning = '\r{} {}{}'
-proxy_warning = '\r参数错误: 代理格式错误, 格式: \n [协议]://host:port / [协议]://user:pass@host:port [协议]为http或socks5'
+proxy_input_warning = '代理格式错误（回车继续）'
+cookie_input_warning = 'cookie格式错误（回车继续）'
+proxy_arg_warning = '参数错误: 代理格式错误, 格式:\n[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5'
+cookie_arg_warning = '参数错误: cookie格式错误, 请参考教程获取cookie:\n{}\n'.format(
+    cookie_tips_page)
 user_unavailable_warning = '\r提取失败: 该用户已锁定/冻结, 访问锁定用户需要设置已关注账号的cookie'
 age_restricted_warning = '\r提取失败: 该用户已设置年龄限制, 访问需要设置账号cookie'
-network_error_warning = '\r网络连接失败, 请检查代理设置(程序默认使用系统代理)'
-proxy_error_warning = '\r代理连接失败, 请检查代理设置是否正确'
-input_warning = '\r解析失败: 错误的链接或命令'
+network_error_warning = '\r网络连接失败, 请检查代理设置'
+input_warning = '\r链接或命令格式错误（回车继续）'
 check_update_warning = '\r检查更新失败, 程序继续运行, 失败信息:\n{}'
 need_cookie_warning = '\r目前访问推特的media列表接口需要登录账号, 故请先设置cookie再爬取'
 dl_nothing_warning = '\r未爬取到任何有效数据'
@@ -30,9 +41,8 @@ input_num_warning = '请输入正确数字（回车继续）'
 # normal text
 task_finish = '\r文件下载任务已完成 {}/{}, 用时 {}s, 保存路径: {}'
 fo_Task_finish = '\r关注列表爬取任务已完成, 保存路径: {}'
-cookie_purge_success = '自定义cookie清除成功\n'
-cookie_success = '\n自定义cookie导入成功\n'
-input_cookie_ask = f'请复制cookie并粘贴到下方, 再单击回车确认(留空直接回车为清除cookie)\n* cookie获取教程：{cookie_tips_page}\n'
+input_cookie_ask = f'请输入cookie, 单击回车确认 (输入0返回, 留空直接回车清除cookie)\n* cookie获取教程：{cookie_tips_page}\n'
+input_proxy_ask = '请输入代理, 单击回车确认 (输入0返回), 格式:\n[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5\n'
 max_concurrency_ask = '下载线程数过高会使下载变慢，请勿设置过大\n\n' \
                       '0.返回\n\n' \
                       '请输入下载线程数，建议设置1~32之间（默认8）：'
@@ -67,7 +77,6 @@ download_settings_ask = '输入数字\n\n' \
                         '4.设置是否下载转推\n\n' \
                         '5.设置是否下载非媒体\n\n' \
                         '请输入：'
-reset_ask = '单击回车键->退出程序, 输入任意内容+回车->重置脚本\n'
 continue_ask = '单击回车键->退出程序, 输入任意内容+回车->继续提取\n'
 input_ask = '输入命令数字或链接 (支持批量, 一行一条, 双击回车确认)\n\n' \
             '0.退出脚本\n' \

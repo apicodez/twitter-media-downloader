@@ -18,7 +18,7 @@
 
 # donate 赞助
 
-作者开发维护不易, 若喜欢本项目, 欢迎前往 [爱发电](https://afdian.net/@mengzonefire) 支持作者
+若喜欢本项目, 欢迎前往 [爱发电](https://afdian.net/@mengzonefire) 支持作者
 
 # tips 提示
 
@@ -44,7 +44,7 @@
   1. 直接运行程序:  
   运行后根据提示输入 命令 或 推文/推主链接即可.
       ```
-      python3 twitter-media-downloader.py
+      python twitter-media-downloader.py
       ```
       <img src="https://pic.rmb.bdstatic.com/bjh/08934029f23df12817604a44d48fb01d.png">
       
@@ -58,37 +58,28 @@
          * 注：脚本搜索页默认不包含回复，如需爬取回复请使用高级搜索
   2. 命令行调用:
        ```
-       usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-u USER_AGENT]
-                                         [-d DIR] [-n] [-q] [-r] [-t] [-v]
-                                         [url [url ...]]
+          usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-d DIR] [-n CONCURRENCY] [-t TYPE] [-m] [-q] [-r] [-v] [url ...]
 
-       positional arguments:
-         url                   tw url to gather media, must be like:
-                                   1. https://twitter.com/***/status/***
-                                   2. https://twitter.com/***(/media) (user page, *** is user_id)
-                                   # 2. will gather all media files of user's tweets
+          positional arguments:
+            url                   tw url to collect, must be like:
+                                      1. https://twitter.com/***/status/***
+                                      2. https://twitter.com/***(/media|likes|following) (user page, *** is user_id)
+                                      3. @*** (search page, plz check README)
 
-       optional arguments:
-         -h, --help            show this help message and exit
-         -c COOKIE, --cookie COOKIE
-                               set cookie to access locked users or tweets, input " " to clear
-         -p PROXY, --proxy PROXY
-                               set network proxy, must be http proxy, input " " to clear
-         -u USER_AGENT, --user_agent USER_AGENT
-                               set user-agent, input " " to clear
-         -d DIR, --dir DIR     set download path
-
-         -n NUM, --num NUM     set the number of concurrency
-
-         -m MEDIA, --media MEDIA
-                               exclude non-media tweets
-         -q QUOTED, --quoted QUOTED
-                               exclude quoted tweets
-         -r RETWEETED, --retweeted RETWEETED
-                               exclude retweeted
-         -t TYPE, --type TYPE  
-                               set the desired media type, optional: photo&animated_gif&video&full_text
-         -v, --version         show version
+          options:
+            -h, --help            show this help message and exit
+            -c COOKIE, --cookie COOKIE
+                                  for access locked users&tweets, will save to cfg file, input " " to clear
+            -p PROXY, --proxy PROXY
+                                  support http&socks5, default use system proxy(win only)
+            -d DIR, --dir DIR     set download path
+            -n CONCURRENCY, --num CONCURRENCY
+                                  downloader concurrency
+            -t TYPE, --type TYPE  desired media type, optional: photo&animated_gif&video&full_text
+            -m, --meida           exclude non-media tweets
+            -q, --quoted          exclude quoted tweets
+            -r, --retweeted       exclude retweeted
+            -v, --version         show version and check update
        ```
       示例：
        * 下载用户主页 `python twitter-media-downloader.py https://twitter.com/user`
