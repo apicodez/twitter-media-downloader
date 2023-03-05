@@ -1,17 +1,16 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-03 10:32:52
+LastEditTime: 2023-03-05 22:00:19
 LastEditors: mengzonefire
-Description: 
+Description: 命令行交互模块
 '''
-import sys
 from task.singlePageTask import SinglePageTask
 from task.searchTask import UserSearchTask
 from typing import List
 from common.text import *
 from common.const import *
-from common.tools import getToken, getHeader, getUserId, saveEnv, showConfig
+from common.tools import getUserId, saveEnv, showConfig, setProxy, setCookie, clear
 from task.userFollowingTask import UserFollowingTask
 from task.userLikesTask import UserLikesTask
 
@@ -19,8 +18,9 @@ from task.userLikesTask import UserLikesTask
 def cmdMode(clearScreen=True):
     if clearScreen:
         clear()
-    url_list = []
+    showConfig()
     print(input_ask)
+    url_list = []
     while True:
         temp = input()
         if not temp:
@@ -31,10 +31,12 @@ def cmdMode(clearScreen=True):
             setCookie()
             print(input_ask)
         elif temp == '2':
+            setProxy()
+        elif temp == '3':
             config()
             showConfig()
             print(input_ask)
-        elif '//t.co/' in temp or '//twitter.com/' in temp:
+        elif '//twitter.com/' in temp:
             url_list.append(temp)
         elif temp and temp[0] == '@':
             url_list.append(temp)
@@ -45,27 +47,6 @@ def cmdMode(clearScreen=True):
 
     if input(continue_ask):
         cmdMode()
-
-
-def setCookie():  # 设置cookie
-    clear()
-    headers = getContext("headers")
-    cookie = input(input_cookie_ask).strip()
-    if cookie:
-        token = getToken(cookie)
-        if token:
-            headers['x-csrf-token'] = token
-            headers['Cookie'] = cookie
-            print(cookie_success)
-        else:
-            print(cookie_warning)
-    else:
-        headers['Cookie'] = ''  # 清除cookie
-        getHeader()  # 重新获取游客token
-        print(cookie_purge_success)
-    setContext('headers', headers)
-    saveEnv()
-    clear()
 
 
 def config():  # 设置菜单
@@ -85,6 +66,9 @@ def config():  # 设置菜单
             clear()
         elif set == '4':
             retweetedStatus()
+            clear()
+        elif set == '5':
+            mediaStatus()
             clear()
         else:
             input(input_num_warning)
@@ -137,7 +121,7 @@ def maxConcurrency():  # 设置线程数
                 input(input_num_warning)
 
 
-def mediatatus():  # 设置非媒体
+def mediaStatus():  # 设置非媒体
     clear()
     while True:
         set = input(media_status_ask)
@@ -191,18 +175,10 @@ def retweetedStatus():  # 设置转推
             input(input_num_warning)
 
 
-def clear():
-    if sys.platform in ['win32', 'win64']:  # 判断是否为win平台
-        os.system('cls')
-    else:
-        os.system('clear')
-
-
 def startCrawl(url_list: List):
     dl_path = getContext('dl_path')
     if not os.path.exists(dl_path):
         os.mkdir(dl_path)
-
     for page_url in url_list:
         print('\n正在提取: {}'.format(page_url))
         urlHandler(page_url)
@@ -210,6 +186,14 @@ def startCrawl(url_list: List):
 
 def urlHandler(url: str):
     media = getContext('media')
+    # singlePage
+    twt_link = p_twt_link.findall(url)
+    if twt_link:
+        userName = twt_link[0][0]
+        twtId = int(twt_link[0][1])
+        SinglePageTask(userName, twtId).start()
+        return
+
     user_link = p_user_link.findall(url)
     if user_link:
         # userHomePage
@@ -227,14 +211,6 @@ def urlHandler(url: str):
             # userFollowingPage
             UserFollowingTask(userName, twtId).start()
             return
-
-    # SinglePage
-    twt_link = p_twt_link.findall(url)
-    if twt_link:
-        userName = twt_link[0][0]
-        twtId = int(twt_link[0][1])
-        SinglePageTask(userName, twtId).start()
-        return
 
     # searchPage
     if url[0] == '@':

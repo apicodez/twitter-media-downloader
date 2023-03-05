@@ -1,12 +1,12 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2023-03-01 08:05:36
+LastEditTime: 2023-03-05 21:13:49
 LastEditors: mengzonefire
 Description: 程序主函数入口
 '''
+import traceback
 from common.console import cmdMode, startCrawl
-from common.exceptHandler import exceptHandler
 from common.tools import *
 
 
@@ -19,15 +19,13 @@ def main():
     if len(sys.argv) == 1:  # 命令行参数为空 / 双击运行程序 -> 进入交互模式
         print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
             version, donate_page, issue_page))
-        getProxy()
+        getSysProxy()
         checkUpdate()
-        getHeader()
-        showConfig()
-        cmdMode(clearScreen=False)
+        getGuestCookie()
+        cmdMode(False)
     else:
         argsHandler()
-        getProxy()
-        getHeader()
+        getGuestCookie()
         startCrawl(getContext('args').url)
     saveEnv()
 
@@ -35,11 +33,8 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception as e:
-        exceptHandler(e)
-        if len(sys.argv) == 1 and input(reset_ask):
-            if sys.platform in ['win32', 'win64']:  # 判断是否为win平台
-                os.system('cls')
-            else:
-                os.system('clear')
-            main()
+    except KeyboardInterrupt:
+        print('退出程序')
+    except Exception as e:  # 缺失异常处理
+        traceback.print_exc()
+        write_log('crash', f'{e} :\ntraceback.format_exc()')

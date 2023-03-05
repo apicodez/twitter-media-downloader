@@ -1,14 +1,13 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-03 10:45:52
+LastEditTime: 2023-03-05 21:11:48
 LastEditors: mengzonefire
 Description: 工具模块
 '''
 import sys
 import time
 import queue
-from typing import List
 import httpx
 import argparse
 from common.text import *
@@ -20,6 +19,13 @@ if isWinPlatform:
     import winreg
 
 
+def clear():
+    if sys.platform in ['win32', 'win64']:  # 判断是否为win平台
+        os.system('cls')
+    else:
+        os.system('clear')
+
+
 def getHttpText(httpCode: int):
     if httpCode in httpCodeText:
         return httpCodeText[httpCode]
@@ -27,18 +33,17 @@ def getHttpText(httpCode: int):
 
 
 def initalArgs():
-    # prog argument
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('-c', '--cookie', dest='cookie', type=str,
-                        help='set cookie to access locked users or tweets, input " " to clear')
+                        help='for access locked users&tweets, will save to cfg file, input " " to clear')
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
-                        help='set network proxy, support http and socks5, input " " to clear')
+                        help="support http&socks5, default use system proxy(win only)")
     parser.add_argument('-u', '--user_agent', dest='user_agent',
-                        type=str, help='set user-agent, input " " to clear')
+                        type=str, help='will save to cfg file, input " " to clear')
     parser.add_argument('-d', '--dir', dest='dir',
                         type=str, help='set download path')
     parser.add_argument('-n', '--num', dest='concurrency', type=int,
-                        help='set the downloader concurrency')
+                        help='downloader concurrency')
     parser.add_argument('-m', '--meida', action="store_true", dest='meida',
                         help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',
@@ -46,15 +51,57 @@ def initalArgs():
     parser.add_argument('-r', '--retweeted', action="store_true", dest='retweeted',
                         help='exclude retweeted')
     parser.add_argument('-t', '--type', dest='type', type=str,
-                        help='set the desired media type, optional: photo&animated_gif&video&full_text')
+                        help='desired media type, optional: photo&animated_gif&video&full_text')
     parser.add_argument('-v', '--version', action='store_true',
-                        help='show version')
+                        help='show version and check update')
     parser.add_argument('url', type=str, nargs='*', help=url_args_help)
     args = parser.parse_args()
     setContext('args', args)
 
 
-def getHeader():  # 获取游客token
+def argsHandler():
+    args = getContext('args')
+    headers = getContext('headers')
+    if args.version:
+        print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
+            version, donate_page, issue_page))
+        checkUpdate()
+        return
+    if args.proxy:
+        if not setProxy(args.proxy):
+            return
+    else:
+        getSysProxy()
+    if args.cookie:
+        if args.cookie == ' ':
+            headers['Cookie'] = ''  # 清除cookie
+        else:
+            args.cookie = args.cookie.strip()
+            token = getToken(args.cookie)
+            if token:
+                headers['x-csrf-token'] = token
+                headers['Cookie'] = args.cookie
+            else:
+                print(cookie_warning)
+                return
+    if args.user_agent:
+        if args.user_agent == ' ':
+            headers['User-Agent'] = ''
+        else:
+            headers['User-Agent'] = args.user_agent
+    if args.dir:
+        setContext('dl_path', args.dir)
+    if args.concurrency:
+        setContext('concurrency', args.concurrency)
+    if args.type:
+        setContext('type', args.type)
+    setContext('media', args.media)
+    setContext('quoted', not args.quoted)
+    setContext('retweeted', not args.retweeted)
+    setContext('header', headers)
+
+
+def getGuestCookie():  # 获取游客token
     headers = getContext('headers')
     if headers['Cookie']:  # 已配置cookie, 无需游客token
         return
@@ -76,7 +123,7 @@ def getHeader():  # 获取游客token
         exit()
 
 
-def getToken(cookie):
+def getToken(cookie):  # 从cookie内提取csrf token
     csrf_token = p_csrf_token.findall(cookie)
     if len(csrf_token) != 0:
         return csrf_token[0]
@@ -84,7 +131,7 @@ def getToken(cookie):
         return None
 
 
-def getProxy():
+def getSysProxy():
     if getContext('proxy'):  # 已配置, 跳过
         return
     if isWinPlatform:  # 非win平台, 跳过
@@ -97,7 +144,40 @@ def getProxy():
         setContext('proxy', f'http://{proxy_server}')
 
 
-def setProxy(proxy_str):
+def setCookie(cookie_str=''):  # 设置cookie
+    if cookie_str == '':  # 输入代理
+        pass
+    elif cookie_str == ' ':
+        setContext('proxy', '')
+        print('清空代理设置')
+        return True
+    clear()
+    headers = getContext("headers")
+    cookie = input(input_cookie_ask).strip()
+    if cookie:
+        token = getToken(cookie)
+        if token:
+            headers['x-csrf-token'] = token
+            headers['Cookie'] = cookie
+            print(cookie_success)
+        else:
+            print(cookie_warning)
+    else:
+        headers['Cookie'] = ''  # 清除cookie
+        getGuestCookie()  # 重新获取游客token
+        print(cookie_purge_success)
+    setContext('headers', headers)
+    saveEnv()
+    clear()
+
+
+def setProxy(proxy_str=''):
+    if proxy_str == '':  # 输入代理
+        pass
+    elif proxy_str == ' ':
+        setContext('proxy', '')
+        print('清空代理设置')
+        return True
     proxyMatch = pProxy.match(proxy_str)
     proxyMatch2 = pProxy2.match(proxy_str)
     if proxyMatch2:
@@ -113,54 +193,6 @@ def setProxy(proxy_str):
         return False
 
 
-def argsHandler():
-    args = getContext('args')
-    headers = getContext('headers')
-
-    if args.version:
-        print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
-            version, donate_page, issue_page))
-        return
-
-    if args.proxy:
-        if args.proxy == ' ':
-            setContext('proxy', {})
-        elif not setProxy(args.proxy):
-            return
-    elif sys.platform in ['win32', 'win64']:
-        getProxy()
-
-    if args.cookie:
-        if args.cookie == ' ':
-            headers['Cookie'] = ''  # 清除cookie
-        else:
-            args.cookie = args.cookie.strip()
-            token = getToken(args.cookie)
-            if token:
-                headers['x-csrf-token'] = token
-                headers['Cookie'] = args.cookie
-            else:
-                print(cookie_warning)
-                return
-
-    if args.user_agent:
-        if args.user_agent == ' ':
-            headers['User-Agent'] = ''
-        else:
-            headers['User-Agent'] = args.user_agent
-
-    if args.dir:
-        setContext('dl_path', args.dir)
-    if args.concurrency:
-        setContext('concurrency', args.concurrency)
-    if args.type:
-        setContext('type', args.type)
-    setContext('media', args.media)
-    setContext('quoted', not args.quoted)
-    setContext('retweeted', not args.retweeted)
-    setContext('header', headers)
-
-
 '''
 description: 保存配置到本地
 '''
@@ -170,7 +202,6 @@ def saveEnv():
     conf.read(conf_path, encoding='utf-8')
     if 'global' not in conf.sections():
         conf.add_section('global')
-    conf.set("global", "proxy", getContext("proxy"))
     conf.set("global", "download_path", getContext("dl_path"))
     conf.set("global", "user-agent", getContext("headers")["User-Agent"])
     conf.set("global", "cookie", getContext("headers")['Cookie'])
@@ -179,6 +210,7 @@ def saveEnv():
     conf.set("global", "type", getContext("type"))
     conf.set("global", "quoted", getContext("quoted"))
     conf.set("global", "retweeted", getContext("retweeted"))
+    conf.set("global", "media", getContext("media"))
     conf.write(open(conf_path, 'w', encoding='utf-8'))
 
 
@@ -201,8 +233,6 @@ def getEnv():
                         headers['Cookie'] = item[1]
                 elif item[0] == 'user-agent' and item[1]:
                     headers['User-Agent'] = item[1]
-                elif item[0] == 'proxy' and item[1]:
-                    setContext('proxy', eval(item[1]))
                 elif item[0] == 'download_path' and item[1]:
                     setContext('dl_path', item[1])
                 elif item[0] == 'updateinfo' and item[1]:
@@ -212,11 +242,11 @@ def getEnv():
                 elif item[0] == 'type' and item[1]:
                     setContext('type', item[1])
                 elif item[0] == 'media' and item[1]:
-                    setContext('meida', item[1])
+                    setContext('meida', eval(item[1]))
                 elif item[0] == 'quoted' and item[1]:
-                    setContext('quoted', item[1])
+                    setContext('quoted', eval(item[1]))
                 elif item[0] == 'retweeted' and item[1]:
-                    setContext('retweeted', item[1])
+                    setContext('retweeted', eval(item[1]))
             setContext('headers', headers)
 
 
@@ -640,22 +670,13 @@ return {int} 0 1 2: 0为相等， 1为1大， 2为2大
 
 
 def compare_version(version1=None, version2=None, split_flag="."):
-    # 如果存在有为空的情况则进入
     if (version1 is None) or (version1 == "") or (version2 is None) or (version2 == ""):
-        # version1为空且version2不为空，则返回version2大
         if ((version1 is None) or (version1 == "")) and (version2 is not None) and (version2 != ""):
             return 2
-        # version2为空且version1不为空，则返回version1大
         if ((version2 is None) or (version2 == "")) and (version1 is not None) and (version1 != ""):
             return 1
-
-    # 如果版本字符串相等，那么直接返回相等，这句会且只会在第一次比较时才可能进入
-    # version1和version2都为空时也会进入这里
     if version1 == version2:
         return 0
-
-    # 对版本字符串从左向右查找"."，第一个"."之前的字符串即为此次要比较的版本
-    # 如1.3.5中的1
     try:
         current_section_version1 = version1[:version1.index(split_flag)]
     except:
@@ -664,14 +685,10 @@ def compare_version(version1=None, version2=None, split_flag="."):
         current_section_version2 = version2[:version2.index(split_flag)]
     except:
         current_section_version2 = version2
-    # 对本次要比较的版本字符转成整型进行比较
     if int(current_section_version1) > int(current_section_version2):
         return 1
     elif int(current_section_version1) < int(current_section_version2):
         return 2
-
-    # 如果本次传来版本字符串中已没有版本号分隔符，那说明本次比较的版本号已是最后一位版本号，下次比较值赋空
-    # 如本次传来的是5，那下次要比较的只能赋空
     try:
         other_section_version1 = version1[version1.index(split_flag)+1:]
     except:
@@ -680,11 +697,9 @@ def compare_version(version1=None, version2=None, split_flag="."):
         other_section_version2 = version2[version2.index(split_flag) + 1:]
     except:
         other_section_version2 = ""
-
-    # 递归调用比较
     return compare_version(other_section_version1, other_section_version2)
 
 
 # 模块测试入口
 if __name__ == '__main__':
-    getProxy()
+    getSysProxy()

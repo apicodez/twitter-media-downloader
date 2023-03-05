@@ -9,7 +9,7 @@ url_args_help = \
     '''tw url to collect, must be like:
     1. https://twitter.com/***/status/***
     2. https://twitter.com/***(/media|likes|following) (user page, *** is user_id)
-    3. @*** (*** is user_id, for extension search, plz check README)'''
+    3. @*** (for extension search, plz check README)'''
 conf = configparser.RawConfigParser()
 conf_path = os.path.expanduser('~') + '/tw_media_downloader.conf'
 
