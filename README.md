@@ -1,3 +1,5 @@
+* 此分支为dev, 仅用于开发, 未测试的功能不一定能用, 使用请下 [release](https://github.com/mengzonefire/twitter-media-downloader/releases) 里的
+
 # twitter-media-downloader 推特媒体文件下载工具
 
 用于下载推特页面中包含的媒体文件（支持文本, 图片, 视频, 动图）的脚本工具, 使用推特网页版的 api 获取数据
