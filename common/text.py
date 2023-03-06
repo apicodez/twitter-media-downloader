@@ -100,6 +100,6 @@ input_ask = \
     '请输入命令或链接：'
 exit_ask = '\n单击回车键退出程序\n'
 config_info = \
-    '排除转推: {retweeted}, 排除引用: {quoted}, 排除非媒体: {meida}, 爬取类型: {type}\n' \
+    '排除转推: {retweeted}, 排除引用: {quoted}, 排除非媒体: {media}, 爬取类型: {type}\n' \
     '线程数: {concurrency}, 已设置cookie: {cookie}, 代理: {proxy}\n' \
     '下载路径: {dl_path}'

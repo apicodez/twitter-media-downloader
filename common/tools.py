@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-06 15:22:07
+LastEditTime: 2023-03-06 16:45:54
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -45,7 +45,7 @@ def initalArgs():
                         help='downloader concurrency')
     parser.add_argument('-t', '--type', dest='type', type=str,
                         help='desired media type, optional: photo&animated_gif&video&full_text')
-    parser.add_argument('-m', '--meida', action="store_true", dest='meida',
+    parser.add_argument('-m', '--media', action="store_true", dest='media',
                         help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',
                         help='exclude quoted tweets')
@@ -237,7 +237,7 @@ def getEnv():
                 elif item[0] == 'type' and item[1]:
                     setContext('type', item[1])
                 elif item[0] == 'media' and item[1]:
-                    setContext('meida', eval(item[1]))
+                    setContext('media', eval(item[1]))
                 elif item[0] == 'quoted' and item[1]:
                     setContext('quoted', eval(item[1]))
                 elif item[0] == 'retweeted' and item[1]:

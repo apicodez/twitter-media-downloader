@@ -76,7 +76,7 @@
             -n CONCURRENCY, --num CONCURRENCY
                                   downloader concurrency
             -t TYPE, --type TYPE  desired media type, optional: photo&animated_gif&video&full_text
-            -m, --meida           exclude non-media tweets
+            -m, --media           exclude non-media tweets
             -q, --quoted          exclude quoted tweets
             -r, --retweeted       exclude retweeted
             -v, --version         show version and check update
