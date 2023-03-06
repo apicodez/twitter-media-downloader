@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-06 03:25:12
+LastEditTime: 2023-03-06 15:44:42
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
@@ -48,9 +48,9 @@ class UserLikesTask(Task):
                                           response.status_code, getHttpText(response.status_code)))
                 self.stopGetDataList()
                 return
-            pageContent = response.json()
+            self.pageContent = response.json()
             cursor, rest_id_list = parseData(
-                pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list)
+                self.pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list)
             if not cursor:
                 self.stopGetDataList()
                 return

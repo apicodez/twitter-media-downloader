@@ -1,10 +1,11 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-06 04:04:26
+LastEditTime: 2023-03-06 15:22:07
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
+import json
 import sys
 import time
 import queue
@@ -12,7 +13,7 @@ import httpx
 import argparse
 from common.text import *
 from common.const import *
-from common.logger import write_log
+from common.logger import writeLog
 from argparse import RawTextHelpFormatter
 isWinPlatform = sys.platform in ['win32', 'win64']
 if isWinPlatform:
@@ -268,11 +269,10 @@ def getUserId(userName: str) -> int | None:
     page_content = response.text
     userId = p_user_id.findall(page_content)
     if userId:
-        userId = userId[0]
-        return int(userId)
+        return int(userId[0])
     else:
         print(user_warning)
-        write_log(userName, page_content)
+        writeLog(userName, json.dumps(page_content))
         return None
 
 
@@ -390,8 +390,9 @@ def getResult(tweet):
     if 'entryId' not in tweet:
         return tweet
     if tweet['content']['entryType'] == 'TimelineTimelineItem':
+        # SelfThread -> singlePageTask
         if 'tweetDisplayType' in tweet['content']['itemContent'] and \
-                tweet['content']['itemContent']['tweetDisplayType'] == 'Tweet':
+                tweet['content']['itemContent']['tweetDisplayType'] in ['Tweet', 'SelfThread']:
             result = getresult(
                 tweet['content']['itemContent']['tweet_results']['result'])
             return result
@@ -505,9 +506,7 @@ param {*} cursor api翻页锚点参数
 '''
 
 
-def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list=None, cursor=None):
-    if rest_id_list is None:
-        rest_id_list = []
+def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list=[], cursor=''):
     if cursor:
         tweet_list, cursor = getTweet(pageContent)
     else:
@@ -540,7 +539,7 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                                   ['rest_id'], result['quoted_status_result']['result']['legacy']])
         else:
             # 搜索接口的去除引用的方法是对比tweet的user_id_str是否等于userId,仅限@user等于from：user
-            if 'quoted_status_id_str' in result and result['user_id_str'] != user_id:
+            if 'quoted_status_id_str' in result and result['user_id_str'] != str(user_id):
                 continue
         for twtId, legacy in legacylist:
             if twtId in rest_id_list:

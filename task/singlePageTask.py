@@ -1,16 +1,18 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-06 03:26:42
+LastEditTime: 2023-03-06 15:38:54
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
 
+import json
 import time
 import httpx
 
-from common.const import *
 from common.text import *
+from common.const import *
+from common.logger import writeLog
 from common.tools import getHttpText, parseData
 from task.baseTask import Task
 
@@ -44,8 +46,7 @@ class SinglePageTask(Task):
             self.stopGetDataList()
             return
 
-        page_content = response.json()
-        # write_log(self.twtId, str(page_content))  # debug
-        parseData(page_content, self.total, self.userName, self.dataList)
+        self.pageContent = response.json()
+        parseData(self.pageContent, self.total, self.userName, self.dataList)
         self.stopGetDataList()
         return

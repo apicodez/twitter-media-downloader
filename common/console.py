@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-06 04:19:48
+LastEditTime: 2023-03-06 14:15:14
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -187,10 +187,10 @@ def startCrawl(urlList: List):
         if not url:
             continue
         if urlChecker(url):
-            print('\n不支持: {}'.format(url))
-        else:
             print('\n正在提取: {}'.format(url))
             urlHandler(url)
+        else:
+            print('\n不支持: {}'.format(url))
 
 
 def urlChecker(url: str):

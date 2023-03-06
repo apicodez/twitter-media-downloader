@@ -1,17 +1,19 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-06 00:28:23
+LastEditTime: 2023-03-06 16:18:53
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
 
+import json
 import os
 import math
 import time
 import threading
 from queue import Queue
 from abc import abstractmethod
+from common.logger import writeLog
 from common.text import *
 from common.const import getContext
 from common.tools import downloadFile
@@ -19,28 +21,19 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 
 class Task(object):
-    savePath: str  # 下载路径
-    userName: str  # 推主id（不是昵称）
-    twtId: int  # 推文id
-    userId: int  # 推主rest_id
-    media: bool  # 爬取media页的时候会强制覆盖全局media配置，故在类成员内添加标记
-    stop: bool   # 进度条与生产者停止信号
-    total: Queue   # 任务总量计数器
-    done: Queue   # 已完成任务计数器
-    dataList: Queue   # 任务数据队列
-    tasks: set  # 任务线程对象容器
 
     def __init__(self):
-        self.tasks = set()
-        self.userName = ''
-        self.savePath = ''
-        self.twtId = 0
-        self.userId = 0
-        self.media = False
-        self.stop = False
-        self.total = Queue()
-        self.done = Queue()
-        self.dataList = Queue()
+        self.tasks = set()  # 任务线程对象容器
+        self.userName = ''   # 推主id（不是昵称）
+        self.savePath = ''   # 下载路径
+        self.twtId = None  # 推文id(int)
+        self.userId = None  # 推主rest_id(int)
+        self.media = False   # 爬取media页的时候会强制覆盖全局media配置，故在类成员内添加标记
+        self.stop = False   # 进度条与生产者停止信号
+        self.total = Queue()   # 任务总量计数器
+        self.done = Queue()    # 已完成任务计数器
+        self.dataList = Queue()  # 任务数据队列
+        self.pageContent = None  # 接口元数据(用于debug)
 
     @abstractmethod
     def getDataList(self):
@@ -60,10 +53,10 @@ class Task(object):
                         if self.stop:
                             return
                         continue
-                    progress = (done / total) * 100
+                    progress = (done / total) * 50  # 缩短进度条长度防止cmd自动换行
                     length = time.perf_counter() - start
                     print(f"\r@{self.userName} {round(progress, 1)}% [{'█' * math.floor(progress)}"
-                          f"{' ' * (100 - math.ceil(progress))}] [{done}/{total}] {round(length, 1)}s {i}", end="")
+                          f"{' ' * (50 - math.ceil(progress))}] [{done}/{total}] {round(length, 1)}s {i}", end='')
                     if self.stop:
                         return
                     time.sleep(0.1)
@@ -90,3 +83,5 @@ class Task(object):
                                      round(time.perf_counter() - start, 1), self.savePath))
         else:
             print(dl_nothing_warning)
+            writeLog(self.twtId or self.userName,
+                     json.dumps(self.pageContent))  # debug

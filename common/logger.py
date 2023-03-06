@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:23:35
-LastEditTime: 2023-03-06 00:19:50
+LastEditTime: 2023-03-06 14:23:29
 LastEditors: mengzonefire
 Description: 日志模块
 '''
@@ -12,7 +12,7 @@ from common.const import getContext
 from common.text import log_warning
 
 
-def write_log(log_name, log_content):
+def writeLog(log_name, log_content):
     log_path = getContext('log_path')
     if not os.path.exists(log_path):
         os.mkdir(log_path)

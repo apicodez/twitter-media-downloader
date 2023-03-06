@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2023-03-06 02:28:41
+LastEditTime: 2023-03-06 15:31:11
 LastEditors: mengzonefire
 Description: 主函数入口
 '''
@@ -30,11 +30,17 @@ def main():
     saveEnv()
 
 
+def test():
+    with open('./sample/twt.json', 'r') as f:
+        print(getResult(json.loads(f.read())))
+
+
 if __name__ == '__main__':
     try:
         main()
+        # test()
     except KeyboardInterrupt:
         pass
     except Exception:  # 缺失异常处理
-        traceback.print_exc()
-        write_log('crash', traceback.format_exc())
+        print(crash_warning)
+        writeLog('crash', traceback.format_exc())

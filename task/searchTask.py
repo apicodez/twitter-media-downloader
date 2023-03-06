@@ -53,9 +53,9 @@ class UserSearchTask(Task):
                                           response.status_code, getHttpText(response.status_code)))
                 self.stopGetDataList()
                 return
-            pageContent = response.json()
+            self.pageContent = response.json()
             cursor, rest_id_list = parseData(
-                pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor)
+                self.pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor)
             if not cursor:
                 self.stopGetDataList()
                 return
