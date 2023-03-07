@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-06 16:22:16
+LastEditTime: 2023-03-07 21:06:31
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -17,11 +17,11 @@ log_warning = '\rlog文件已保存到 {}\n'
 crash_warning = f'\r未知错误, 请前往issue页反馈log文件:\n{issue_page}'
 user_warning = f'\r提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{issue_page}'
 token_warning = f'\r运行失败: Guest Token获取失败, 请前往issue页反馈:\n{issue_page}'
-parse_warning = f'\r解析失败: 跳过解析此数据, 请带上错误数据信息前往issue页反馈:\n{issue_page}\n错误信息: {{}}\n'
+parse_warning = f'\r解析失败, 跳过此数据, 请前往issue页反馈log文件:\n{issue_page}'
 
 
 http_warning = '\r提取失败{}: http访问异常, 状态码: {} -> {}'
-timeout_warning = '\r网络超时: 服务器未响应或断开链接, 正在重试...{}'
+timeout_warning = '\r网络超时, 服务器未响应或断开链接, 正在重试...{}'
 download_timeout_warning = '\r{} {}{}'
 proxy_input_warning = '代理格式错误（回车继续）'
 cookie_input_warning = 'cookie格式错误（回车继续）'

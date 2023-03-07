@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-06 16:45:54
+LastEditTime: 2023-03-08 00:59:40
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -407,7 +407,8 @@ def getResult(tweet):
         else:
             return None
     else:
-        print(parse_warning.format(tweet))
+        print(parse_warning)
+        writeLog(f'unexpectTwt', json.dumps(tweet))
         return None
 
 
@@ -503,6 +504,8 @@ param {*} dataList 任务数据队列
 param {*} user_id 推主id
 param {*} rest_id_list 推文id列表
 param {*} cursor api翻页锚点参数
+dataList数据结构：
+[{'推主id': {'推文id':{'date':'日期(%Y-%m-%d %H:%M:%S)','dataList':{'数据类型':['下载链接'],'text':'文本内容'}}}}}}]
 '''
 
 
@@ -513,11 +516,11 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
         tweet_list, cursor = getTweet(pageContent, isfirst=True)
     if not tweet_list:
         return cursor, rest_id_list
+    twtDic = {}
     for tweet in tweet_list:
-        picDic = {}
-        gifDic = {}
-        vidDic = {}
-        textDic = {}
+        picList = []
+        gifList = []
+        vidList = []
         result = getResult(tweet)
         if not result:
             continue
@@ -549,55 +552,49 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
             if 'extended_entities' in legacy:
                 for media in legacy['extended_entities']['media']:
 
-                    # get pic links
-                    if media['type'] == 'photo' and media['type'] in media_type:  # photo
+                  # photo
+                    if media['type'] == 'photo' and media['type'] in media_type:
                         # get {'url', url}, add query '?name=orig' can get original pic file
-                        url = media['media_url_https']
-                        picDic[url.split(
-                            '/')[-1]] = {'url': url + '?name=orig', 'twtId': twtId}
                         if url:
+                            picList.append(url)
                             total.put('add')
 
-                    # get gif links(.mp4)
-                    elif media['type'] == 'animated_gif' and media['type'] in media_type:  # gif
+                    # gif(.mp4)
+                    elif media['type'] == 'animated_gif' and media['type'] in media_type:
                         # [{'bitrate':filesize',url':url}]
                         variants = media['video_info']['variants'][0]
                         url = variants['url']
-                        gifDic[url.split('/')[-1]
-                               ] = {'url': url, 'twtId': twtId}
                         if url:
+                            gifList.append(url)
                             total.put('add')
 
-                    # get video links(.mp4)
-                    elif media['type'] == 'video' and media['type'] in media_type:  # video
+                    # video(.mp4)
+                    elif media['type'] == 'video' and media['type'] in media_type:
                         # [{'bitrate':filesize',url':url},{}...] choose largest resolution
                         variants = sorted(media['video_info']['variants'],
                                           key=lambda s: s['bitrate'] if 'bitrate' in s else 0, reverse=True)[0]
                         url = variants['url']
-                        vidDic[url.split('/')[-1].split('?')[0]
-                               ] = {'url': url, 'twtId': twtId}
                         if url:
+                            vidList.append(url)
                             total.put('add')
                     # fail
                     elif media['type'] and media['type'] not in ['video', 'animated_gif', 'photo']:
-                        print('解析失败：', media)
+                        print(parse_warning)
+                        writeLog(f'{twtId}_unexpectType', json.dumps(media))
+
+            twtDic[twtId] = {
+                'picList': dict(**picList),
+                'gifList': dict(**gifList),
+                'vidList': dict(**vidList),
+                'date': time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(legacy['created_at'], "%a %b %d %H:%M:%S +0000 %Y"))
+            }
 
             # get twt text content,Ignore empty text
             if legacy['full_text'] and 'full_text' in media_type:
-                textDic[twtId] = {
-                    'content': legacy['full_text'],
-                    'date': time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(legacy['created_at'], "%a %b %d %H:%M:%S +0000 %Y"))
-                }
+                twtDic[twtId]['text'] = legacy['full_text']
                 total.put('add')
-        data = {
-            f'{userName}': {
-                'picList': dict(**picDic),
-                'gifList': dict(**gifDic),
-                'vidList': dict(**vidDic),
-                'textList': dict(**textDic)
-            }
-        }
-        dataList.put(data)
+
+        dataList.put({f'{userName}': dict(**twtDic)})
     return cursor, rest_id_list
 
 

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-06 16:18:53
+LastEditTime: 2023-03-07 20:55:58
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -83,5 +83,5 @@ class Task(object):
                                      round(time.perf_counter() - start, 1), self.savePath))
         else:
             print(dl_nothing_warning)
-            writeLog(self.twtId or self.userName,
+            writeLog(f'{self.twtId or self.userName}_noMedia',
                      json.dumps(self.pageContent))  # debug
