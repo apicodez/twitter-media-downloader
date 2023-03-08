@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-08 00:59:40
+LastEditTime: 2023-03-09 04:30:09
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -45,6 +45,8 @@ def initalArgs():
                         help='downloader concurrency')
     parser.add_argument('-t', '--type', dest='type', type=str,
                         help='desired media type, optional: photo&animated_gif&video&full_text')
+    parser.add_argument('-f', '--fileName', dest='fileName', type=str,
+                        help='output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}\ndefault:{userName}-{twtId}-{time}_{date}-{type}, will save to cfg file')
     parser.add_argument('-m', '--media', action="store_true", dest='media',
                         help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',
@@ -81,6 +83,13 @@ def argsHandler():
         setContext('concurrency', args.concurrency)
     if args.type:
         setContext('type', args.type)
+    if args.fileName:
+        if not len(p_unexpect_var.findall(args.fileName)):
+            setContext('fileName', re.sub(
+                r'[\\/:*?"<>|]', '', args.fileName.strip()))
+        else:
+            print(unexpectVar_arg_warning)
+            return
     setContext('media', args.media)
     setContext('quoted', not args.quoted)
     setContext('retweeted', not args.retweeted)
@@ -205,6 +214,7 @@ def saveEnv():
     conf.set("global", "updateinfo", getContext("updateInfo"))
     conf.set("global", "concurrency", getContext("concurrency"))
     conf.set("global", "type", getContext("type"))
+    conf.set("global", "type", getContext("type"))
     conf.set("global", "quoted", getContext("quoted"))
     conf.set("global", "retweeted", getContext("retweeted"))
     conf.set("global", "media", getContext("media"))
@@ -233,9 +243,11 @@ def getEnv():
                 elif item[0] == 'updateinfo' and item[1]:
                     setContext('updateInfo', eval(item[1]))
                 elif item[0] == 'concurrency' and item[1]:
-                    setContext('concurrency', eval(item[1]))
+                    setContext('concurrency', int(item[1]))
                 elif item[0] == 'type' and item[1]:
                     setContext('type', item[1])
+                elif item[0] == 'fileName' and item[1]:
+                    setContext('fileName', item[1])
                 elif item[0] == 'media' and item[1]:
                     setContext('media', eval(item[1]))
                 elif item[0] == 'quoted' and item[1]:
@@ -333,29 +345,32 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue, media:
         userName = list(datalist.keys())[0]
         headers = getContext('headers')
         with httpx.Client(proxies=getContext('proxy'), headers=headers, verify=False) as client:
-            for datatype, typelayer in datalist.get(userName).items():
-                if datatype in ['picList', 'gifList', 'vidList']:
-                    for serverFileName, datalayer in typelayer.items():
-                        isMediaTw = True
-                        url = datalayer.get('url')
-                        fileName = '{}_{}_{}'.format(
-                            userName, datalayer.get('twtId'), serverFileName)
-                        filePath = '{}/{}'.format(savePath, fileName)
-                        if os.path.exists(filePath):
-                            done.put('done')
-                            continue
-                        if os.path.exists(f'{filePath}'):
-                            continue
-                        if downloader(client, url, filePath, fileName):
-                            done.put('done')
-                else:
-                    for twtId, content in typelayer.items():
-                        fileName = '{}_{}.txt'.format(
-                            userName, twtId)
-                        filePath = '{}/{}'.format(savePath, fileName)
+            for twtId, datalayer in datalist.get(userName).items():
+                date = datalayer.get('date').split(' ')
+                time, date = (date[-1], date[0])
+                for datatype, data in datalayer.get('dataList').items():
+                    if datatype in ['pic', 'gif', 'vid']:  # media
+                        count = 0
+                        for url in data:
+                            count += 1
+                            isMediaTw = True
+                            ori, ext = os.path.splitext(url.split('/')[-1])
+                            if datatype == 'pic':
+                                url += '?name=orig'  # add query '?name=orig' can get original pic file
+                            fileName = getContext('fileName').format(
+                                userName=userName, twtId=twtId, ori=ori, date=date, time=time, type=f'{datatype}{count}') + ext
+                            filePath = os.path.join(savePath, fileName)
+                            if os.path.exists(filePath):
+                                done.put('done')
+                                continue
+                            if downloader(client, url, filePath, fileName):
+                                done.put('done')
+                    else:  # text
+                        fileName = getContext('fileName').format(
+                            userName=userName, twtId=twtId, date=date, time=time, type='text') + '.txt'
                         if media and not isMediaTw:  # 过滤非媒体推文
                             done.put('done')
-                        elif saveText(filePath, content['content'], content['date']):
+                        elif saveText(os.path.join(savePath, fileName), data):
                             done.put('done')
 
 
@@ -367,11 +382,10 @@ param {str} date 推文发布日期
 '''
 
 
-def saveText(filePath: str, content: str, date: str):
+def saveText(filePath: str, content: str):
     if os.path.exists(filePath):
         return True
     with open(filePath, 'w', encoding='utf-8') as f:
-        f.write(f'{date}\n\n')
         f.write(content)
     return True
 
@@ -581,19 +595,17 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                     elif media['type'] and media['type'] not in ['video', 'animated_gif', 'photo']:
                         print(parse_warning)
                         writeLog(f'{twtId}_unexpectType', json.dumps(media))
-
+            twtId = str(twtId)
             twtDic[twtId] = {
-                'picList': dict(**picList),
-                'gifList': dict(**gifList),
-                'vidList': dict(**vidList),
+                'pic': dict(**picList),
+                'gif': dict(**gifList),
+                'vid': dict(**vidList),
                 'date': time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(legacy['created_at'], "%a %b %d %H:%M:%S +0000 %Y"))
             }
-
             # get twt text content,Ignore empty text
             if legacy['full_text'] and 'full_text' in media_type:
                 twtDic[twtId]['text'] = legacy['full_text']
                 total.put('add')
-
         dataList.put({f'{userName}': dict(**twtDic)})
     return cursor, rest_id_list
 

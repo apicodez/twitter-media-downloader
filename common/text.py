@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-07 21:06:31
+LastEditTime: 2023-03-09 04:39:34
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -28,7 +28,7 @@ cookie_input_warning = 'cookie格式错误（回车继续）'
 proxy_arg_warning = \
     '参数错误: 代理格式错误, 格式:\n' \
     '[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5'
-cookie_arg_warning = f'参数错误: cookie格式错误, 请参考教程获取cookie:\n{cookie_tips_page}\n'
+cookie_arg_warning = f'参数错误: cookie格式错误, 请参考教程获取cookie:\n{cookie_tips_page}'
 user_unavailable_warning = '\r提取失败: 该用户已锁定/冻结, 访问锁定用户需要设置已关注账号的cookie'
 age_restricted_warning = '\r提取失败: 该用户已设置年龄限制, 访问需要设置账号cookie'
 network_error_warning = '\r网络连接失败, 请检查代理设置'
@@ -37,19 +37,21 @@ check_update_warning = '\r检查更新失败, 程序继续运行, 失败信息:\
 need_cookie_warning = '\r目前访问推特的media列表接口需要登录账号, 故请先设置cookie再爬取'
 dl_nothing_warning = f'\r未爬取到任何有效数据, 请前往issue页反馈log文件:\n{issue_page}'
 queue_empty_warning = '\r超过30秒未从任务队列中获取到数据'
+unexpectVar_arg_warning = '参数错误: 自定义文件名格式错误, 存在错误的变量名'
+unexpectVar_input_warning = '\r存在错误的变量名, 请重新输入（回车继续）'
 input_num_warning = '请输入正确数字（回车继续）'
 
 # normal text
 task_finish = '\r文件下载任务已完成 {}/{}, 用时 {}s, 保存路径: {}'
 fo_Task_finish = '\r关注列表爬取任务已完成, 保存路径: {}'
 input_cookie_ask = \
-    '请输入cookie, 单击回车确认 (输入0返回, 留空直接回车清除cookie)\n' \
+    '请输入cookie, 单击回车确认(留空直接回车清除cookie)\n' \
     f'* cookie获取教程：{cookie_tips_page}\n' \
-    '请输入：'
+    '请输入 (输入0返回)：'
 input_proxy_ask = \
-    '请输入代理, 单击回车确认 (输入0返回), 格式:\n' \
+    '请输入代理, 单击回车确认, 格式:\n' \
     '[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5\n' \
-    '请输入：'
+    '请输入 (输入0返回)：'
 max_concurrency_ask = \
     '下载线程数过高会使下载变慢，请勿设置过大\n\n' \
     '0.返回\n\n' \
@@ -63,6 +65,15 @@ set_type_ask = \
     '4.下载文本\n' \
     '5.所有\n\n' \
     '请输入（默认所有）：'
+set_fileName_ask = \
+    '输入自定义文件名, 可选变量：\n\n' \
+    '{userName} : 推主id\n' \
+    '{twtId} : 推文id\n' \
+    '{date} : 推文日期, 例如20230213\n' \
+    '{time} : 推文时间, 例如114210\n' \
+    '{type} : 数据类型+序号(1-4,文本没序号), 例如img1/vid1/gif1/text\n' \
+    '{ori} : 服务器文件名(文本文件没有此项), 例如FAGkEkFVEAI8GSd\n\n' \
+    '请输入 (输入0返回)：'
 retweeted_status_ask = \
     '是否下载转推\n\n' \
     '0.返回\n' \
@@ -88,7 +99,8 @@ download_settings_ask = \
     '2.设置下载线程数\n' \
     '3.设置是否下载引用推文\n' \
     '4.设置是否下载转推\n' \
-    '5.设置是否下载非媒体\n\n' \
+    '5.设置是否下载非媒体\n' \
+    '6.设置自定义保存文件名\n\n' \
     '请输入：'
 continue_ask = '\n单击回车键->退出程序, 输入任意内容+回车->继续提取\n'
 input_ask = \

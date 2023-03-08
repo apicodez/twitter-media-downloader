@@ -6,13 +6,11 @@ LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
 
-import json
 import time
 import httpx
 
 from common.text import *
 from common.const import *
-from common.logger import writeLog
 from common.tools import getHttpText, parseData
 from task.baseTask import Task
 

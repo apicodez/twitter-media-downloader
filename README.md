@@ -25,13 +25,14 @@
 # tips 提示
 
 1. 获取到的媒体文件默认下载到程序同目录下的 **twitter_media_download** 文件夹
-2. 设置年龄限制/锁定 的 推主/推文 必须设置 cookie 才能爬取, 设置完成后, cookie会保存到本地, 下次运行程序自动读取
-3. 下载文件名格式: **{推主 id}\_{推文 id}\_{服务器文件名}**, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
-4. 默认使用系统代理, 无需配置 (仅 win 平台, 其余平台请手动设置)，但注意程序仅支持http代理
+2. 设置年龄限制/锁定 的 推主/推文 必须设置 cookie 才能爬取, 设置完成后, cookie会保存到配置文件, 下次运行程序自动读取
+3. 默认下载文件名格式: **{推主 id}\_{推文 id}\_{服务器文件名}**, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
+   * 1.3.0改为**推主id-推文id-日期_时间-数据类型+序号** 例如 memidesuyo-1614977212545844224-20230213_114210-img1.jpg
+   * 若需要旧版的格式, 请将自定义保存文件名设置为: {userName}\_{twtId}\_{ori}
+4. 默认使用系统代理, 无需配置 (仅 win 平台, 其余平台请手动设置), 支持http, socks5代理
 5. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
-6. 支持爬取推文文本, 自动保存为 **{推主 id}\_{推文 id}.txt**
-7. 若出现任何问题/提意见&需求, 请前往 [issue](https://github.com/mengzonefire/twitter-media-downloader/issues) 反馈
-8. 程序的配置文件路径: * 配置文件内含proxy(代理)，download_path(下载路径)，UA和cookie四项配置
+6. 若出现任何问题/提意见&需求, 请前往 [issue](https://github.com/mengzonefire/twitter-media-downloader/issues) 反馈
+7. 程序的配置文件路径:
     * linux: ~/tw_media_downloader.conf
     * win: %userprofile%/tw_media_downloader.conf
 
@@ -59,30 +60,33 @@
        * 高级搜索， 包含#tag1和#tag2，并指定推文来自用户user ```@&advanced=(#tag1 AND #tag2) (from:user)```  
          * 注：脚本搜索页默认不包含回复，如需爬取回复请使用高级搜索
   2. 命令行调用:
-       ```
-          usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-d DIR] [-n CONCURRENCY] [-t TYPE] [-m] [-q] [-r] [-v] [url ...]
+      ```
+        usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-d DIR] [-n CONCURRENCY] [-t TYPE] [-f FILENAME] [-m] [-q] [-r] [-v] [url ...]
 
-          positional arguments:
-            url                   tw url to collect, must be like:
-                                      1. https://twitter.com/***/status/***
-                                      2. https://twitter.com/***(/media|likes|following) (user page, *** is user_id)
-                                      3. @*** (search page, plz check README)
+        positional arguments:
+          url                   tw url to collect, must be like:
+                                    1. https://twitter.com/***/status/***
+                                    2. https://twitter.com/***(/media|likes|following) (user page, *** is user_id)
+                                    3. @*** (search page, plz check README)
 
-          options:
-            -h, --help            show this help message and exit
-            -c COOKIE, --cookie COOKIE
-                                  for access locked users&tweets, will save to cfg file, input " " to clear
-            -p PROXY, --proxy PROXY
-                                  support http&socks5, default use system proxy(win only)
-            -d DIR, --dir DIR     set download path
-            -n CONCURRENCY, --num CONCURRENCY
-                                  downloader concurrency
-            -t TYPE, --type TYPE  desired media type, optional: photo&animated_gif&video&full_text
-            -m, --media           exclude non-media tweets
-            -q, --quoted          exclude quoted tweets
-            -r, --retweeted       exclude retweeted
-            -v, --version         show version and check update
-       ```
+        options:
+          -h, --help            show this help message and exit
+          -c COOKIE, --cookie COOKIE
+                                for access locked users&tweets, will save to cfg file, input " " to clear
+          -p PROXY, --proxy PROXY
+                                support http&socks5, default use system proxy(win only)
+          -d DIR, --dir DIR     set download path
+          -n CONCURRENCY, --num CONCURRENCY
+                                downloader concurrency
+          -t TYPE, --type TYPE  desired media type, optional: photo&animated_gif&video&full_text
+          -f FILENAME, --fileName FILENAME
+                                output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}
+                                default:{userName}-{twtId}-{time}_{date}-{type}, will save to cfg file
+          -m, --media           exclude non-media tweets
+          -q, --quoted          exclude quoted tweets
+          -r, --retweeted       exclude retweeted
+          -v, --version         show version and check update
+      ```
       示例：
        * 下载用户主页 `python twitter-media-downloader.py https://twitter.com/user`
        * 下载用户主页，排除转推 `python twitter-media-downloader.py -r https://twitter.com/user`
@@ -105,12 +109,12 @@
 # TODO 待实现需求
 
 1. GUI (可能要等很久才能写出来)
-2. 添加socks代理支持, 优化代理配置流程
-3. 废弃主页,媒体页api, 直接使用搜索页api
-4. 添加用户like页爬取功能
-5. 修改默认输出文件名格式为 **推主id-推文id-日期_时间/-img1/-vid1/-gif1/-text**
+2. ~~添加socks代理支持, 优化代理配置流程~~(完成)
+3. ~~废弃主页,媒体页api, 直接使用搜索页api~~(完成)
+4. ~~添加用户like页爬取功能~~(完成)
+5. ~~修改默认输出文件名格式为 **推主id-推文id-日期_时间-img1/-vid1/-gif1/-text**~~(完成)
    * 例如 \*\*\*-1614977212545844224-20230213_114210-img1.jpg
-6. 添加输出文件名自定义 可选元素: 推主id, 推文id, 日期, 时间, 数据类型+序号
+6. ~~添加输出文件名自定义 可选元素: 推主id, 推文id, 日期, 时间, 类型+序号~~(完成)
 7. 支持推文评论爬取
 
 <details>

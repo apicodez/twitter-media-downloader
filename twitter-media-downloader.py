@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2023-03-06 15:31:11
+LastEditTime: 2023-03-08 11:45:30
 LastEditors: mengzonefire
 Description: 主函数入口
 '''
@@ -30,7 +30,7 @@ def main():
     saveEnv()
 
 
-def test():
+def test():  # debug
     with open('./sample/twt.json', 'r') as f:
         print(getResult(json.loads(f.read())))
 

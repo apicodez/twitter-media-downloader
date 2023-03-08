@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-06 14:15:14
+LastEditTime: 2023-03-09 04:37:32
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -70,8 +70,11 @@ def config():  # 设置菜单
             retweetedStatus()
         elif set == '5':
             mediaStatus()
+        elif set == '6':
+            setFileName()
         else:
             input(input_num_warning)
+            clear()
     clear()
 
 
@@ -102,6 +105,23 @@ def setType():  # 设置下载类型
             break
         else:
             input(input_num_warning)
+            clear()
+    clear()
+
+
+def setFileName():  # 设置自定义保存文件名
+    clear()
+    while True:
+        fileName = input(set_fileName_ask).strip()
+        if fileName == '0':
+            break
+        else:
+            if not len(p_unexpect_var.findall(fileName)):
+                setContext('fileName', re.sub(r'[\\/:*?"<>|]', '', fileName))
+                break
+            else:
+                input(unexpectVar_input_warning)
+                clear()
     clear()
 
 
@@ -119,6 +139,7 @@ def maxConcurrency():  # 设置线程数
                 break
             except ValueError:
                 input(input_num_warning)
+                clear()
     clear()
 
 
@@ -138,6 +159,7 @@ def mediaStatus():  # 设置非媒体
             break
         else:
             input(input_num_warning)
+            clear()
     clear()
 
 
@@ -157,6 +179,7 @@ def quotedStatus():  # 设置引用
             break
         else:
             input(input_num_warning)
+            clear()
     clear()
 
 
@@ -176,6 +199,7 @@ def retweetedStatus():  # 设置转推
             break
         else:
             input(input_num_warning)
+            clear()
     clear()
 
 
