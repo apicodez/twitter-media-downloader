@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-09 04:30:09
+LastEditTime: 2023-03-09 23:14:21
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -36,9 +36,9 @@ def getHttpText(httpCode: int):
 def initalArgs():
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('-c', '--cookie', dest='cookie', type=str,
-                        help='for access locked users&tweets, will save to cfg file, input " " to clear')
+                        help='for access locked users&tweets, default use cfg file, input " " to clear')
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
-                        help="support http&socks5, default use system proxy(win only)")
+                        help="support http&socks5, default use cfg file, input " " to clear")
     parser.add_argument('-d', '--dir', dest='dir',
                         type=str, help='set download path')
     parser.add_argument('-n', '--num', dest='concurrency', type=int,
@@ -70,13 +70,9 @@ def argsHandler():
     if args.proxy:
         if not setProxy(args.proxy):
             return
-    else:
-        getSysProxy()
     if args.cookie:
         if not setCookie(args.cookie):
             return
-    else:
-        getGuestCookie()
     if args.dir:
         setContext('dl_path', args.dir)
     if args.concurrency:
@@ -93,19 +89,26 @@ def argsHandler():
     setContext('media', args.media)
     setContext('quoted', not args.quoted)
     setContext('retweeted', not args.retweeted)
+    saveEnv()
+    print(save_cfg_finsh.format(conf_path))
+    showConfig()
 
 
 def getGuestCookie():  # 获取游客token
     headers = getContext('headers')
-    if headers['Cookie']:  # 已配置cookie, 无需游客token
-        return
+    if headers['Cookie'] or 'x-guest-token' in headers:  # cookie/游客token已配置
+        return True
     with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), timeout=5, verify=False) as client:
         for i in range(1, 6):
             try:
                 response = client.post(hostUrl).json()
                 break
             except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError):
-                print(timeout_warning.format(i))
+                if i >= 5:
+                    print(network_error_warning)
+                    return False
+                else:
+                    print(timeout_warning.format(i))
             time.sleep(1)
     if 'guest_token' in response:
         x_guest_token = response['guest_token']
@@ -126,8 +129,6 @@ def getToken(cookie):  # 从cookie内提取csrf token
 
 
 def getSysProxy():
-    if getContext('proxy'):  # 已配置, 跳过
-        return
     if isWinPlatform:  # 非win平台, 跳过
         return
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
@@ -166,9 +167,7 @@ def setCookie(cookie=''):  # 设置cookie
                 return False
     else:
         headers['Cookie'] = ''
-        getGuestCookie()  # 重新获取游客token
     setContext('headers', headers)
-    saveEnv()
     return True
 
 
@@ -181,7 +180,16 @@ def setProxy(proxy=''):
         clear()
         if proxy == '0':
             return True
-    else:
+        elif proxy == '1':
+            getSysProxy()
+            return True
+        elif proxy == '':
+            setContext('proxy', None)
+            return True
+    elif proxy == ' ':
+        setContext('proxy', None)
+        return True
+    else:  # 命令行参数
         proxy = proxy.strip()
     proxyMatch = pProxy.match(proxy)
     proxyMatch2 = pProxy2.match(proxy)
@@ -214,10 +222,13 @@ def saveEnv():
     conf.set("global", "updateinfo", getContext("updateInfo"))
     conf.set("global", "concurrency", getContext("concurrency"))
     conf.set("global", "type", getContext("type"))
-    conf.set("global", "type", getContext("type"))
+    conf.set("global", "fileName", getContext("fileName"))
     conf.set("global", "quoted", getContext("quoted"))
     conf.set("global", "retweeted", getContext("retweeted"))
     conf.set("global", "media", getContext("media"))
+    proxy = getContext("proxy")
+    if proxy:
+        conf.set("global", "proxy", proxy)
     conf.write(open(conf_path, 'w', encoding='utf-8'))
 
 
@@ -254,6 +265,8 @@ def getEnv():
                     setContext('quoted', eval(item[1]))
                 elif item[0] == 'retweeted' and item[1]:
                     setContext('retweeted', eval(item[1]))
+                elif item[0] == 'proxy' and item[1] and (pProxy.match(item[1]) or pProxy2.match(item[1])):
+                    setContext('proxy', item[1])
             setContext('headers', headers)
 
 
@@ -272,7 +285,11 @@ def getUserId(userName: str) -> int | None:
                     userName)})
                 break
             except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError):
-                print(timeout_warning.format(i))
+                if i >= 5:
+                    print(network_error_warning)
+                    return False
+                else:
+                    print(timeout_warning.format(i))
             time.sleep(1)
     if response.status_code != httpx.codes.OK:
         print(http_warning.format('getUserId',
@@ -661,7 +678,9 @@ description: 显示配置
 
 
 def showConfig():
-    print()
+    def bool2str(b):
+        return '是' if b else '否'
+    print(config_info.format())
 
 
 '''

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-07 20:55:58
+LastEditTime: 2023-03-09 23:05:33
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -81,7 +81,7 @@ class Task(object):
         if self.total.qsize():
             print(task_finish.format(self.done.qsize(), self.total.qsize(),
                                      round(time.perf_counter() - start, 1), self.savePath))
-        else:
+        elif self.pageContent:
             print(dl_nothing_warning)
             writeLog(f'{self.twtId or self.userName}_noMedia',
                      json.dumps(self.pageContent))  # debug

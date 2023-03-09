@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-06 15:38:54
+LastEditTime: 2023-03-09 22:56:51
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -33,7 +33,12 @@ class SinglePageTask(Task):
                         'features': singlePageApiPar2})
                 break
             except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError):
-                print(timeout_warning.format(i))
+                if i >= 5:
+                    print(network_error_warning)
+                    self.stopGetDataList()
+                    return
+                else:
+                    print(timeout_warning.format(i))
             time.sleep(1)
         if not response:
             self.stopGetDataList()

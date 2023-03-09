@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2023-03-08 11:45:30
+LastEditTime: 2023-03-09 22:39:05
 LastEditors: mengzonefire
 Description: 主函数入口
 '''
@@ -20,14 +20,11 @@ def main():
     if len(sys.argv) == 1:  # 命令行参数为空 / 双击运行程序 -> 进入交互模式
         print('version: {}\ndonate page: {}\nissue page: {}\n'.format(
             version, donate_page, issue_page))
-        getSysProxy()
         checkUpdate()
-        getGuestCookie()
         cmdMode(False)
     else:
         argsHandler()
         startCrawl(getContext('args').url)
-    saveEnv()
 
 
 def test():  # debug

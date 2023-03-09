@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-09 04:39:34
+LastEditTime: 2023-03-09 23:10:45
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -18,8 +18,6 @@ crash_warning = f'\r未知错误, 请前往issue页反馈log文件:\n{issue_page
 user_warning = f'\r提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{issue_page}'
 token_warning = f'\r运行失败: Guest Token获取失败, 请前往issue页反馈:\n{issue_page}'
 parse_warning = f'\r解析失败, 跳过此数据, 请前往issue页反馈log文件:\n{issue_page}'
-
-
 http_warning = '\r提取失败{}: http访问异常, 状态码: {} -> {}'
 timeout_warning = '\r网络超时, 服务器未响应或断开链接, 正在重试...{}'
 download_timeout_warning = '\r{} {}{}'
@@ -49,9 +47,9 @@ input_cookie_ask = \
     f'* cookie获取教程：{cookie_tips_page}\n' \
     '请输入 (输入0返回)：'
 input_proxy_ask = \
-    '请输入代理, 单击回车确认, 格式:\n' \
+    '请输入代理, 单击回车确认(留空直接回车为不使用代理), 格式:\n' \
     '[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5\n' \
-    '请输入 (输入0返回)：'
+    '请输入 (输入0返回,输入1获取系统代理)：'
 max_concurrency_ask = \
     '下载线程数过高会使下载变慢，请勿设置过大\n\n' \
     '0.返回\n\n' \
@@ -114,4 +112,5 @@ exit_ask = '\n单击回车键退出程序\n'
 config_info = \
     '排除转推: {retweeted}, 排除引用: {quoted}, 排除非媒体: {media}, 爬取类型: {type}\n' \
     '线程数: {concurrency}, 已设置cookie: {cookie}, 代理: {proxy}\n' \
-    '下载路径: {dl_path}'
+    '自定义文件名: {fileName}, 下载路径: {dl_path}'
+save_cfg_finsh = '以下参数保存到配置文件：{}'

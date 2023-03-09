@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-09 04:37:32
+LastEditTime: 2023-03-09 23:08:13
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -11,7 +11,7 @@ from task.searchTask import UserSearchTask
 from typing import List
 from common.text import *
 from common.const import *
-from common.tools import getUserId, saveEnv, showConfig, setProxy, setCookie, clear
+from common.tools import getGuestCookie, getUserId, saveEnv, showConfig, setProxy, setCookie, clear
 from task.userFollowingTask import UserFollowingTask
 from task.userLikesTask import UserLikesTask
 
@@ -30,10 +30,12 @@ def cmdMode(clearScreen=True):
             return
         elif temp == '1':
             setCookie()
+            saveEnv()
             showConfig()
             print(input_ask)
         elif temp == '2':
             setProxy()
+            saveEnv()
             showConfig()
             print(input_ask)
         elif temp == '3':
@@ -62,16 +64,22 @@ def config():  # 设置菜单
             break
         elif set == '1':
             setType()
+            saveEnv()
         elif set == '2':
             maxConcurrency()
+            saveEnv()
         elif set == '3':
             quotedStatus()
+            saveEnv()
         elif set == '4':
             retweetedStatus()
+            saveEnv()
         elif set == '5':
             mediaStatus()
+            saveEnv()
         elif set == '6':
             setFileName()
+            saveEnv()
         else:
             input(input_num_warning)
             clear()
@@ -96,12 +104,10 @@ def setType():  # 设置下载类型
                 elif i == '4':
                     type.append('full_text')
             setContext('type', '&'.join(type))
-            saveEnv()
             break
         elif only == '5':
             type = ['photo', 'animated_gif', 'video', 'full_text']
             setContext('type', '&'.join(type))
-            saveEnv()
             break
         else:
             input(input_num_warning)
@@ -135,7 +141,6 @@ def maxConcurrency():  # 设置线程数
             try:
                 setContext('concurrency', int(num))
                 clear()
-                saveEnv()
                 break
             except ValueError:
                 input(input_num_warning)
@@ -151,11 +156,9 @@ def mediaStatus():  # 设置非媒体
             break
         elif set == '1':
             setContext('media', False)
-            saveEnv()
             break
         elif set == '2':
             setContext('media', True)
-            saveEnv()
             break
         else:
             input(input_num_warning)
@@ -171,11 +174,9 @@ def quotedStatus():  # 设置引用
             break
         elif set == '1':
             setContext('quoted', True)
-            saveEnv()
             break
         elif set == '2':
             setContext('quoted', False)
-            saveEnv()
             break
         else:
             input(input_num_warning)
@@ -191,11 +192,9 @@ def retweetedStatus():  # 设置转推
             break
         elif set == '1':
             setContext('retweeted', True)
-            saveEnv()
             break
         elif set == '2':
             setContext('retweeted', False)
-            saveEnv()
             break
         else:
             input(input_num_warning)
@@ -204,6 +203,10 @@ def retweetedStatus():  # 设置转推
 
 
 def startCrawl(urlList: List):
+    if not len(urlList):
+        return
+    if not getGuestCookie():
+        return
     dl_path = getContext('dl_path')
     if not os.path.exists(dl_path):
         os.mkdir(dl_path)

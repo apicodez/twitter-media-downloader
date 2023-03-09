@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-06 15:44:42
+LastEditTime: 2023-03-09 22:57:09
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
@@ -38,7 +38,12 @@ class UserLikesTask(Task):
                             'features': commonApiPar})
                     break
                 except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
-                    print(timeout_warning.format(i))
+                    if i >= 5:
+                        print(network_error_warning)
+                        self.stopGetDataList()
+                        return
+                    else:
+                        print(timeout_warning.format(i))
                 time.sleep(1)
             if not response:
                 self.stopGetDataList()

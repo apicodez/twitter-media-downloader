@@ -43,7 +43,11 @@ class UserSearchTask(Task):
                         response = client.get(userSearchApi, params=params)
                     break
                 except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
-                    print(timeout_warning.format(i))
+                    if i >= 5:
+                        print(network_error_warning)
+                        return False
+                    else:
+                        print(timeout_warning.format(i))
                 time.sleep(1)
             if not response:
                 self.stopGetDataList()
