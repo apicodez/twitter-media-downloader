@@ -72,16 +72,16 @@
         options:
           -h, --help            show this help message and exit
           -c COOKIE, --cookie COOKIE
-                                for access locked users&tweets, will save to cfg file, input " " to clear
+                                for access locked users&tweets, default use cfg file, input " " to clear
           -p PROXY, --proxy PROXY
-                                support http&socks5, default use system proxy(win only)
-          -d DIR, --dir DIR     set download path
+                                support http&socks5, default use cfg file, input " " to clear
+          -d DIR, --dir DIR     set download path, default: ./twitter_media_download or use cfg file
           -n CONCURRENCY, --num CONCURRENCY
-                                downloader concurrency
-          -t TYPE, --type TYPE  desired media type, optional: photo&animated_gif&video&full_text
+                                downloader concurrency, default: 8 or use cfg file
+          -t TYPE, --type TYPE  desired media type, default: photo&animated_gif&video&full_text or use cfg file
           -f FILENAME, --fileName FILENAME
                                 output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}
-                                default:{userName}-{twtId}-{time}_{date}-{type}, will save to cfg file
+                                default: {userName}-{twtId}-{time}_{date}-{type} or use cfg file
           -m, --media           exclude non-media tweets
           -q, --quoted          exclude quoted tweets
           -r, --retweeted       exclude retweeted

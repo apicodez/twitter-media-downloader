@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-09 23:58:10
+LastEditTime: 2023-03-10 00:26:53
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -38,15 +38,15 @@ def initalArgs():
     parser.add_argument('-c', '--cookie', dest='cookie', type=str,
                         help='for access locked users&tweets, default use cfg file, input " " to clear')
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
-                        help="support http&socks5, default use cfg file, input " " to clear")
+                        help='support http&socks5, default use cfg file, input " " to clear')
     parser.add_argument('-d', '--dir', dest='dir',
-                        type=str, help='set download path')
+                        type=str, help='set download path, default: ./twitter_media_download or use cfg file')
     parser.add_argument('-n', '--num', dest='concurrency', type=int,
-                        help='downloader concurrency')
+                        help='downloader concurrency, default: 8 or use cfg file')
     parser.add_argument('-t', '--type', dest='type', type=str,
-                        help='desired media type, optional: photo&animated_gif&video&full_text')
+                        help='desired media type, default: photo&animated_gif&video&full_text or use cfg file')
     parser.add_argument('-f', '--fileName', dest='fileName', type=str,
-                        help='output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}\ndefault:{userName}-{twtId}-{time}_{date}-{type}, will save to cfg file')
+                        help='output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}\ndefault: {userName}-{twtId}-{time}_{date}-{type} or use cfg file')
     parser.add_argument('-m', '--media', action="store_true", dest='media',
                         help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',

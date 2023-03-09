@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-09 23:59:08
+LastEditTime: 2023-03-10 00:22:49
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -31,7 +31,7 @@ user_unavailable_warning = '\r提取失败: 该用户已锁定/冻结, 访问锁
 age_restricted_warning = '\r提取失败: 该用户已设置年龄限制, 访问需要设置账号cookie'
 network_error_warning = '\r网络连接失败, 请检查代理设置'
 input_warning = '\r链接或命令格式错误（回车继续）'
-check_update_warning = '\r检查更新失败, 程序继续运行, 失败信息:\n{}'
+check_update_warning = '\r检查更新失败, 程序继续运行, 失败信息:\n{}\n'
 need_cookie_warning = '\r目前访问推特的media列表接口需要登录账号, 故请先设置cookie再爬取'
 dl_nothing_warning = f'\r未爬取到任何有效数据, 请前往issue页反馈log文件:\n{issue_page}'
 queue_empty_warning = '\r超过30秒未从任务队列中获取到数据'
