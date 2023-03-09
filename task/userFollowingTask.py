@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 09:46:48
-LastEditTime: 2023-03-09 23:04:57
+LastEditTime: 2023-03-10 04:57:41
 LastEditors: mengzonefire
 Description: 关注列表爬取任务类
 '''
@@ -18,6 +18,7 @@ from common.tools import getFollower, getHttpText
 
 class UserFollowingTask():
     dataList = []
+    stop = False
     pageContent = None
 
     def __init__(self, userName: str, userId: int):
@@ -25,10 +26,8 @@ class UserFollowingTask():
         self.userId = userId
         self.savePath = os.path.join(getContext('dl_path'), userName)
 
-    def getDataList(self):
+    def getDataList(self, cursor=''):
         while True:
-            if self.stop:
-                return
             cursorPar = cursor and '"cursor":"{}",'.format(cursor)
             response = None
             for i in range(1, 6):
@@ -52,7 +51,7 @@ class UserFollowingTask():
                                           response.status_code, getHttpText(response.status_code)))
                 return
             self.pageContent = response.json()
-            cursor = getFollower(self.pageContent, self.dataList, cursor)
+            cursor = getFollower(self.pageContent, self.dataList)
             if not cursor:
                 return
 
@@ -70,5 +69,5 @@ class UserFollowingTask():
                 os.path.join(self.savePath, 'following.txt')))
         elif self.pageContent:
             print(dl_nothing_warning)
-            writeLog(f'{self.twtId or self.userName}_noFollowing',
+            writeLog(f'{self.userName}_noFollowing',
                      json.dumps(self.pageContent))  # debug

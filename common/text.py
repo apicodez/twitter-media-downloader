@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-10 00:22:49
+LastEditTime: 2023-03-10 04:54:10
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -16,8 +16,11 @@ cookie_tips_page = 'https://git.io/how_to_get_cookies_cn'
 log_warning = '\rlog文件已保存到 {}\n'
 crash_warning = f'\r未知错误, 请前往issue页反馈log文件:\n{issue_page}'
 user_warning = f'\r提取失败: 该用户不存在, 若存在, 请前往issue页反馈:\n{issue_page}'
-token_warning = f'\r运行失败: Guest Token获取失败, 请前往issue页反馈:\n{issue_page}'
+token_warning = f'\r提取失败: Guest Token获取失败, 请前往issue页反馈:\n{issue_page}'
 parse_warning = f'\r解析失败, 跳过此数据, 请前往issue页反馈log文件:\n{issue_page}'
+apiErr_warning = '\r已删除/不存在/年龄限制(需要cookie), 错误信息: {}'
+dataErr_warning = '\r提取失败, 错误信息: {}'
+needCookie_warning = '\r提取失败, 请先设置cookie'
 http_warning = '\r提取失败{}: http访问异常, 状态码: {} -> {}'
 timeout_warning = '\r网络超时, 服务器未响应或断开链接, 正在重试...{}'
 download_timeout_warning = '\r{} {}{}'
@@ -33,7 +36,7 @@ network_error_warning = '\r网络连接失败, 请检查代理设置'
 input_warning = '\r链接或命令格式错误（回车继续）'
 check_update_warning = '\r检查更新失败, 程序继续运行, 失败信息:\n{}\n'
 need_cookie_warning = '\r目前访问推特的media列表接口需要登录账号, 故请先设置cookie再爬取'
-dl_nothing_warning = f'\r未爬取到任何有效数据, 请前往issue页反馈log文件:\n{issue_page}'
+dl_nothing_warning = f'\r未解析到任何数据, 若上方没有其他报错, 可前往issue页反馈log文件:\n{issue_page}'
 queue_empty_warning = '\r超过30秒未从任务队列中获取到数据'
 unexpectVar_arg_warning = '参数错误: 自定义文件名格式错误, 存在错误的变量名'
 unexpectVar_input_warning = '\r存在错误的变量名, 请重新输入（回车继续）'
@@ -64,13 +67,14 @@ set_type_ask = \
     '5.所有\n\n' \
     '请输入（默认所有）：'
 set_fileName_ask = \
-    '输入自定义文件名, 可选变量：\n\n' \
+    '输入自定义文件名, 可选变量()：\n\n' \
     '{userName} : 推主id\n' \
     '{twtId} : 推文id\n' \
     '{date} : 推文日期, 例如20230213\n' \
     '{time} : 推文时间, 例如114210\n' \
     '{type} : 数据类型+序号(1-4,文本没序号), 例如img1/vid1/gif1/text\n' \
-    '{ori} : 服务器文件名(文本文件没有此项), 例如FAGkEkFVEAI8GSd\n\n' \
+    '{ori} : 服务器文件名(文本文件没有此项), 例如FAGkEkFVEAI8GSd\n' \
+    '* 脚本没有重命名策略, 故{type}和{ori}请至少带上一个防止重名\n\n' \
     '请输入 (输入0返回)：'
 retweeted_status_ask = \
     '是否下载转推\n\n' \

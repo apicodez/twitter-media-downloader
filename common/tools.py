@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-10 00:26:53
+LastEditTime: 2023-03-10 05:07:58
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -114,6 +114,7 @@ def getGuestCookie():  # 获取游客token
         x_guest_token = response['guest_token']
         headers['x-guest-token'] = x_guest_token
         setContext('headers', headers)
+        return True
     else:
         print(token_warning)
         input(exit_ask)
@@ -420,7 +421,7 @@ return {*} 解析出的目标数据(内含媒体url)
 def getResult(tweet):
     def getresult(result): return result if result['__typename'] == 'Tweet' else \
         (result['tweet'] if result['__typename'] == 'TweetWithVisibilityResults' else
-         (None if result['__typename'] == 'TweetTombstone' else None))
+         ({'errText': result['tombstone']['text']['text']} if result['__typename'] == 'TweetTombstone' else None))
     if 'entryId' not in tweet:
         return tweet
     if tweet['content']['entryType'] == 'TimelineTimelineItem':
@@ -441,8 +442,6 @@ def getResult(tweet):
         else:
             return None
     else:
-        print(parse_warning)
-        writeLog(f'unexpectTwt', json.dumps(tweet))
         return None
 
 
@@ -454,11 +453,17 @@ param {List} dataList 数据容器
 '''
 
 
-def getFollower(pageContent, dataList: list, cursor=None):
+def getFollower(pageContent, dataList: list):
+    cursor = None
+    if 'errors' in pageContent:
+        message = pageContent['errors'][0]['message']
+        print(apiErr_warning.format(message))
+        return None
     if 'user' in pageContent['data']:
         result = pageContent['data']['user']['result']
         if result['__typename'] == 'UserUnavailable':
-            return
+            print(user_unavailable_warning)
+            return None
         instructions = result['timeline']['timeline']['instructions']
         for instruction in instructions:
             if instruction['type'] == 'TimelineAddEntries':
@@ -466,12 +471,13 @@ def getFollower(pageContent, dataList: list, cursor=None):
                 if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-2] and 'cursor-bottom' in entries[-2]['entryId']:
                     # 翻页完成, 无内容, 两个fo接口的entries[-1]为cursor-top, [-2]为cursor-bottom
                     return None
+                for entry in entries:
+                    if 'entryId' in entry and 'user-' in entry['entryId']:
+                        dataList.append(entry['content']['itemContent']
+                                        ['user_results']['result']['legacy']['screen_name'])
                 cursor = entries[-2]['content']['value'] if len(
                     entries) != 0 else None
                 break
-    for entry in entries:
-        dataList.append(entry['content']['itemContent']
-                        ['user_results']['result']['legacy']['screen_name'])
     return cursor
 
 
@@ -486,12 +492,12 @@ param {bool} isfirst 是否为第一页
 def getTweet(pageContent, cursor=None, isfirst=False):
     if 'errors' in pageContent:
         message = pageContent['errors'][0]['message']
-        print(f'推文已删除/不存在：{message}')
+        print(apiErr_warning.format(message))
         return None, None
     elif 'globalObjects' in pageContent:  # 搜索接口
         entries = pageContent['globalObjects']['tweets'].values()
         if not entries and isfirst:
-            print('\r请获取cookie')
+            print(needCookie_warning)
         cursor = pageContent['timeline']['instructions'][0]['addEntries']['entries'][-1]['content']['operation']['cursor']['value'] \
             if len(entries) != 0 and pageContent['timeline']['instructions'][0]['addEntries']['entries'][-1]['entryId'] == 'sq-cursor-bottom' \
             else (pageContent['timeline']['instructions'][-1]['replaceEntry']['entry']['content']['operation']['cursor']['value']
@@ -557,6 +563,11 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
         vidList = []
         result = getResult(tweet)
         if not result:
+            print(parse_warning)
+            writeLog(f'{userName}_unexpectData', json.dumps(tweet))
+            continue
+        elif 'errText' in result:
+            print(dataErr_warning.format(result.get('errText')))
             continue
         # 转推
         if 'legacy' in result and 'retweeted_status_result' in result['legacy']:

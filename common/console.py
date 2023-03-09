@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-10 00:01:29
+LastEditTime: 2023-03-10 04:30:25
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -203,9 +203,7 @@ def retweetedStatus():  # 设置转推
 
 
 def startCrawl(urlList: List):
-    if not len(urlList):
-        return
-    if not getGuestCookie():
+    if not len(urlList) or not getGuestCookie():
         return
     dl_path = getContext('dl_path')
     if not os.path.exists(dl_path):
@@ -240,16 +238,19 @@ def urlHandler(url: str):
         func = url.split('/')[-1]
         userName = user_link[0]
         url = f'@{userName}'
+        userId = getUserId(userName)
+        if not userId:
+            return
         if func == 'media':
             # userMediaPage
             media = False  # 爬取媒体页, 筛除接口数据中的非媒体推文(覆盖全局配置)
         elif func == 'likes':
             # userLikesPage
-            UserLikesTask(userName, twtId, media).start()
+            UserLikesTask(userName, userId, media).start()
             return
         elif func == 'following':
             # userFollowingPage
-            UserFollowingTask(userName, twtId).start()
+            UserFollowingTask(userName, userId).start()
             return
 
     # searchPage
