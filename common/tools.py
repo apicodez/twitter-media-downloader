@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-09 23:14:21
+LastEditTime: 2023-03-09 23:58:10
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -86,7 +86,7 @@ def argsHandler():
         else:
             print(unexpectVar_arg_warning)
             return
-    setContext('media', args.media)
+    setContext('media', not args.media)
     setContext('quoted', not args.quoted)
     setContext('retweeted', not args.retweeted)
     saveEnv()
@@ -129,14 +129,17 @@ def getToken(cookie):  # 从cookie内提取csrf token
 
 
 def getSysProxy():
-    if isWinPlatform:  # 非win平台, 跳过
+    if not isWinPlatform:  # 非win平台, 跳过
         return
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                          r"SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings")
     proxy_enable, _ = winreg.QueryValueEx(key, "ProxyEnable")
     if proxy_enable:
         proxy_server, _ = winreg.QueryValueEx(key, "ProxyServer")
-        setContext('proxy', f'http://{proxy_server}')
+        if 'socks=' in proxy_server:
+            setContext('proxy', f'socks5//{proxy_server}')
+        else:
+            setContext('proxy', f'http://{proxy_server}')
 
 
 def setCookie(cookie=''):  # 设置cookie
@@ -385,7 +388,7 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue, media:
                     else:  # text
                         fileName = getContext('fileName').format(
                             userName=userName, twtId=twtId, date=date, time=time, type='text') + '.txt'
-                        if media and not isMediaTw:  # 过滤非媒体推文
+                        if not media and not isMediaTw:  # 过滤非媒体推文
                             done.put('done')
                         elif saveText(os.path.join(savePath, fileName), data):
                             done.put('done')
@@ -666,7 +669,7 @@ def checkUpdate():
         updateInfo['tagName'] = tagName
         updateInfo['name'] = name
     else:
-        print("当前版本已是最新")
+        print("当前版本已是最新\n")
 
     setContext('updateInfo', updateInfo)
     saveEnv()
@@ -680,7 +683,17 @@ description: 显示配置
 def showConfig():
     def bool2str(b):
         return '是' if b else '否'
-    print(config_info.format())
+    proxy = getContext('proxy') or '不使用'
+    quoted = bool2str(not getContext('quoted'))
+    retweeted = bool2str(not getContext('retweeted'))
+    media = bool2str(not getContext('media'))
+    cookie = bool2str(getContext('headers')['Cookie'])
+    concurrency = getContext('concurrency')
+    fileName = getContext('fileName')
+    dl_path = getContext('dl_path')
+    type = getContext('type')
+    print(config_info.format(proxy=proxy, retweeted=retweeted, media=media, cookie=cookie,
+          quoted=quoted, concurrency=concurrency, fileName=fileName, dl_path=dl_path, type=type))
 
 
 '''
@@ -721,8 +734,3 @@ def compare_version(version1=None, version2=None, split_flag="."):
     except:
         other_section_version2 = ""
     return compare_version(other_section_version1, other_section_version2)
-
-
-# 模块测试入口
-if __name__ == '__main__':
-    getSysProxy()

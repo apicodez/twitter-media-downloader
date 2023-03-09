@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-09 23:08:13
+LastEditTime: 2023-03-10 00:01:29
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -155,10 +155,10 @@ def mediaStatus():  # 设置非媒体
         if set == '0':
             break
         elif set == '1':
-            setContext('media', False)
+            setContext('media', True)
             break
         elif set == '2':
-            setContext('media', True)
+            setContext('media', False)
             break
         else:
             input(input_num_warning)
@@ -242,7 +242,7 @@ def urlHandler(url: str):
         url = f'@{userName}'
         if func == 'media':
             # userMediaPage
-            media = True
+            media = False  # 爬取媒体页, 筛除接口数据中的非媒体推文(覆盖全局配置)
         elif func == 'likes':
             # userLikesPage
             UserLikesTask(userName, twtId, media).start()

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-09 04:19:50
+LastEditTime: 2023-03-09 23:46:26
 LastEditors: mengzonefire
 Description: 存放全局常量
 '''
@@ -36,7 +36,7 @@ context = {
     'fileName': '{userName}-{twtId}-{time}_{date}-{type}',
     'quoted': True,
     'retweeted': True,
-    'media': False
+    'media': True  # 是否包含非媒体(纯文本)推文
 }
 
 

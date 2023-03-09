@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 15:48:35
-LastEditTime: 2023-03-09 22:39:05
+LastEditTime: 2023-03-09 23:31:12
 LastEditors: mengzonefire
 Description: 主函数入口
 '''
@@ -28,8 +28,9 @@ def main():
 
 
 def test():  # debug
-    with open('./sample/twt.json', 'r') as f:
-        print(getResult(json.loads(f.read())))
+    getSysProxy()
+    # with open('./sample/twt.json', 'r') as f:
+    #     print(getResult(json.loads(f.read())))
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-09 23:10:45
+LastEditTime: 2023-03-09 23:59:08
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -107,10 +107,10 @@ input_ask = \
     '1.设置cookie\n' \
     '2.设置网络代理\n' \
     '3.设置下载参数\n\n' \
-    '请输入命令或链接：'
+    '请输入：'
 exit_ask = '\n单击回车键退出程序\n'
 config_info = \
+    '当前配置: 线程数: {concurrency}, 已设置cookie: {cookie}, 代理设置: {proxy}\n' \
     '排除转推: {retweeted}, 排除引用: {quoted}, 排除非媒体: {media}, 爬取类型: {type}\n' \
-    '线程数: {concurrency}, 已设置cookie: {cookie}, 代理: {proxy}\n' \
-    '自定义文件名: {fileName}, 下载路径: {dl_path}'
+    '自定义文件名: {fileName}, 下载路径: {dl_path}\n'
 save_cfg_finsh = '以下参数保存到配置文件：{}'
