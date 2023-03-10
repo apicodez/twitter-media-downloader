@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-10 18:09:41
+LastEditTime: 2023-03-10 18:40:33
 LastEditors: mengzonefire
 Description: 存放全局常量
 '''
@@ -82,4 +82,4 @@ p_unexpect_var = re.compile(
 
 # http code text warning
 httpCodeText = {403: '本机IP已被推特服务器禁止访问, 请尝试更换代理节点',
-                401: '导入的cookie无效, 请重新获取并导入', 400: '无访问权限, 可能需要设置cookie'}
+                401: '导入的cookie无效, 请重新获取并导入', 400: '请求错误, 请前往issue页反馈'}
