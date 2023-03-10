@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-10 07:55:02
+LastEditTime: 2023-03-10 17:11:43
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -363,35 +363,35 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
             return
         if not datalist:
             return
-        userName = list(datalist.keys())[0]
         headers = getContext('headers')
-        with httpx.Client(proxies=getContext('proxy'), headers=headers, verify=False) as client:
-            for twtId, datalayer in datalist.get(userName).items():
-                date = datalayer.get('date').split(' ')
-                time, date = (date[-1], date[0])
-                for datatype, data in datalayer.get('dataList').items():
-                    if datatype in ['pic', 'gif', 'vid']:  # media
-                        count = 0
-                        for url in data:
-                            count += 1
-                            ori, ext = os.path.splitext(url.split('/')[-1])
-                            if datatype == 'pic':
-                                url += '?name=orig'  # add query '?name=orig' can get original pic file
+        for userName in datalist:
+            with httpx.Client(proxies=getContext('proxy'), headers=headers, verify=False) as client:
+                for twtId, datalayer in datalist.get(userName).items():
+                    date = datalayer.get('date').split(' ')
+                    time, date = (date[-1], date[0])
+                    for datatype, data in datalayer.get('dataList').items():
+                        if datatype in ['pic', 'gif', 'vid']:  # media
+                            count = 0
+                            for url in data:
+                                count += 1
+                                ori, ext = os.path.splitext(url.split('/')[-1])
+                                if datatype == 'pic':
+                                    url += '?name=orig'  # add query '?name=orig' can get original pic file
+                                fileName = getContext('fileName').format(
+                                    userName=userName, twtId=twtId, ori=ori, date=date, time=time, type=f'{datatype}{count}') + ext
+                                filePath = os.path.join(savePath, fileName)
+                                if os.path.exists(filePath) or os.path.exists(f'{filePath}.cache'):
+                                    continue
+                                elif downloader(client, url, filePath, fileName):
+                                    done.put('done')
+                        else:  # text
                             fileName = getContext('fileName').format(
-                                userName=userName, twtId=twtId, ori=ori, date=date, time=time, type=f'{datatype}{count}') + ext
+                                userName=userName, twtId=twtId, date=date, time=time, type='text') + '.txt'
                             filePath = os.path.join(savePath, fileName)
-                            if os.path.exists(filePath) or os.path.exists(f'{filePath}.cache'):
+                            if os.path.exists(filePath):
                                 continue
-                            elif downloader(client, url, filePath, fileName):
+                            elif saveText(filePath, data):
                                 done.put('done')
-                    else:  # text
-                        fileName = getContext('fileName').format(
-                            userName=userName, twtId=twtId, date=date, time=time, type='text') + '.txt'
-                        filePath = os.path.join(savePath, fileName)
-                        if os.path.exists(filePath):
-                            continue
-                        elif saveText(filePath, data):
-                            done.put('done')
 
 
 '''
@@ -574,19 +574,25 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                     else result['legacy']['retweeted_status_result']['result']
             else:
                 continue
-        legacylist = [[result['rest_id'] if 'rest_id' in result else result['id_str'],
-                       result['legacy'] if 'legacy' in result else result]]
+        twtId = result.get('rest_id') or result.get('id_str')
+        if not twtId:
+            raise KeyError('twtId获取失败')
+        _userName = result['core']['user_results']['result']['legacy']['screen_name']
+        legacy = result['legacy'] if 'legacy' in result else result
+        legacylist = [[_userName, twtId, legacy]]
         media_type = getContext('type').split('&')
         if getContext('quoted'):  # 包括引用，如 https://twitter.com/Liyu0109/status/1611734998402633728
             # 判断是否有引用，以及引用是否能查看，搜索接口的引用tweet直接在tweet_list里面，其他接口则嵌套在result里面
             if 'quoted_status_result' in result and 'legacy' in result['quoted_status_result']['result']:
-                legacylist.append([result['quoted_status_result']['result']
-                                  ['rest_id'], result['quoted_status_result']['result']['legacy']])
+                _userName = result['quoted_status_result']['result']['core']['user_results']['result']['legacy']['screen_name']
+                twtId = result['quoted_status_result']['result']['rest_id']
+                legacy = result['quoted_status_result']['result']['legacy']
+                legacylist.append([_userName, twtId, legacy])
         else:
             # 搜索接口的去除引用的方法是对比tweet的user_id_str是否等于userId,仅限@user等于from：user
             if 'quoted_status_id_str' in result and result['user_id_str'] != str(user_id):
                 continue
-        for twtId, legacy in legacylist:
+        for _userName, twtId, legacy in legacylist:
             picList = []
             gifList = []
             vidList = []
@@ -629,15 +635,17 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                         writeLog(f'{twtId}_unexpectType', json.dumps(media))
             twtId = str(twtId)
             isMediaTwt = len(picList) or len(gifList) or len(vidList)
-            twtDic[twtId] = {
+            if _userName not in twtDic:
+                twtDic[_userName] = {}
+            twtDic[_userName][twtId] = {
                 'dataList': {'pic': picList, 'gif': gifList, 'vid': vidList},
                 'date': time.strftime("%Y%m%d %H%M%S", time.strptime(legacy['created_at'], "%a %b %d %H:%M:%S +0000 %Y"))
             }
             # get twt text content,Ignore empty text,&非媒体推文过滤器
             if (legacy['full_text'] and 'full_text' in media_type) and (includeNonMedia or isMediaTwt):
-                twtDic[twtId]['dataList']['text'] = legacy['full_text']
+                twtDic[_userName][twtId]['dataList']['text'] = legacy['full_text']
                 total.put('add')
-    dataList.put({f'{userName}': dict(**twtDic)})
+    dataList.put(dict(**twtDic))
     return cursor, rest_id_list
 
 
@@ -708,7 +716,7 @@ def showConfig():
 
 
 '''
-description: 
+description:
 param {str} version1 版本号1
 param {str} version2 版本号2
 param {str} split_flag 版本号分隔符

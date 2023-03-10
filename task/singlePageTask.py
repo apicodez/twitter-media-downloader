@@ -1,13 +1,16 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-10 07:58:46
+LastEditTime: 2023-03-10 17:01:37
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
 
+import json
 import time
+import traceback
 import httpx
+from common.logger import writeLog
 
 from common.text import *
 from common.const import *
@@ -50,6 +53,19 @@ class SinglePageTask(Task):
             return
 
         self.pageContent = response.json()
-        parseData(self.pageContent, self.total, self.userName, self.dataList)
-        self.stopGetDataList()
-        return
+        try:
+            parseData(self.pageContent, self.total,
+                      self.userName, self.dataList)
+        except KeyError:
+            self.errFlag = True
+            print(parse_warning)
+            writeLog(f'{self.twtId}_unexpectData',
+                     f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
+        except Exception:
+            self.errFlag = True
+            print(crash_warning)
+            writeLog(f'{self.twtId}_crash',
+                     traceback.format_exc())  # debug
+        finally:
+            self.stopGetDataList()
+            return

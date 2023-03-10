@@ -4,9 +4,11 @@
 # @Author  : 178
 import time
 import json
+import traceback
 import httpx
 
 from common.const import *
+from common.logger import writeLog
 from common.text import *
 from common.tools import getHttpText, parseData
 from task.baseTask import Task
@@ -58,8 +60,20 @@ class UserSearchTask(Task):
                 self.stopGetDataList()
                 return
             self.pageContent = response.json()
-            cursor, rest_id_list = parseData(
-                self.pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor, self.media)
-            if not cursor:
-                self.stopGetDataList()
-                return
+            try:
+                cursor, rest_id_list = parseData(
+                    self.pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor, self.media)
+            except KeyError:
+                self.errFlag = True
+                print(parse_warning)
+                writeLog(f'{self.userName}_unexpectData',
+                         f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
+            except Exception:
+                self.errFlag = True
+                print(crash_warning)
+                writeLog(f'{self.userName}_crash',
+                         traceback.format_exc())  # debug
+            finally:
+                if self.errFlag or not cursor:
+                    self.stopGetDataList()
+                    return

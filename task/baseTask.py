@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-10 07:37:25
+LastEditTime: 2023-03-10 16:43:01
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -34,6 +34,7 @@ class Task(object):
         self.done = Queue()    # 已完成任务计数器
         self.dataList = Queue()  # 任务数据队列
         self.pageContent = None  # 接口元数据(用于debug)
+        self.errFlag = False
 
     @abstractmethod
     def getDataList(self):
@@ -82,7 +83,7 @@ class Task(object):
         if self.total.qsize():
             print(task_finish.format(self.done.qsize(), self.total.qsize(),
                                      round(time.perf_counter() - start, 1), self.savePath))
-        elif self.pageContent:
+        elif self.pageContent and not self.errFlag:
             print(dl_nothing_warning)
             writeLog(f'{self.twtId or self.userName}_noMedia',
                      json.dumps(self.pageContent))  # debug

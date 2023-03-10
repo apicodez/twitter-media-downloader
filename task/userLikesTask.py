@@ -1,15 +1,18 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-10 07:58:00
+LastEditTime: 2023-03-10 17:01:00
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
 
+import json
 import time
+import traceback
 import httpx
 
 from common.const import *
+from common.logger import writeLog
 from common.text import *
 from common.tools import getHttpText, parseData
 from task.baseTask import Task
@@ -54,8 +57,20 @@ class UserLikesTask(Task):
                 self.stopGetDataList()
                 return
             self.pageContent = response.json()
-            cursor, rest_id_list = parseData(
-                self.pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list, includeNonMedia=self.media)
-            if not cursor:
-                self.stopGetDataList()
-                return
+            try:
+                cursor, rest_id_list = parseData(
+                    self.pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list, includeNonMedia=self.media)
+            except KeyError:
+                self.errFlag = True
+                print(parse_warning)
+                writeLog(f'{self.userName}_unexpectData',
+                         f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
+            except Exception as _:
+                self.errFlag = True
+                print(crash_warning)
+                writeLog(f'{self.userName}_crash',
+                         traceback.format_exc())  # debug
+            finally:
+                if self.errFlag or not cursor:
+                    self.stopGetDataList()
+                    return

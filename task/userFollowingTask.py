@@ -1,13 +1,14 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 09:46:48
-LastEditTime: 2023-03-10 07:57:17
+LastEditTime: 2023-03-10 17:00:02
 LastEditors: mengzonefire
 Description: 关注列表爬取任务类
 '''
 
 import json
 import time
+import traceback
 import httpx
 
 from common.const import *
@@ -20,6 +21,7 @@ class UserFollowingTask():
     dataList = []
     stop = False
     pageContent = None
+    errFlag = False
 
     def __init__(self, userName: str, userId: int):
         self.userName = userName
@@ -52,9 +54,21 @@ class UserFollowingTask():
                                           response.status_code, getHttpText(response.status_code)))
                 return
             self.pageContent = response.json()
-            cursor = getFollower(self.pageContent, self.dataList)
-            if not cursor:
-                return
+            try:
+                cursor = getFollower(self.pageContent, self.dataList)
+            except KeyError:
+                self.errFlag = True
+                print(parse_warning)
+                writeLog(f'{self.userName}_fo_unexpectData',
+                         f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
+            except Exception:
+                self.errFlag = True
+                print(crash_warning)
+                writeLog(f'{self.userName}_crash',
+                         traceback.format_exc())  # debug
+            finally:
+                if self.errFlag or not cursor:
+                    return
 
     def saveDataList(self):
         if not os.path.exists(self.savePath):
