@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-10 17:01:00
+LastEditTime: 2023-03-10 18:33:01
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
@@ -25,9 +25,9 @@ class UserLikesTask(Task):
         self.userName = userName
         self.userId = userId
         self.media = media
-        self.savePath = '{}/{}'.format(getContext('dl_path'), userName)
+        self.savePath = os.path.join(getContext('dl_path'), userName, 'likes')
 
-    def getDataList(self, cursor='', rest_id_list=None):
+    def getDataList(self, cursor='', rest_id_list=[]):
         while True:
             if self.stop:
                 return

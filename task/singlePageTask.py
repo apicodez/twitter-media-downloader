@@ -33,7 +33,7 @@ class SinglePageTask(Task):
                 try:
                     response = client.get(singlePageApi, params={
                         'variables': singlePageApiPar.format(self.twtId),
-                        'features': singlePageApiPar2})
+                        'features': commonApiPar})
                     break
                 except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError):
                     if i >= 5:

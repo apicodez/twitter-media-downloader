@@ -38,7 +38,7 @@ class UserFollowingTask():
                     try:
                         response = client.get(userFollowingApi, params={
                             'variables': userFollowingApiPar.format(self.userId, twtCount, cursorPar),
-                            'features': commonApiPar})
+                            'features': userFollowingApiPar2})
                         break
                     except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
                         if i >= 5:

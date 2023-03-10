@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-10 17:11:43
+LastEditTime: 2023-03-10 18:26:52
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -374,7 +374,8 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
                             count = 0
                             for url in data:
                                 count += 1
-                                ori, ext = os.path.splitext(url.split('/')[-1])
+                                ori, ext = os.path.splitext(
+                                    url.split('?')[0].split('/')[-1])
                                 if datatype == 'pic':
                                     url += '?name=orig'  # add query '?name=orig' can get original pic file
                                 fileName = getContext('fileName').format(
