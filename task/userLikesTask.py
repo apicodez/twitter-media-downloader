@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-09 22:57:09
+LastEditTime: 2023-03-10 07:58:00
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
@@ -30,21 +30,21 @@ class UserLikesTask(Task):
                 return
             cursorPar = cursor and '"cursor":"{}",'.format(cursor)
             response = None
-            for i in range(1, 6):
-                try:
-                    with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+            with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+                for i in range(1, 6):
+                    try:
                         response = client.get(userLikesApi, params={
                             'variables': userLikesApiPar.format(self.userId, twtCount, cursorPar),
                             'features': commonApiPar})
-                    break
-                except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
-                    if i >= 5:
-                        print(network_error_warning)
-                        self.stopGetDataList()
-                        return
-                    else:
-                        print(timeout_warning.format(i))
-                time.sleep(1)
+                        break
+                    except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
+                        if i >= 5:
+                            print(network_error_warning)
+                            self.stopGetDataList()
+                            return
+                        else:
+                            print(timeout_warning.format(i))
+                            time.sleep(1)
             if not response:
                 self.stopGetDataList()
                 return
@@ -55,7 +55,7 @@ class UserLikesTask(Task):
                 return
             self.pageContent = response.json()
             cursor, rest_id_list = parseData(
-                self.pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list)
+                self.pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list, includeNonMedia=self.media)
             if not cursor:
                 self.stopGetDataList()
                 return

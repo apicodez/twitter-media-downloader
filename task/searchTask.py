@@ -23,7 +23,7 @@ class UserSearchTask(Task):
         self.media = media
         self.savePath = os.path.join(getContext('dl_path'), userName)
 
-    def getDataList(self, cursor='', rest_id_list=None):
+    def getDataList(self, cursor='', rest_id_list=[]):
         while True:
             if self.stop:
                 return
@@ -37,18 +37,18 @@ class UserSearchTask(Task):
             params = json.loads(
                 userSearchApiPar.format(q, twtCount, cursorPar))
             response = None
-            for i in range(1, 6):
-                try:
-                    with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+            with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+                for i in range(1, 6):
+                    try:
                         response = client.get(userSearchApi, params=params)
-                    break
-                except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
-                    if i >= 5:
-                        print(network_error_warning)
-                        return False
-                    else:
-                        print(timeout_warning.format(i))
-                time.sleep(1)
+                        break
+                    except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
+                        if i >= 5:
+                            print(network_error_warning)
+                            return False
+                        else:
+                            print(timeout_warning.format(i))
+                            time.sleep(1)
             if not response:
                 self.stopGetDataList()
                 return
@@ -59,7 +59,7 @@ class UserSearchTask(Task):
                 return
             self.pageContent = response.json()
             cursor, rest_id_list = parseData(
-                self.pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor)
+                self.pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor, self.media)
             if not cursor:
                 self.stopGetDataList()
                 return

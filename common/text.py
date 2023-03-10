@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-10 04:54:10
+LastEditTime: 2023-03-10 07:21:11
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -20,6 +20,7 @@ token_warning = f'\r提取失败: Guest Token获取失败, 请前往issue页反�
 parse_warning = f'\r解析失败, 跳过此数据, 请前往issue页反馈log文件:\n{issue_page}'
 apiErr_warning = '\r已删除/不存在/年龄限制(需要cookie), 错误信息: {}'
 dataErr_warning = '\r提取失败, 错误信息: {}'
+download_warning = '\r下载失败, 错误信息: {}'
 needCookie_warning = '\r提取失败, 请先设置cookie'
 http_warning = '\r提取失败{}: http访问异常, 状态码: {} -> {}'
 timeout_warning = '\r网络超时, 服务器未响应或断开链接, 正在重试...{}'
@@ -43,7 +44,7 @@ unexpectVar_input_warning = '\r存在错误的变量名, 请重新输入（回�
 input_num_warning = '请输入正确数字（回车继续）'
 
 # normal text
-task_finish = '\r文件下载任务已完成 {}/{}, 用时 {}s, 保存路径: {}'
+task_finish = '\r文件下载任务已完成 {}/{}, 用时 {}s, 保存路径: {}       '
 fo_Task_finish = '\r关注列表爬取任务已完成, 保存路径: {}'
 input_cookie_ask = \
     '请输入cookie, 单击回车确认(留空直接回车清除cookie)\n' \

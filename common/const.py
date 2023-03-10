@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-10 04:37:24
+LastEditTime: 2023-03-10 08:02:24
 LastEditors: mengzonefire
 Description: 存放全局常量
 '''
@@ -28,12 +28,12 @@ authorization = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4p
 context = {
     'proxy': None,
     'headers': {'authorization': authorization, 'Cookie': ''},
-    'dl_path': './twitter_media_download',
-    'log_path': './log',
+    'dl_path': 'twitter_media_download',
+    'log_path': 'log',
     'updateInfo': {'LastCheckDate': '', 'tagName': '', 'name': ''},
     'concurrency': 8,
     'type': 'photo&animated_gif&video&full_text',
-    'fileName': '{userName}-{twtId}-{time}_{date}-{type}',
+    'fileName': '{userName}-{twtId}-{date}_{time}-{type}',
     'quoted': True,
     'retweeted': True,
     'media': True  # 是否包含非媒体(纯文本)推文

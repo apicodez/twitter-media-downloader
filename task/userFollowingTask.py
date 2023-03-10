@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 09:46:48
-LastEditTime: 2023-03-10 04:57:41
+LastEditTime: 2023-03-10 07:57:17
 LastEditors: mengzonefire
 Description: 关注列表爬取任务类
 '''
@@ -24,26 +24,27 @@ class UserFollowingTask():
     def __init__(self, userName: str, userId: int):
         self.userName = userName
         self.userId = userId
-        self.savePath = os.path.join(getContext('dl_path'), userName)
+        self.savePath = os.path.join(
+            os.path.normpath(getContext('dl_path')), userName)
 
     def getDataList(self, cursor=''):
         while True:
             cursorPar = cursor and '"cursor":"{}",'.format(cursor)
             response = None
-            for i in range(1, 6):
-                try:
-                    with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+            with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+                for i in range(1, 6):
+                    try:
                         response = client.get(userFollowingApi, params={
                             'variables': userFollowingApiPar.format(self.userId, twtCount, cursorPar),
                             'features': commonApiPar})
-                    break
-                except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
-                    if i >= 5:
-                        print(network_error_warning)
-                        return
-                    else:
-                        print(timeout_warning.format(i))
-                time.sleep(1)
+                        break
+                    except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
+                        if i >= 5:
+                            print(network_error_warning)
+                            return
+                        else:
+                            print(timeout_warning.format(i))
+                            time.sleep(1)
             if not response:
                 return
             if response.status_code != httpx.codes.OK:

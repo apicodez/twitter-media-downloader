@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-09 22:56:51
+LastEditTime: 2023-03-10 07:58:46
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -25,21 +25,21 @@ class SinglePageTask(Task):
 
     def getDataList(self):
         response = None
-        for i in range(1, 6):
-            try:
-                with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+        with httpx.Client(proxies=getContext('proxy'), headers=getContext('headers'), verify=False) as client:
+            for i in range(1, 6):
+                try:
                     response = client.get(singlePageApi, params={
                         'variables': singlePageApiPar.format(self.twtId),
                         'features': singlePageApiPar2})
-                break
-            except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError):
-                if i >= 5:
-                    print(network_error_warning)
-                    self.stopGetDataList()
-                    return
-                else:
-                    print(timeout_warning.format(i))
-            time.sleep(1)
+                    break
+                except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError):
+                    if i >= 5:
+                        print(network_error_warning)
+                        self.stopGetDataList()
+                        return
+                    else:
+                        print(timeout_warning.format(i))
+                        time.sleep(1)
         if not response:
             self.stopGetDataList()
             return

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-09 23:05:33
+LastEditTime: 2023-03-10 07:37:25
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -62,6 +62,7 @@ class Task(object):
                     time.sleep(0.1)
 
     def start(self):
+        self.savePath = os.path.normpath(self.savePath)
         if not os.path.exists(self.savePath):
             os.makedirs(self.savePath)
         start = time.perf_counter()
@@ -72,7 +73,7 @@ class Task(object):
         with ThreadPoolExecutor(max_workers=getContext('concurrency')) as executor:
             for _ in range(getContext('concurrency')):
                 task = executor.submit(
-                    downloadFile, self.savePath, self.dataList, self.done, self.media)
+                    downloadFile, self.savePath, self.dataList, self.done)
                 self.tasks.add(task)
         wait(self.tasks)
         self.stop = True

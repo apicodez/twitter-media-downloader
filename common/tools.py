@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-10 05:07:58
+LastEditTime: 2023-03-10 07:55:02
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -40,13 +40,13 @@ def initalArgs():
     parser.add_argument('-p', '--proxy', dest='proxy', type=str,
                         help='support http&socks5, default use cfg file, input " " to clear')
     parser.add_argument('-d', '--dir', dest='dir',
-                        type=str, help='set download path, default: ./twitter_media_download or use cfg file')
+                        type=str, help='set download path, default: twitter_media_download/ or use cfg file')
     parser.add_argument('-n', '--num', dest='concurrency', type=int,
                         help='downloader concurrency, default: 8 or use cfg file')
     parser.add_argument('-t', '--type', dest='type', type=str,
                         help='desired media type, default: photo&animated_gif&video&full_text or use cfg file')
     parser.add_argument('-f', '--fileName', dest='fileName', type=str,
-                        help='output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}\ndefault: {userName}-{twtId}-{time}_{date}-{type} or use cfg file')
+                        help='output fileName, valid var: {userId},{twtId},{ori},{date},{time},{type}\ndefault: {userName}-{twtId}-{date}_{time}-{type} or use cfg file')
     parser.add_argument('-m', '--media', action="store_true", dest='media',
                         help='exclude non-media tweets')
     parser.add_argument('-q', '--quoted', action="store_true", dest='quoted',
@@ -109,7 +109,7 @@ def getGuestCookie():  # 获取游客token
                     return False
                 else:
                     print(timeout_warning.format(i))
-            time.sleep(1)
+                    time.sleep(1)
     if 'guest_token' in response:
         x_guest_token = response['guest_token']
         headers['x-guest-token'] = x_guest_token
@@ -294,7 +294,7 @@ def getUserId(userName: str) -> int | None:
                     return False
                 else:
                     print(timeout_warning.format(i))
-            time.sleep(1)
+                    time.sleep(1)
     if response.status_code != httpx.codes.OK:
         print(http_warning.format('getUserId',
                                   response.status_code, getHttpText(response.status_code)))
@@ -335,8 +335,9 @@ def downloader(client, url: str, filePath: str, fileName: str) -> bool:
                 return True
         except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError, httpx.RemoteProtocolError):
             # print(download_timeout_warning.format(fileName, '正在重试...', i))
-            pass
-        time.sleep(1)
+            time.sleep(1)
+        except Exception as e:
+            print(download_warning.format(e))
     print(download_timeout_warning.format(fileName, '失败次数过多...', ''))
     return False
 
@@ -349,8 +350,7 @@ param {queue} done 已完成队列
 '''
 
 
-def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue, media: bool):
-    isMediaTw = False
+def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
     while True:
         if dataList.qsize():
             break
@@ -374,24 +374,23 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue, media:
                         count = 0
                         for url in data:
                             count += 1
-                            isMediaTw = True
                             ori, ext = os.path.splitext(url.split('/')[-1])
                             if datatype == 'pic':
                                 url += '?name=orig'  # add query '?name=orig' can get original pic file
                             fileName = getContext('fileName').format(
                                 userName=userName, twtId=twtId, ori=ori, date=date, time=time, type=f'{datatype}{count}') + ext
                             filePath = os.path.join(savePath, fileName)
-                            if os.path.exists(filePath):
-                                done.put('done')
+                            if os.path.exists(filePath) or os.path.exists(f'{filePath}.cache'):
                                 continue
-                            if downloader(client, url, filePath, fileName):
+                            elif downloader(client, url, filePath, fileName):
                                 done.put('done')
                     else:  # text
                         fileName = getContext('fileName').format(
                             userName=userName, twtId=twtId, date=date, time=time, type='text') + '.txt'
-                        if not media and not isMediaTw:  # 过滤非媒体推文
-                            done.put('done')
-                        elif saveText(os.path.join(savePath, fileName), data):
+                        filePath = os.path.join(savePath, fileName)
+                        if os.path.exists(filePath):
+                            continue
+                        elif saveText(filePath, data):
                             done.put('done')
 
 
@@ -544,12 +543,13 @@ param {*} dataList 任务数据队列
 param {*} user_id 推主id
 param {*} rest_id_list 推文id列表
 param {*} cursor api翻页锚点参数
+param {*} includeNonMedia 是否包含非媒体(纯文本)推文
 dataList数据结构：
-[{'推主id': {'推文id':{'date':'日期(%Y-%m-%d %H:%M:%S)','dataList':{'数据类型':['下载链接'],'text':'文本内容'}}}}}}]
+[{'推主id': {'推文id':{'date':'日期(%Y%m%d %H%M%S)','dataList':{'数据类型':['下载链接'],'text':'文本内容'}}}}}}]
 '''
 
 
-def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list=[], cursor=''):
+def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list=[], cursor='', includeNonMedia=True):
     if cursor:
         tweet_list, cursor = getTweet(pageContent)
     else:
@@ -558,9 +558,6 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
         return cursor, rest_id_list
     twtDic = {}
     for tweet in tweet_list:
-        picList = []
-        gifList = []
-        vidList = []
         result = getResult(tweet)
         if not result:
             print(parse_warning)
@@ -590,6 +587,9 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
             if 'quoted_status_id_str' in result and result['user_id_str'] != str(user_id):
                 continue
         for twtId, legacy in legacylist:
+            picList = []
+            gifList = []
+            vidList = []
             if twtId in rest_id_list:
                 continue
             else:
@@ -600,6 +600,7 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                   # photo
                     if media['type'] == 'photo' and media['type'] in media_type:
                         # get {'url', url}, add query '?name=orig' can get original pic file
+                        url = media['media_url_https']
                         if url:
                             picList.append(url)
                             total.put('add')
@@ -627,17 +628,16 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
                         print(parse_warning)
                         writeLog(f'{twtId}_unexpectType', json.dumps(media))
             twtId = str(twtId)
+            isMediaTwt = len(picList) or len(gifList) or len(vidList)
             twtDic[twtId] = {
-                'pic': dict(**picList),
-                'gif': dict(**gifList),
-                'vid': dict(**vidList),
-                'date': time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(legacy['created_at'], "%a %b %d %H:%M:%S +0000 %Y"))
+                'dataList': {'pic': picList, 'gif': gifList, 'vid': vidList},
+                'date': time.strftime("%Y%m%d %H%M%S", time.strptime(legacy['created_at'], "%a %b %d %H:%M:%S +0000 %Y"))
             }
-            # get twt text content,Ignore empty text
-            if legacy['full_text'] and 'full_text' in media_type:
-                twtDic[twtId]['text'] = legacy['full_text']
+            # get twt text content,Ignore empty text,&非媒体推文过滤器
+            if (legacy['full_text'] and 'full_text' in media_type) and (includeNonMedia or isMediaTwt):
+                twtDic[twtId]['dataList']['text'] = legacy['full_text']
                 total.put('add')
-        dataList.put({f'{userName}': dict(**twtDic)})
+    dataList.put({f'{userName}': dict(**twtDic)})
     return cursor, rest_id_list
 
 
