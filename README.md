@@ -27,7 +27,7 @@
 1. 获取到的媒体文件默认下载到程序同目录下的 **twitter_media_download** 文件夹
 2. 设置年龄限制/锁定 的 推主/推文 必须设置 cookie 才能爬取, 设置完成后, cookie会保存到配置文件, 下次运行程序自动读取
 3. 默认下载文件名格式: **{推主 id}\_{推文 id}\_{服务器文件名}**, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
-   * 1.3.0改为**推主id-推文id-日期_时间-数据类型+序号** 例如 memidesuyo-1614977212545844224-20230213_114210-img1.jpg
+   * 1.3.0改为**推主id-推文id-日期_时间(UTC)-数据类型+序号** 例如 memidesuyo-1614977212545844224-20230213_114210-img1.jpg
    * 若需要旧版的格式, 请将自定义保存文件名设置为: {userName}\_{twtId}\_{ori}
 4. 默认使用系统代理, 无需配置 (仅 win 平台, 其余平台请手动设置), 支持http, socks5代理
 5. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
@@ -40,17 +40,15 @@
 
 * 若使用python3环境运行py代码，注意先安装依赖：
 
-    ```
-    pip install -r requirements.txt
-    ```
+  ```
+  pip install -r requirements.txt
+  ```
 
-  1. 直接运行程序:  
-  运行后根据提示输入 命令 或 推文/推主链接即可.
+  1. 交互模式:  
+      直接运行后根据提示输入 命令 或 链接即可.
       ```
       python twitter-media-downloader.py
       ```
-      <img src="https://pic.rmb.bdstatic.com/bjh/08934029f23df12817604a44d48fb01d.png">
-      
       示例：
        * 下载单条推文 ```https://<span></span>twitter.com/user/status/0000000000000000000```
        * 下载用户主页 ```https://<span></span>twitter.com/user```
@@ -58,7 +56,7 @@
        * 下载用户[搜索页](#搜索接口用法) ```@user```  
        * 下载用户[搜索页](#搜索接口用法)并指定日期 ```@user&2022-12-1|2022-12-10```  
        * 高级搜索， 包含#tag1和#tag2，并指定推文来自用户user ```@&advanced=(#tag1 AND #tag2) (from:user)```  
-         * 注：脚本搜索页默认不包含回复，如需爬取回复请使用高级搜索
+         * 注：脚本搜索页默认不包含回复，如需爬取回复请使用高级搜索 [详情](#搜索接口用法)
   2. 命令行调用:
       ```
         usage: twitter-media-downloader.py [-h] [-c COOKIE] [-p PROXY] [-d DIR] [-n CONCURRENCY] [-t TYPE] [-f FILENAME] [-m] [-q] [-r] [-v] [url ...]

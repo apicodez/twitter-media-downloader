@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-13 16:30:01
+LastEditTime: 2023-03-13 20:11:01
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -54,19 +54,4 @@ class SinglePageTask(Task):
             return
 
         self.pageContent = response.json()
-        try:
-            parseData(self.pageContent, self.total,
-                      self.userName, self.dataList, self.cfg)
-        except KeyError:
-            self.errFlag = True
-            print(parse_warning)
-            writeLog(f'{self.twtId}_unexpectData',
-                     f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
-        except Exception:
-            self.errFlag = True
-            print(crash_warning)
-            writeLog(f'{self.twtId}_crash',
-                     traceback.format_exc())  # debug
-        finally:
-            self.stopGetDataList()
-            return
+        self.parseData('', [])

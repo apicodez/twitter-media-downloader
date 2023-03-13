@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-13 16:27:53
+LastEditTime: 2023-03-13 19:00:29
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -72,7 +72,7 @@ set_fileName_ask = \
     '{userName} : 推主id\n' \
     '{twtId} : 推文id\n' \
     '{date} : 推文日期, 例如20230213\n' \
-    '{time} : 推文时间, 例如114210\n' \
+    '{time} : 推文时间(UTC), 例如114210\n' \
     '{type} : 数据类型+序号(1-4,文本没序号), 例如img1/vid1/gif1/text\n' \
     '{ori} : 服务器文件名(文本文件没有此项), 例如FAGkEkFVEAI8GSd\n' \
     '* 脚本没有重命名策略, 故{type}和{ori}请至少带上一个防止重名\n\n' \

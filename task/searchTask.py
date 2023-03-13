@@ -4,24 +4,21 @@
 # @Author  : 178
 import time
 import json
-import traceback
 import httpx
 
 from common.const import *
-from common.logger import writeLog
 from common.text import *
-from common.tools import getHttpText, parseData
+from common.tools import getHttpText
 from task.baseTask import Task
 
 
 class UserSearchTask(Task):
 
-    def __init__(self, userName, userId, date, advanced, cfg):
+    def __init__(self, userName, date, advanced, cfg):
         super(UserSearchTask, self).__init__()
         self.date = date
         self.advanced = advanced
         self.userName = userName
-        self.userId = userId
         self.cfg = cfg
         self.savePath = os.path.join(getContext('dl_path'), userName)
 
@@ -60,20 +57,5 @@ class UserSearchTask(Task):
                 self.stopGetDataList()
                 return
             self.pageContent = response.json()
-            try:
-                cursor, rest_id_list = parseData(
-                    self.pageContent, self.total, self.userName, self.dataList, self.cfg, self.userId, rest_id_list, cursor)
-            except KeyError:
-                self.errFlag = True
-                print(parse_warning)
-                writeLog(f'{self.userName}_unexpectData',
-                         f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
-            except Exception:
-                self.errFlag = True
-                print(crash_warning)
-                writeLog(f'{self.userName}_crash',
-                         traceback.format_exc())  # debug
-            finally:
-                if self.errFlag or not cursor:
-                    self.stopGetDataList()
-                    return
+            if self.parseData(cursor, rest_id_list):
+                break

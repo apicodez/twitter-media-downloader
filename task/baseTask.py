@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-13 16:23:15
+LastEditTime: 2023-03-13 20:09:00
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -13,10 +13,11 @@ import time
 import threading
 from queue import Queue
 from abc import abstractmethod
+import traceback
 from common.logger import writeLog
 from common.text import *
 from common.const import getContext
-from common.tools import downloadFile
+from common.tools import downloadFile, parseData
 from concurrent.futures import ThreadPoolExecutor, wait
 
 
@@ -39,6 +40,27 @@ class Task(object):
     @abstractmethod
     def getDataList(self):
         raise NotImplemented
+
+    def parseData(self, rest_id_list, cursor):
+        try:
+            cursor, rest_id_list = parseData(
+                self.pageContent, self.total, self.userName, self.dataList, self.cfg, rest_id_list, cursor)
+        except KeyError:
+            self.errFlag = True
+            print(parse_warning)
+            writeLog(f'{self.userName}_unexpectData',
+                     f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
+        except Exception:
+            self.errFlag = True
+            print(crash_warning)
+            writeLog(f'{self.userName}_crash',
+                     traceback.format_exc())  # debug
+        finally:
+            if self.errFlag or not cursor:
+                self.stopGetDataList()
+                return True  # 结束
+            else:
+                return False  # 未结束
 
     def stopGetDataList(self):
         for _ in range(getContext('concurrency')):

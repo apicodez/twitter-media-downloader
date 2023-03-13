@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-13 16:50:27
+LastEditTime: 2023-03-13 20:01:36
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -138,7 +138,7 @@ def getSysProxy():
     if proxy_enable:
         proxy_server, _ = winreg.QueryValueEx(key, "ProxyServer")
         if 'socks=' in proxy_server:
-            setContext('proxy', f'socks5//{proxy_server}')
+            setContext('proxy', f'socks5://{proxy_server}')
         else:
             setContext('proxy', f'http://{proxy_server}')
 
@@ -550,7 +550,7 @@ dataList数据结构：
 '''
 
 
-def parseData(pageContent, total, userName, dataList, cfg, user_id=None, rest_id_list=[], cursor=''):
+def parseData(pageContent, total, userName, dataList, cfg, rest_id_list, cursor):
     includeNonMedia = cfg['media']
     includeRetweeted = cfg['retweeted']
     includeQuoted = cfg['quoted']
@@ -561,6 +561,8 @@ def parseData(pageContent, total, userName, dataList, cfg, user_id=None, rest_id
     if not tweet_list:
         return cursor, rest_id_list
     twtDic = {}
+    userIdDic = pageContent['globalObjects']['users'] if 'globalObjects' in pageContent else {
+    }
     for tweet in tweet_list:
         result = getResult(tweet)
         if not result:
@@ -581,7 +583,8 @@ def parseData(pageContent, total, userName, dataList, cfg, user_id=None, rest_id
         twtId = result.get('rest_id') or result.get('id_str')
         if not twtId:
             raise KeyError('twtId获取失败')
-        _userName = result['core']['user_results']['result']['legacy']['screen_name']
+        _userName = result['core']['user_results']['result']['legacy'][
+            'screen_name'] if 'core' in result else userIdDic[result['user_id_str']]['screen_name']
         legacy = result['legacy'] if 'legacy' in result else result
         legacylist = [[_userName, twtId, legacy]]
         media_type = getContext('type').split('&')
@@ -593,8 +596,8 @@ def parseData(pageContent, total, userName, dataList, cfg, user_id=None, rest_id
                 legacy = result['quoted_status_result']['result']['legacy']
                 legacylist.append([_userName, twtId, legacy])
         else:
-            # 搜索接口的去除引用的方法是对比tweet的user_id_str是否等于userId,仅限@user等于from：user
-            if 'quoted_status_id_str' in result and result['user_id_str'] != str(user_id):
+            # 搜索接口, userName为空(@&advanced=)时忽略引用过滤
+            if 'quoted_status_id_str' in result and userName and userName != _userName:
                 continue
         for _userName, twtId, legacy in legacylist:
             picList = []

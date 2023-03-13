@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-13 16:46:11
+LastEditTime: 2023-03-13 20:11:32
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
@@ -57,20 +57,5 @@ class UserLikesTask(Task):
                 self.stopGetDataList()
                 return
             self.pageContent = response.json()
-            try:
-                cursor, rest_id_list = parseData(
-                    self.pageContent, self.total, self.userName, self.dataList, self.cfg, rest_id_list=rest_id_list)
-            except KeyError:
-                self.errFlag = True
-                print(parse_warning)
-                writeLog(f'{self.userName}_unexpectData',
-                         f'{traceback.format_exc()}\n\n{json.dumps(self.pageContent)}')  # debug
-            except Exception as _:
-                self.errFlag = True
-                print(crash_warning)
-                writeLog(f'{self.userName}_crash',
-                         traceback.format_exc())  # debug
-            finally:
-                if self.errFlag or not cursor:
-                    self.stopGetDataList()
-                    return
+            if self.parseData(cursor, rest_id_list):
+                break

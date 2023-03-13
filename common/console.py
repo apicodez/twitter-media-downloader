@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-13 16:48:09
+LastEditTime: 2023-03-13 18:45:03
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -274,9 +274,6 @@ def urlHandler(url: str):
             print(f'无法解析：{url}')
             return
         if userName:
-            userId = getUserId(userName)
-            if userId:
-                UserSearchTask(userName, userId, date, advanced, cfg).start()
+            UserSearchTask(userName, date, advanced, cfg).start()
         elif advanced:
-            userName = 'advanced_search'
-            UserSearchTask(userName, None, date, advanced, cfg).start()
+            UserSearchTask(userName, date, advanced, cfg).start()
