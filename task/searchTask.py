@@ -16,13 +16,13 @@ from task.baseTask import Task
 
 class UserSearchTask(Task):
 
-    def __init__(self, userName, userId, date, advanced, media):
+    def __init__(self, userName, userId, date, advanced, cfg):
         super(UserSearchTask, self).__init__()
         self.date = date
         self.advanced = advanced
         self.userName = userName
         self.userId = userId
-        self.media = media
+        self.cfg = cfg
         self.savePath = os.path.join(getContext('dl_path'), userName)
 
     def getDataList(self, cursor='', rest_id_list=[]):
@@ -62,7 +62,7 @@ class UserSearchTask(Task):
             self.pageContent = response.json()
             try:
                 cursor, rest_id_list = parseData(
-                    self.pageContent, self.total, self.userName, self.dataList, self.userId, rest_id_list, cursor, self.media)
+                    self.pageContent, self.total, self.userName, self.dataList, self.cfg, self.userId, rest_id_list, cursor)
             except KeyError:
                 self.errFlag = True
                 print(parse_warning)

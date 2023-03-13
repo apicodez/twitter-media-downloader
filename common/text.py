@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-10 07:21:11
+LastEditTime: 2023-03-13 16:27:53
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -37,7 +37,7 @@ network_error_warning = '\r网络连接失败, 请检查代理设置'
 input_warning = '\r链接或命令格式错误（回车继续）'
 check_update_warning = '\r检查更新失败, 程序继续运行, 失败信息:\n{}\n'
 need_cookie_warning = '\r目前访问推特的media列表接口需要登录账号, 故请先设置cookie再爬取'
-dl_nothing_warning = f'\r未解析到任何数据, 若上方没有其他报错, 可前往issue页反馈log文件:\n{issue_page}'
+dl_nothing_warning = f'\r未解析到任何数据, 若上方没有其他报错且未开启排除设置, 可前往issue页反馈log文件:\n{issue_page}'
 queue_empty_warning = '\r超过30秒未从任务队列中获取到数据'
 unexpectVar_arg_warning = '参数错误: 自定义文件名格式错误, 存在错误的变量名'
 unexpectVar_input_warning = '\r存在错误的变量名, 请重新输入（回车继续）'

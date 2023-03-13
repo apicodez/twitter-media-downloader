@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-10 18:26:52
+LastEditTime: 2023-03-13 16:50:27
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -544,13 +544,16 @@ param {*} dataList 任务数据队列
 param {*} user_id 推主id
 param {*} rest_id_list 推文id列表
 param {*} cursor api翻页锚点参数
-param {*} includeNonMedia 是否包含非媒体(纯文本)推文
+param {*} cfg 推文解析参数
 dataList数据结构：
-[{'推主id': {'推文id':{'date':'日期(%Y%m%d %H%M%S)','dataList':{'数据类型':['下载链接'],'text':'文本内容'}}}}}}]
+    [{'推主id': {'推文id':{'date':'日期(%Y%m%d %H%M%S)','dataList':{'数据类型':['下载链接'],'text':'文本内容'}}}}}}]
 '''
 
 
-def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list=[], cursor='', includeNonMedia=True):
+def parseData(pageContent, total, userName, dataList, cfg, user_id=None, rest_id_list=[], cursor=''):
+    includeNonMedia = cfg['media']
+    includeRetweeted = cfg['retweeted']
+    includeQuoted = cfg['quoted']
     if cursor:
         tweet_list, cursor = getTweet(pageContent)
     else:
@@ -569,7 +572,7 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
             continue
         # 转推
         if 'legacy' in result and 'retweeted_status_result' in result['legacy']:
-            if getContext('retweeted'):
+            if includeRetweeted:
                 result = result['legacy']['retweeted_status_result']['result']['tweet'] \
                     if 'tweet' in result['legacy']['retweeted_status_result']['result'] \
                     else result['legacy']['retweeted_status_result']['result']
@@ -582,7 +585,7 @@ def parseData(pageContent, total, userName, dataList, user_id=None, rest_id_list
         legacy = result['legacy'] if 'legacy' in result else result
         legacylist = [[_userName, twtId, legacy]]
         media_type = getContext('type').split('&')
-        if getContext('quoted'):  # 包括引用，如 https://twitter.com/Liyu0109/status/1611734998402633728
+        if includeQuoted:  # 包括引用，如 https://twitter.com/Liyu0109/status/1611734998402633728
             # 判断是否有引用，以及引用是否能查看，搜索接口的引用tweet直接在tweet_list里面，其他接口则嵌套在result里面
             if 'quoted_status_result' in result and 'legacy' in result['quoted_status_result']['result']:
                 _userName = result['quoted_status_result']['result']['core']['user_results']['result']['legacy']['screen_name']

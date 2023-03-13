@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-10 04:30:25
+LastEditTime: 2023-03-13 16:48:09
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -223,13 +223,15 @@ def urlChecker(url: str):
 
 
 def urlHandler(url: str):
-    media = getContext('media')
+    cfg = {'media': getContext('media'), 'quoted': getContext(
+        'quoted'), 'retweeted': getContext('retweeted')}
+
     # singlePage
     twt_link = p_twt_link.findall(url)
     if twt_link:
         userName = twt_link[0][0]
         twtId = int(twt_link[0][1])
-        SinglePageTask(userName, twtId).start()
+        SinglePageTask(userName, twtId, cfg).start()
         return
 
     user_link = p_user_link.findall(url)
@@ -237,16 +239,16 @@ def urlHandler(url: str):
         # userHomePage
         func = url.split('/')[-1]
         userName = user_link[0]
-        url = f'@{userName}'
         userId = getUserId(userName)
         if not userId:
             return
         if func == 'media':
             # userMediaPage
-            media = False  # 爬取媒体页, 筛除接口数据中的非媒体推文(覆盖全局配置)
+            url = f'@{userName}'
+            cfg['media'] = cfg['quoted'] = cfg['retweeted'] = False
         elif func == 'likes':
             # userLikesPage
-            UserLikesTask(userName, userId, media).start()
+            UserLikesTask(userName, userId, cfg).start()
             return
         elif func == 'following':
             # userFollowingPage
@@ -274,7 +276,7 @@ def urlHandler(url: str):
         if userName:
             userId = getUserId(userName)
             if userId:
-                UserSearchTask(userName, userId, date, advanced, media).start()
+                UserSearchTask(userName, userId, date, advanced, cfg).start()
         elif advanced:
             userName = 'advanced_search'
-            UserSearchTask(userName, None, date, advanced, media).start()
+            UserSearchTask(userName, None, date, advanced, cfg).start()

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-10 18:33:01
+LastEditTime: 2023-03-13 16:46:11
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
@@ -20,11 +20,11 @@ from task.baseTask import Task
 
 class UserLikesTask(Task):
 
-    def __init__(self, userName: str, userId: int, media: bool):
+    def __init__(self, userName: str, userId: int, cfg):
         super(UserLikesTask, self).__init__()
         self.userName = userName
         self.userId = userId
-        self.media = media
+        self.cfg = cfg
         self.savePath = os.path.join(getContext('dl_path'), userName, 'likes')
 
     def getDataList(self, cursor='', rest_id_list=[]):
@@ -59,7 +59,7 @@ class UserLikesTask(Task):
             self.pageContent = response.json()
             try:
                 cursor, rest_id_list = parseData(
-                    self.pageContent, self.total, self.userName, self.dataList, rest_id_list=rest_id_list, includeNonMedia=self.media)
+                    self.pageContent, self.total, self.userName, self.dataList, self.cfg, rest_id_list=rest_id_list)
             except KeyError:
                 self.errFlag = True
                 print(parse_warning)

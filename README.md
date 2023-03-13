@@ -15,7 +15,7 @@
 
 * 1.3.0版本已弃用主页接口和media接口(数据不全), 批量爬取全局使用搜索接口, 具体实现逻辑如下:
   *  twitter.com/user 转换为 @user
-  *  twitter.com/user/media 转换为 -m @user
+  *  twitter.com/user/media 转换为 -q -r -m @user
   *  twitter.com/user/likes 无法使用搜索接口实现, 使用like接口
 
 # donate 赞助

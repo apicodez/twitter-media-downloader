@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-10 16:43:01
+LastEditTime: 2023-03-13 16:23:15
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -28,7 +28,7 @@ class Task(object):
         self.savePath = ''   # 下载路径
         self.twtId = None  # 推文id(int)
         self.userId = None  # 推主rest_id(int)
-        self.media = False   # 爬取media页的时候会强制覆盖全局media配置，故在类成员内添加标记
+        self.cfg = {}   # 爬取media页的时候会强制覆盖全局配置参数，故在类成员内单独添加标记
         self.stop = False   # 进度条与生产者停止信号
         self.total = Queue()   # 任务总量计数器
         self.done = Queue()    # 已完成任务计数器

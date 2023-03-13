@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-10 17:01:37
+LastEditTime: 2023-03-13 16:30:01
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
@@ -20,10 +20,11 @@ from task.baseTask import Task
 
 class SinglePageTask(Task):
 
-    def __init__(self, userName: str, twtId: int):
+    def __init__(self, userName: str, twtId: int, cfg):
         super(SinglePageTask, self).__init__()
         self.twtId = twtId
         self.userName = userName
+        self.cfg = cfg
         self.savePath = os.path.join(getContext('dl_path'), userName)
 
     def getDataList(self):
@@ -55,7 +56,7 @@ class SinglePageTask(Task):
         self.pageContent = response.json()
         try:
             parseData(self.pageContent, self.total,
-                      self.userName, self.dataList)
+                      self.userName, self.dataList, self.cfg)
         except KeyError:
             self.errFlag = True
             print(parse_warning)
