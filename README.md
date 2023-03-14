@@ -20,15 +20,11 @@
 
 # tips 提示
 
-1. 获取到的媒体文件默认下载到程序同目录下的 **twitter_media_download** 文件夹
-2. 设置年龄限制/锁定 的 推主/推文 必须设置 cookie 才能爬取, 设置完成后, cookie会保存到配置文件, 下次运行程序自动读取
-3. 默认下载文件名格式: **{推主 id}\_{推文 id}\_{服务器文件名}**, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
+1. 默认下载文件名格式: **{推主 id}\_{推文 id}\_{服务器文件名}**, 例如 memidesuyo_1441613758988574723_FAGkEkFVEAI8GSd.jpg
    * 1.3.0改为**推主id-推文id-日期_时间(UTC)-数据类型+序号** 例如 memidesuyo-1614977212545844224-20230213_114210-img1.jpg
    * 若需要旧版的格式, 请将自定义保存文件名设置为: {userName}\_{twtId}\_{ori}
-4. 默认使用系统代理, 无需配置 (仅 win 平台, 其余平台请手动设置), 支持http, socks5代理
-5. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
-6. 若出现任何问题/提意见&需求, 请前往 [issue](https://github.com/mengzonefire/twitter-media-downloader/issues) 反馈
-7. 程序的配置文件路径:
+2. 爬取视频文件时, 会自动选择最高分辨率下载, 图片文件则自动选择原图画质
+3. 程序的配置文件路径:
     * linux: ~/tw_media_downloader.conf
     * win: %userprofile%/tw_media_downloader.conf
 

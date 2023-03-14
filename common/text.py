@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-13 19:00:29
+LastEditTime: 2023-03-15 01:02:42
 LastEditors: mengzonefire
 Description: 存放公用提示文本和链接
 '''
@@ -53,7 +53,7 @@ input_cookie_ask = \
 input_proxy_ask = \
     '请输入代理, 单击回车确认(留空直接回车为不使用代理), 格式:\n' \
     '[协议]://host:port 或 [协议]://user:pass@host:port [协议]为http或socks5\n' \
-    '请输入 (输入0返回,输入1获取系统代理)：'
+    '请输入 (输入0返回,1使用win系统代理)：'
 max_concurrency_ask = \
     '下载线程数过高会使下载变慢，请勿设置过大\n\n' \
     '0.返回\n\n' \
