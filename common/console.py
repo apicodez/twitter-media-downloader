@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:19
-LastEditTime: 2023-03-13 18:45:03
+LastEditTime: 2023-03-13 20:36:56
 LastEditors: mengzonefire
 Description: 命令行交互模块
 '''
@@ -13,7 +13,9 @@ from common.text import *
 from common.const import *
 from common.tools import getGuestCookie, getUserId, saveEnv, showConfig, setProxy, setCookie, clear
 from task.userFollowingTask import UserFollowingTask
+from task.userHomeTask import UserHomeTask
 from task.userLikesTask import UserLikesTask
+from task.userMediaTask import UserMediaTask
 
 
 def cmdMode(clearScreen=True):
@@ -236,7 +238,6 @@ def urlHandler(url: str):
 
     user_link = p_user_link.findall(url)
     if user_link:
-        # userHomePage
         func = url.split('/')[-1]
         userName = user_link[0]
         userId = getUserId(userName)
@@ -244,8 +245,8 @@ def urlHandler(url: str):
             return
         if func == 'media':
             # userMediaPage
-            url = f'@{userName}'
-            cfg['media'] = cfg['quoted'] = cfg['retweeted'] = False
+            UserMediaTask(userName, userId, cfg).start()
+            return
         elif func == 'likes':
             # userLikesPage
             UserLikesTask(userName, userId, cfg).start()
@@ -253,6 +254,10 @@ def urlHandler(url: str):
         elif func == 'following':
             # userFollowingPage
             UserFollowingTask(userName, userId).start()
+            return
+        else:
+            # userHomePage
+            UserHomeTask(userName, userId, cfg).start()
             return
 
     # searchPage

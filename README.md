@@ -13,11 +13,6 @@
 5. https://<span></span>twitter.com/\*\*\*/following (推主关注页, 爬取关注列表)
 6. @\*\*\* (用于搜索页爬取)
 
-* 1.3.0版本已弃用主页接口和media接口(数据不全), 批量爬取全局使用搜索接口, 具体实现逻辑如下:
-  *  twitter.com/user 转换为 @user
-  *  twitter.com/user/media 转换为 -q -r -m @user
-  *  twitter.com/user/likes 无法使用搜索接口实现, 使用like接口
-
 # donate 赞助
 
 若喜欢本项目, 欢迎前往 [爱发电](https://afdian.net/@mengzonefire) 支持作者
