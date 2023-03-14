@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-14 20:24:07
+LastEditTime: 2023-03-15 00:45:27
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -45,7 +45,7 @@ class Task(object):
         try:
             cursor, rest_id_list = parseData(
                 self.pageContent, self.total, self.userName, self.dataList, self.cfg, rest_id_list, cursor)
-        except KeyError:
+        except (KeyError, TypeError):
             self.errFlag = True
             print(parse_warning)
             writeLog(f'{self.userName}_unexpectData',
@@ -56,11 +56,11 @@ class Task(object):
             writeLog(f'{self.userName}_crash',
                      traceback.format_exc())  # debug
         finally:
-            if self.errFlag or not cursor:
+            if self.errFlag or not cursor:  # 结束
                 self.stopGetDataList()
-                return True  # 结束
-            else:
-                return False  # 未结束
+                return None, None
+            else:  # 继续
+                return cursor, rest_id_list
 
     def stopGetDataList(self):
         for _ in range(getContext('concurrency')):

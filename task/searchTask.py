@@ -57,5 +57,6 @@ class UserSearchTask(Task):
                 self.stopGetDataList()
                 return
             self.pageContent = response.json()
-            if self.parseData(cursor, rest_id_list):
+            cursor, rest_id_list = self.parseData(cursor, rest_id_list)
+            if not cursor:
                 break

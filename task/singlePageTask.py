@@ -1,20 +1,17 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:18:34
-LastEditTime: 2023-03-13 20:11:01
+LastEditTime: 2023-03-15 00:33:18
 LastEditors: mengzonefire
 Description: 单推文爬取任务类
 '''
 
-import json
 import time
-import traceback
 import httpx
-from common.logger import writeLog
 
 from common.text import *
 from common.const import *
-from common.tools import getHttpText, parseData
+from common.tools import getHttpText
 from task.baseTask import Task
 
 

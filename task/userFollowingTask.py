@@ -56,7 +56,7 @@ class UserFollowingTask():
             self.pageContent = response.json()
             try:
                 cursor = getFollower(self.pageContent, self.dataList)
-            except KeyError:
+            except (KeyError, TypeError):
                 self.errFlag = True
                 print(parse_warning)
                 writeLog(f'{self.userName}_fo_unexpectData',

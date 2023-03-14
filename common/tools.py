@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-13 20:01:36
+LastEditTime: 2023-03-15 00:51:19
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -469,7 +469,7 @@ def getFollower(pageContent, dataList: list):
             if instruction['type'] == 'TimelineAddEntries':
                 entries = instruction['entries']
                 if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-2] and 'cursor-bottom' in entries[-2]['entryId']:
-                    # 翻页完成, 无内容, 两个fo接口的entries[-1]为cursor-top, [-2]为cursor-bottom
+                    # 翻页完成, 两个follow接口的entries[-1]为cursor-top, [-2]为cursor-bottom (与推文的接口相反)
                     return None
                 for entry in entries:
                     if 'entryId' in entry and 'user-' in entry['entryId']:
@@ -495,7 +495,7 @@ def getTweet(pageContent, cursor=None, isfirst=False):
         print(apiErr_warning.format(message))
         return None, None
     elif 'globalObjects' in pageContent:  # 搜索接口
-        entries = pageContent['globalObjects']['tweets'].values()
+        entries = list(pageContent['globalObjects']['tweets'].values())
         if not entries and isfirst:
             print(needCookie_warning)
         cursor = pageContent['timeline']['instructions'][0]['addEntries']['entries'][-1]['content']['operation']['cursor']['value'] \
@@ -524,7 +524,7 @@ def getTweet(pageContent, cursor=None, isfirst=False):
         entries = pageContent['data']['threaded_conversation_with_injections_v2']['instructions'][0]['entries']
     # 搜索接口返回的entries不包括cursor
     if len(entries) == 0 or len(entries) == 2 and 'entryId' in entries[-1] and 'cursor-bottom' in entries[-1]['entryId']:
-        # 翻页完成, 无内容, 搜索/主页/媒体 接口的entries[-1]为cursor-bottom, [-2]为cursor-top
+        # 翻页完成
         return None, None
     tweets = []
     for tweet in entries:

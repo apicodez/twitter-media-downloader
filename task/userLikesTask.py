@@ -1,20 +1,17 @@
 '''
 Author: mengzonefire
 Date: 2023-03-01 13:58:17
-LastEditTime: 2023-03-13 20:11:32
+LastEditTime: 2023-03-15 00:33:39
 LastEditors: mengzonefire
 Description: likes页爬取任务类
 '''
 
-import json
 import time
-import traceback
 import httpx
 
-from common.const import *
-from common.logger import writeLog
 from common.text import *
-from common.tools import getHttpText, parseData
+from common.const import *
+from common.tools import getHttpText
 from task.baseTask import Task
 
 
@@ -57,5 +54,6 @@ class UserLikesTask(Task):
                 self.stopGetDataList()
                 return
             self.pageContent = response.json()
-            if self.parseData(cursor, rest_id_list):
+            cursor, rest_id_list = self.parseData(cursor, rest_id_list)
+            if not cursor:
                 break
