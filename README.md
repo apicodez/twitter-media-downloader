@@ -1,4 +1,5 @@
-* 此分支为dev, 仅用于开发, 未测试的功能不一定能用, 使用请下 [release](https://github.com/mengzonefire/twitter-media-downloader/releases) 里的
+* 此分支为dev, 仅用于开发, 可能存在各种问题, 需要稳定版请下 [release](https://github.com/mengzonefire/twitter-media-downloader/releases) 里的
+* 若使用dev分支出现问题欢迎反馈, 可以缩短我的测试流程
 
 # twitter-media-downloader 推特媒体文件下载工具
 
