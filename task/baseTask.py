@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-24 21:04:29
-LastEditTime: 2023-03-13 20:09:00
+LastEditTime: 2023-03-14 20:24:07
 LastEditors: mengzonefire
 Description: 任务类基类
 '''
@@ -41,7 +41,7 @@ class Task(object):
     def getDataList(self):
         raise NotImplemented
 
-    def parseData(self, rest_id_list, cursor):
+    def parseData(self, cursor, rest_id_list):
         try:
             cursor, rest_id_list = parseData(
                 self.pageContent, self.total, self.userName, self.dataList, self.cfg, rest_id_list, cursor)

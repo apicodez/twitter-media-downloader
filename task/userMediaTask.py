@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:19:02
-LastEditTime: 2023-03-14 18:21:45
+LastEditTime: 2023-03-14 20:19:49
 LastEditors: mengzonefire
 Description: 推主推文批量爬取任务类
 '''
@@ -23,7 +23,7 @@ class UserMediaTask(Task):
         self.cfg = cfg
         self.savePath = '{}/{}'.format(getContext('dl_path'), userName)
 
-    def getDataList(self, cursor='', rest_id_list=None):
+    def getDataList(self, cursor='', rest_id_list=[]):
         while True:
             if self.stop:
                 return
