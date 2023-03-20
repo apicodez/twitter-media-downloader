@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-14 18:20:34
+LastEditTime: 2023-03-20 18:54:57
 LastEditors: mengzonefire
 Description: 存放全局常量
 '''
@@ -82,7 +82,7 @@ p_user_link = re.compile(
     r'https://twitter.com/([^/]+?)(?:/media|/likes|/following)?$')
 p_twt_link = re.compile(r'https://twitter.com/(.+?)/status/(\d+)')
 p_unexpect_var = re.compile(
-    r'\{(?!(userName)|(twtId)|(time)|(date)|(type))([^}]+?)?\}')
+    r'\{(?!(userName)|(twtId)|(time)|(date)|(type)|(ori))([^}]+?)?\}')
 
 # http code text warning
 httpCodeText = {403: '本机IP已被推特服务器禁止访问, 请尝试更换代理节点',
