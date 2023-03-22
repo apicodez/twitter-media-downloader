@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-15 00:51:19
+LastEditTime: 2023-03-22 12:29:55
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -213,7 +213,7 @@ def setProxy(proxy=''):
 
 
 '''
-description: 保存配置到本地
+description: 保存配置到本地, 注意key字段会自动处理为小写, 请勿使用含大写字母的key
 '''
 
 
@@ -226,7 +226,7 @@ def saveEnv():
     conf.set("global", "updateinfo", getContext("updateInfo"))
     conf.set("global", "concurrency", getContext("concurrency"))
     conf.set("global", "type", getContext("type"))
-    conf.set("global", "fileName", getContext("fileName"))
+    conf.set("global", "filename", getContext("fileName"))
     conf.set("global", "quoted", getContext("quoted"))
     conf.set("global", "retweeted", getContext("retweeted"))
     conf.set("global", "media", getContext("media"))
@@ -261,7 +261,7 @@ def getEnv():
                     setContext('concurrency', int(item[1]))
                 elif item[0] == 'type' and item[1]:
                     setContext('type', item[1])
-                elif item[0] == 'fileName' and item[1]:
+                elif item[0] == 'filename' and item[1]:
                     setContext('fileName', item[1])
                 elif item[0] == 'media' and item[1]:
                     setContext('media', eval(item[1]))
