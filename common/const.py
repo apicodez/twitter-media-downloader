@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2023-01-15 23:14:36
-LastEditTime: 2023-03-20 18:54:57
+LastEditTime: 2023-04-02 18:03:27
 LastEditors: mengzonefire
 Description: 存放全局常量
 '''
@@ -9,7 +9,7 @@ Description: 存放全局常量
 import re
 import os
 import configparser
-version = '1.3.0'
+version = '1.3.1'
 
 # const
 twtCount = 100  # 列表api的count参数

@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-03-22 12:29:55
+LastEditTime: 2023-04-02 17:56:22
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -9,6 +9,7 @@ import json
 import sys
 import time
 import queue
+import traceback
 import httpx
 import argparse
 from common.text import *
@@ -364,35 +365,38 @@ def downloadFile(savePath: str, dataList: queue.Queue, done: queue.Queue):
         if not datalist:
             return
         headers = getContext('headers')
-        for userName in datalist:
+        try:
             with httpx.Client(proxies=getContext('proxy'), headers=headers, verify=False) as client:
-                for twtId, datalayer in datalist.get(userName).items():
-                    date = datalayer.get('date').split(' ')
-                    time, date = (date[-1], date[0])
-                    for datatype, data in datalayer.get('dataList').items():
-                        if datatype in ['pic', 'gif', 'vid']:  # media
-                            count = 0
-                            for url in data:
-                                count += 1
-                                ori, ext = os.path.splitext(
-                                    url.split('?')[0].split('/')[-1])
-                                if datatype == 'pic':
-                                    url += '?name=orig'  # add query '?name=orig' can get original pic file
+                for userName in datalist:
+                    for twtId, datalayer in datalist.get(userName).items():
+                        date = datalayer.get('date').split(' ')
+                        time, date = (date[-1], date[0])
+                        for datatype, data in datalayer.get('dataList').items():
+                            if datatype in ['pic', 'gif', 'vid']:  # media
+                                count = 0
+                                for url in data:
+                                    count += 1
+                                    ori, ext = os.path.splitext(
+                                        url.split('?')[0].split('/')[-1])
+                                    if datatype == 'pic':
+                                        url += '?name=orig'  # add query '?name=orig' can get original pic file
+                                    fileName = getContext('fileName').format(
+                                        userName=userName, twtId=twtId, ori=ori, date=date, time=time, type=f'{datatype}{count}') + ext
+                                    filePath = os.path.join(savePath, fileName)
+                                    if os.path.exists(filePath) or os.path.exists(f'{filePath}.cache'):
+                                        continue
+                                    elif downloader(client, url, filePath, fileName):
+                                        done.put('done')
+                            else:  # text
                                 fileName = getContext('fileName').format(
-                                    userName=userName, twtId=twtId, ori=ori, date=date, time=time, type=f'{datatype}{count}') + ext
+                                    userName=userName, twtId=twtId, date=date, time=time, type='text', ori='') + '.txt'
                                 filePath = os.path.join(savePath, fileName)
-                                if os.path.exists(filePath) or os.path.exists(f'{filePath}.cache'):
+                                if os.path.exists(filePath):
                                     continue
-                                elif downloader(client, url, filePath, fileName):
+                                elif saveText(filePath, data):
                                     done.put('done')
-                        else:  # text
-                            fileName = getContext('fileName').format(
-                                userName=userName, twtId=twtId, date=date, time=time, type='text') + '.txt'
-                            filePath = os.path.join(savePath, fileName)
-                            if os.path.exists(filePath):
-                                continue
-                            elif saveText(filePath, data):
-                                done.put('done')
+        except Exception:
+            print(download_warning.format(traceback.format_exc()))
 
 
 '''
