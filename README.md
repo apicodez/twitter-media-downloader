@@ -104,7 +104,7 @@
   pip install -r requirements.txt
   pyinstaller -F twitter-media-downloader.py
   ```
-输出路径: ./build
+输出路径: ./dist
 
 # api_关于接口
 目前有5个不同的下载接口，分别是单条推文、用户主页、用户媒体页、搜索页、喜爱页。
