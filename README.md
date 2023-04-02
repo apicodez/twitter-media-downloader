@@ -98,6 +98,14 @@
    8. 高级搜索： 前往 [推特高级搜索页](https://twitter.com/search-advanced?f=live) 填写并搜索，然后复制搜索框内容，将内容粘贴至 `@&advanced=` 后面
    9. 关于高级搜索的tag：推特默认使用 `#taga OR #tagb` 意为包含taga或者包含tagb，但是可以手动修改为 `#taga AND #tagb` ，意为含taga并且包含tagb
 
+# build 编译
+执行如下命令生成 **当前平台**的可执行文件(可免python环境运行)：
+  ```
+  pip install -r requirements.txt
+  pyinstaller -F twitter-media-downloader.py
+  ```
+输出路径: ./build
+
 # api_关于接口
 目前有5个不同的下载接口，分别是单条推文、用户主页、用户媒体页、搜索页、喜爱页。
 
