@@ -1,7 +1,7 @@
 '''
 Author: mengzonefire
 Date: 2021-09-21 09:20:04
-LastEditTime: 2023-04-02 17:56:22
+LastEditTime: 2023-04-10 14:12:30
 LastEditors: mengzonefire
 Description: 工具模块, 快1k行了, 抽空分模块拆分一下
 '''
@@ -432,17 +432,21 @@ def getResult(tweet):
         # SelfThread -> singlePageTask
         if 'tweetDisplayType' in tweet['content']['itemContent'] and \
                 tweet['content']['itemContent']['tweetDisplayType'] in ['Tweet', 'SelfThread']:
-            result = getresult(
-                tweet['content']['itemContent']['tweet_results']['result'])
-            return result
+            result = tweet['content']['itemContent']['tweet_results']
+            if 'result' in result:
+                return getresult(result['result'])
+            else:
+                return None
         else:
             return None
     elif tweet['content']['entryType'] == 'TimelineTimelineModule':
         if 'tweetDisplayType' in tweet['content'] and \
                 tweet['content']['tweetDisplayType'] == 'VerticalConversation':
-            result = getresult(tweet['content']['items']
-                               [-1]['item']['tweet_results']['result'])
-            return result
+            result = tweet['content']['items'][-1]['item']['tweet_results']
+            if 'result' in result:
+                return getresult(result['result'])
+            else:
+                return None
         else:
             return None
     else:
@@ -571,7 +575,8 @@ def parseData(pageContent, total, userName, dataList, cfg, rest_id_list, cursor)
         result = getResult(tweet)
         if not result:
             print(parse_warning)
-            writeLog(f'{userName}_unexpectData', json.dumps(tweet))
+            writeLog(f'{userName}_unexpectData',
+                     f'{traceback.format_exc()}\n\n{json.dumps(tweet)}')
             continue
         elif 'errText' in result:
             print(dataErr_warning.format(result.get('errText')))
